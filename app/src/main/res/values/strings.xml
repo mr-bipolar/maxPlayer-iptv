@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MaxPlayer</string>
+
+    <!-- Bottom nav -->
+    <string name="nav_home">Home</string>
+    <string name="nav_playlists">Playlists</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_history">History</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Home — empty -->
+    <string name="empty_no_playlists_title">No playlists yet</string>
+    <string name="empty_no_playlists_sub">Add your first playlist to start watching.</string>
+    <string name="btn_add_playlist">Add playlist</string>
+    <string name="btn_how_to_add">How to add a playlist</string>
+    <string name="btn_play_video_url">Play a video URL</string>
+    <string name="btn_play_audio_stream">Play an audio stream</string>
+
+    <!-- Home — filled -->
+    <string name="section_my_playlists">My playlists</string>
+    <string name="playlist_world_live_tv">World Live TV</string>
+    <string name="playlist_world_live_tv_sub">2,340 channels · opened today</string>
+    <string name="playlist_sports_feed">Sports Feed EU</string>
+    <string name="playlist_sports_feed_sub">186 channels · 2 days ago</string>
+    <string name="playlist_family_mix">Family Home Mix</string>
+    <string name="playlist_family_mix_sub">54 channels · 1 week ago</string>
+    <string name="playlist_radio_stations">Radio Stations</string>
+    <string name="playlist_radio_stations_sub">312 stations · 3 weeks ago</string>
+    <string name="now_playing_bbc">BBC News HD</string>
+    <string name="now_playing_bbc_sub">Live · World Live TV</string>
+
+    <!-- Favorites / History -->
+    <string name="title_favorites">Favorites</string>
+    <string name="tab_favorites">Favorites</string>
+    <string name="tab_history">History</string>
+    <string name="group_channels">Channels</string>
+    <string name="group_playlists">Playlists</string>
+    <string name="group_streams">Streams</string>
+    <string name="fav_bbc_news">BBC News HD</string>
+    <string name="fav_bbc_news_cat">News · World Live TV</string>
+    <string name="fav_sky_sports">Sky Sports Main</string>
+    <string name="fav_sky_sports_cat">Sports · Sports Feed EU</string>
+    <string name="fav_world_live_tv">World Live TV</string>
+    <string name="fav_world_live_tv_cat">2,340 channels</string>
+    <string name="fav_chillhop">Chillhop Radio</string>
+    <string name="fav_chillhop_cat">Internet radio</string>
+
+    <!-- Add playlist -->
+    <string name="title_add_playlist">Add playlist</string>
+    <string name="source_folder_title">Folder</string>
+    <string name="source_folder_desc">Scan a folder for playlist files</string>
+    <string name="source_file_title">File</string>
+    <string name="source_file_desc">Select an M3U / M3U8 playlist file</string>
+    <string name="source_url_title">Playlist URL</string>
+    <string name="source_url_desc">Add an online M3U / M3U8 playlist</string>
+    <string name="source_video_title">Video URL</string>
+    <string name="source_video_desc">Play a single video stream</string>
+    <string name="source_audio_title">Audio stream</string>
+    <string name="source_audio_desc">Listen to an internet radio stream</string>
+
+    <!-- Playlist URL -->
+    <string name="title_add_playlist_url">Add playlist URL</string>
+    <string name="label_playlist_url">Playlist URL</string>
+    <string name="hint_playlist_url">https://example.com/playlist.m3u8</string>
+    <string name="label_playlist_name_optional">Playlist name (optional)</string>
+    <string name="hint_playlist_name">e.g. World Live TV</string>
+    <string name="label_states">STATES</string>
+    <string name="state_parsing">Parsing playlist…</string>
+    <string name="result_playlist_added">Playlist added</string>
+    <string name="stat_channels">Channels</string>
+    <string name="stat_categories">Categories</string>
+    <string name="btn_open_playlist">Open playlist</string>
+    <string name="error_parse_playlist">Couldn\'t parse this playlist. Check the URL and your connection, then try again.</string>
+
+    <!-- Video URL -->
+    <string name="title_play_video_url">Play video URL</string>
+    <string name="label_video_url">Video or stream URL</string>
+    <string name="hint_url_generic">https://</string>
+    <string name="label_name_optional">Name (optional)</string>
+    <string name="hint_name_conference">e.g. Conference feed</string>
+    <string name="btn_play">Play</string>
+    <string name="section_recent_urls">Recent URLs</string>
+    <string name="recent_conference_feed">Conference feed</string>
+    <string name="recent_conference_feed_url">rtmp://stream.example.com/live</string>
+    <string name="recent_test_hls">Test HLS stream</string>
+    <string name="recent_test_hls_url">https://cdn.example.com/index.m3u8</string>
+    <string name="recent_backyard_camera">Backyard camera</string>
+    <string name="recent_backyard_camera_url">https://192.168.1.20:8080/stream</string>
+
+    <!-- Gallery -->
+    <string name="hint_search_channels">Search channels, categories…</string>
+    <string name="toggle_gallery">Gallery</string>
+    <string name="toggle_list">List</string>
+    <string name="label_filter">Filter</string>
+    <string name="label_sort">Sort</string>
+    <string name="section_categories">Categories</string>
+    <string name="cat_live_tv">Live TV</string>
+    <string name="cat_live_tv_count">612 channels</string>
+    <string name="cat_sports">Sports</string>
+    <string name="cat_sports_count">186 channels</string>
+    <string name="cat_news">News</string>
+    <string name="cat_news_count">94 channels</string>
+    <string name="cat_movies">Movies</string>
+    <string name="cat_movies_count">340 channels</string>
+    <string name="cat_kids">Kids</string>
+    <string name="cat_kids_count">58 channels</string>
+    <string name="cat_radio">Radio</string>
+    <string name="cat_radio_count">312 stations</string>
+
+    <!-- Channel list -->
+    <string name="hint_search_in_sports">Search in Sports…</string>
+    <string name="chip_all">All</string>
+    <string name="chip_football">Football</string>
+    <string name="chip_basketball">Basketball</string>
+    <string name="chip_motorsport">Motorsport</string>
+    <string name="label_channel_count">186 channels</string>
+    <string name="channel_sky_sports_main">Sky Sports Main Event</string>
+    <string name="channel_espn">ESPN HD</string>
+    <string name="channel_eurosport">Eurosport 1</string>
+    <string name="channel_dazn">DAZN 1</string>
+    <string name="label_sports">Sports</string>
+    <string name="section_continue_watching">Continue watching</string>
+
+    <!-- Player — live -->
+    <string name="badge_live">LIVE</string>
+    <string name="player_channel_name">Sky Sports Main Event</string>
+    <string name="player_channel_sub">World Live TV · Sports</string>
+    <string name="player_buffer">Buffer 8s</string>
+    <string name="player_ctl_audio">Audio</string>
+    <string name="player_ctl_subtitles">Subtitles</string>
+    <string name="player_ctl_speed">Speed</string>
+    <string name="player_ctl_aspect">Aspect</string>
+    <string name="player_ctl_channels">Channels</string>
+    <string name="player_ctl_fullscreen">Full screen</string>
+
+    <!-- Player — drawer -->
+    <string name="drawer_header">Sports · 186 channels</string>
+    <string name="chip_favorites">Favorites</string>
+    <string name="drawer_bt_sport">BT Sport 2</string>
+    <string name="drawer_bein_sports">beIN Sports</string>
+
+    <!-- Player — error -->
+    <string name="error_title">Unable to play this stream</string>
+    <string name="btn_retry">Retry</string>
+    <string name="btn_other_channels">Other channels</string>
+    <string name="btn_copy_url">Copy URL</string>
+    <string name="btn_stream_info">Stream information</string>
+
+    <!-- Audio player -->
+    <string name="label_playing_from">PLAYING FROM RADIO STATIONS</string>
+    <string name="audio_station_name">Chillhop Radio</string>
+    <string name="audio_station_sub">Lofi beats to relax / study to</string>
+    <string name="audio_status_playing">Playing</string>
+    <string name="audio_format">MP3 · 128 kbps</string>
+    <string name="audio_buffer_note">Buffering smooth</string>
+
+    <!-- Settings -->
+    <string name="title_settings">Settings</string>
+    <string name="settings_section_playback">PLAYBACK</string>
+    <string name="settings_section_subtitles_audio">SUBTITLES &amp; AUDIO</string>
+    <string name="settings_section_interface">INTERFACE</string>
+    <string name="settings_section_playlists">PLAYLISTS</string>
+    <string name="settings_section_about">ABOUT</string>
+    <string name="settings_decoding">Decoding</string>
+    <string name="settings_decoding_value">Hardware</string>
+    <string name="settings_aspect_ratio">Default aspect ratio</string>
+    <string name="settings_aspect_ratio_value">Fit screen</string>
+    <string name="settings_autoplay">Auto-play</string>
+    <string name="settings_remember_channel">Remember last channel</string>
+    <string name="settings_subtitle_size">Subtitle size</string>
+    <string name="settings_subtitle_size_value">Medium</string>
+    <string name="settings_volume_norm">Volume normalization</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_value">Dark</string>
+    <string name="settings_default_view">Default browse view</string>
+    <string name="settings_default_view_value">Grid</string>
+    <string name="settings_auto_refresh">Auto refresh</string>
+    <string name="settings_clear_cache">Clear cache</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_version_value">2.4.0</string>
+    <string name="settings_help">Help</string>
+
+
+    <!-- Player error description -->
+    <string name="error_desc">The connection was lost. Check your network or try another channel.</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_search">Search</string>
+    <string name="cd_settings">Settings</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_more">More options</string>
+    <string name="cd_favorite">Favorite</string>
+    <string name="cd_close">Close</string>
+    <string name="cd_pause">Pause</string>
+    <string name="cd_play">Play</string>
+    <string name="cd_expand">Expand</string>
+    <string name="cd_add">Add</string>
+    <string name="cd_previous">Previous</string>
+    <string name="cd_next">Next</string>
+    <string name="cd_stop">Stop</string>
+    <string name="cd_sort">Sort</string>
+
+    <!-- Misc -->
+    <string name="label_all_caps_live">LIVE</string>
+
+    <string name="audio_meta_separator">·</string>
+    <string name="toggle_grid">Grid</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>

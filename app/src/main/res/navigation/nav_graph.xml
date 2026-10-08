@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navHome">
+
+    <!-- 1. Home Destination -->
+    <fragment
+        android:id="@+id/navHome"
+        android:name="com.aaronmaxlab.maxplayer.navigates.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home" />
+
+    <!-- 2. Playlists Destination -->
+    <fragment
+        android:id="@+id/navPlaylists"
+        android:name="com.aaronmaxlab.maxplayer.navigates.PlaylistsFragment"
+        android:label="Playlists"
+        tools:layout="@layout/fragment_playlists" />
+
+    <!-- 3. Favorites Destination -->
+    <fragment
+        android:id="@+id/navFavorites"
+        android:name="com.aaronmaxlab.maxplayer.navigates.FavoritesFragment"
+        android:label="Favorites"
+        tools:layout="@layout/fragment_favorites" />
+
+    <!-- 4. History Destination -->
+    <fragment
+        android:id="@+id/navHistory"
+        android:name="com.aaronmaxlab.maxplayer.navigates.HistoryFragment"
+        android:label="History"
+        tools:layout="@layout/fragment_history" />
+
+    <!-- 5. Settings Destination -->
+    <fragment
+        android:id="@+id/navSettings"
+        android:name="com.aaronmaxlab.maxplayer.navigates.SettingsFragment"
+        android:label="Settings"
+        tools:layout="@layout/fragment_settings" />
+
+</navigation>

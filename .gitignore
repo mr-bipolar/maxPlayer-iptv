@@ -1,0 +1,35 @@
+# Built application files / outputs
+*.apk
+*.aar
+*.ap_
+*.aab
+
+# Files for the Kotlin engine
+*.bin
+
+# Metaprogramming output
+.kotlin
+
+# Local configuration file (sdk path, passwords, local keys)
+local.properties
+
+# Log Files
+*.log
+
+# Android Studio & IntelliJ IDEA settings
+.navigation/
+.gradle/
+build/
+app/build/
+/build/
+/.idea/
+
+# Android Studio generated files
+captures/
+.externalNativeBuild
+.cxx/
+*.iml
+
+# OS generated files
+.DS_Store
+Thumbs.db

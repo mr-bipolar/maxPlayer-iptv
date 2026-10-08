@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Active / Selected tab color -->
+    <item android:state_checked="true" android:color="@color/accent" />
+    <!-- Inactive / Default tab color -->
+    <item android:color="@color/ink_faint" />
+</selector>
