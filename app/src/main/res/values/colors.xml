@@ -26,6 +26,7 @@
     <!-- Status -->
     <color name="live">#FF4D5E</color>
     <color name="ok">#3DDC97</color>
+    <color name="warn_text">#E3B463</color>
     <color name="error_text">#FF8A93</color>
 
     <!-- Alpha overlays (pre-mixed, for use as flat backgrounds) -->

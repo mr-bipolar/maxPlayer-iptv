@@ -210,4 +210,39 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!-- How to add a playlist -->
+    <string name="title_how_to_add">How to add a playlist</string>
+    <string name="howto_intro">Bring in your own channels in four quick steps.</string>
+    <string name="howto_step_1">STEP 1</string>
+    <string name="howto_step_2">STEP 2</string>
+    <string name="howto_step_3">STEP 3</string>
+    <string name="howto_step_4">STEP 4</string>
+    <string name="howto_1_title">Get your M3U / M3U8 link or file</string>
+    <string name="howto_1_desc">Your provider or your own server gives you a link or a file ending in .m3u or .m3u8.</string>
+    <string name="howto_2_title">Choose URL, File or Folder</string>
+    <string name="howto_2_desc">Pick how you want to bring the playlist into MaxPlayer.</string>
+    <string name="howto_3_title">Add the playlist</string>
+    <string name="howto_3_desc">Paste the link or select the file, then tap Add playlist. MaxPlayer reads the channels for you.</string>
+    <string name="howto_4_title">Open a category and start watching</string>
+    <string name="howto_4_desc">Browse by category, pick a channel and it starts playing.</string>
+    <string name="howto_note">MaxPlayer does not provide TV channels or playlists. Add your own playlist or stream.</string>
+    <string name="btn_play_url">Play a URL</string>
+
+    <!-- Play audio stream -->
+    <string name="title_play_audio_stream">Play audio stream</string>
+    <string name="label_audio_url">Audio stream URL</string>
+    <string name="label_station_optional">Station name (optional)</string>
+    <string name="hint_station_name">e.g. Chillhop Radio</string>
+    <string name="label_play_as">Play as</string>
+    <string name="seg_auto">Auto-detect</string>
+    <string name="seg_audio">Audio</string>
+    <string name="seg_video">Video</string>
+    <string name="audio_url_tip">Radio streams (MP3, AAC, HLS audio) open in the audio player and keep playing in the background.</string>
+    <string name="section_recent_streams">Recent streams</string>
+    <string name="recent_jazz">Jazz Cafe FM</string>
+    <string name="recent_rock">Classic Rock Radio</string>
+    <string name="recent_chillhop_url">https://stream.example.com/chillhop.mp3</string>
+    <string name="recent_jazz_url">https://radio.example.com/jazz/aac</string>
+    <string name="recent_rock_url">https://cdn.example.com/rock/index.m3u8</string>
+
 </resources>
