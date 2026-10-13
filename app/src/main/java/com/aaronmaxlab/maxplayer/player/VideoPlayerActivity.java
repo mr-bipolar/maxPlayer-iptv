@@ -8,8 +8,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Rational;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,6 +40,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.databinding.ActivityVideoPlayerBinding;
 import com.aaronmaxlab.maxplayer.playlist.adapter.PlaylistAdapter;
+import com.aaronmaxlab.maxplayer.playlist.models.PlaylistChannel;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
 import com.aaronmaxlab.maxplayer.service.VideoPlaybackService;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
@@ -44,7 +49,15 @@ import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.PlayerUtils;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.common.util.concurrent.ListenableFuture;
+
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 public class VideoPlayerActivity extends AppCompatActivity {
 
@@ -59,6 +72,12 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private ListenableFuture<MediaController> controllerFuture;
     private boolean wasInPipMode = false;
     private boolean isFullscreen = false;
+    private PlaylistAdapter adapter;
+    private boolean showSearchBox = false;
+    private List<PlaylistChannel> allChannels = new ArrayList<>();
+    private String selectedCategory = "All";
+    private String searchQuery = "";
+
 
 
     private final Handler bufferHandler = new Handler(Looper.getMainLooper());
@@ -78,31 +97,27 @@ public class VideoPlayerActivity extends AppCompatActivity {
         }
     };
 
+
     private void showChannelsBottomSheet() {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
-
         dialog.setContentView(R.layout.playlist_drawer);
 
         RecyclerView rvChannels = dialog.findViewById(R.id.rvChannels);
-
         if (rvChannels == null) {
             return;
         }
 
-        PlaylistAdapter adapter = new PlaylistAdapter();
+        adapter = new PlaylistAdapter();
 
         rvChannels.setLayoutManager(new LinearLayoutManager(this));
         rvChannels.setAdapter(adapter);
-
         adapter.setChannels(playlistModel.channels);
-
-        // Restore the currently playing channel whenever the dialog opens.
         adapter.setPlayingPosition(currentChannelPosition);
 
-        String finalName = UIUtils.extractLabel(playlistModel.fileName).toUpperCase();
+        String finalName =
+                UIUtils.extractLabel(playlistModel.fileName).toUpperCase();
 
         TextView topLabel = dialog.findViewById(R.id.topLabelView);
-
         if (topLabel != null) {
             topLabel.setText(getString(
                     R.string.drawer_header,
@@ -111,39 +126,97 @@ public class VideoPlayerActivity extends AppCompatActivity {
             ));
         }
 
+        // Category chips
+        LinearLayout categoryList = dialog.findViewById(R.id.categoryList);
+
+        if (categoryList != null) {
+            setupCategoryChips(categoryList, getCategories());
+
+            View allChip = categoryList.findViewById(R.id.categoryContainer);
+            if (allChip != null) {
+                allChip.setOnClickListener(v -> {
+                    selectedCategory = "All";
+                    selectCategoryChip((LinearLayout) allChip, categoryList);
+                    applyChannelFilters();
+                });
+            }
+        }
+
+        // Search controls
+        ImageView searchBtn = dialog.findViewById(R.id.searchButton);
+        TextInputLayout searchBox =
+                dialog.findViewById(R.id.channelSearchLayout);
+        TextInputEditText searchEditText =
+                dialog.findViewById(R.id.etChannelSearch);
+
+        if (searchBtn != null && searchBox != null && searchEditText != null) {
+            ClickUtils.applyTouchEffect(searchBtn, v -> {
+                if (showSearchBox) {
+                    searchEditText.setText("");
+                    searchBox.setVisibility(View.GONE);
+                    searchBtn.setImageResource(R.drawable.ic_search);
+                    showSearchBox = false;
+                } else {
+                    searchBox.setVisibility(View.VISIBLE);
+                    searchBtn.setImageResource(R.drawable.ic_close);
+                    showSearchBox = true;
+                    searchEditText.requestFocus();
+                }
+            });
+
+            setupChannelSearch(searchEditText, playlistModel.channels);
+        }
+
+        // Channel selection
         adapter.setOnChannelClickListener((channel, position) -> {
             if (channel.url == null || channel.url.trim().isEmpty()) {
                 AppToast.error(this, "Invalid channel URL");
                 return;
             }
 
-            // Update the current channel.
-            currentChannelPosition = position;
+            // Find the channel's original playlist position.
+            int originalPosition = playlistModel.channels.indexOf(channel);
+
+            if (originalPosition == -1) {
+                AppToast.error(this, "Channel not found in playlist");
+                return;
+            }
+
+            currentChannelPosition = originalPosition;
             streamUrl = channel.url;
-            // Actually switch ExoPlayer to the selected stream.
-            player.setMediaItem(
-                    MediaItem.fromUri(channel.url)
-            );
+
+            // Switch the player to the selected stream.
+            player.setMediaItem(MediaItem.fromUri(channel.url));
             player.prepare();
             player.play();
 
-            // Update the player labels.
-            TextView bannerTitle = playerView.findViewById(R.id.playerTopLabel);
-            TextView bannerSubtext = playerView.findViewById(R.id.playerSubLabel);
-            ImageView playPauseBtn = playerView.findViewById(R.id.play_icon);
+            // Update player labels.
+            TextView bannerTitle =
+                    playerView.findViewById(R.id.playerTopLabel);
+            TextView bannerSubtext =
+                    playerView.findViewById(R.id.playerSubLabel);
+            ImageView playPauseBtn =
+                    playerView.findViewById(R.id.play_icon);
 
-            playPauseBtn.setImageResource(R.drawable.ic_pause);
+            if (bannerTitle != null) {
+                bannerTitle.setText(channel.name);
+            }
 
-            bannerTitle.setText(channel.name);
-            bannerSubtext.setText(channel.category);
+            if (bannerSubtext != null) {
+                bannerSubtext.setText(channel.category);
+            }
 
+            if (playPauseBtn != null) {
+                playPauseBtn.setImageResource(R.drawable.ic_pause);
+            }
 
-            // Update the equalizer.
+            // The stored position is the original playlist position.
             adapter.setPlayingPosition(position);
 
             dialog.dismiss();
         });
 
+        // Bottom sheet system navigation styling.
         dialog.setOnShowListener(d -> {
             Window window = dialog.getWindow();
 
@@ -174,6 +247,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
 
         dialog.show();
     }
+
 
 
     @OptIn(markerClass = UnstableApi.class)
@@ -284,6 +358,161 @@ public class VideoPlayerActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+    private void setupCategoryChips(
+            LinearLayout categoryList,
+            List<String> categories
+    ) {
+        // Keep the existing "All" chip.
+        categoryList.removeViews(
+                1,
+                Math.max(0, categoryList.getChildCount() - 1)
+        );
+
+        for (String category : categories) {
+            LinearLayout chip = new LinearLayout(this);
+            chip.setGravity(Gravity.CENTER_VERTICAL);
+            chip.setOrientation(LinearLayout.HORIZONTAL);
+            chip.setPadding(dp(14), dp(8), dp(14), dp(8));
+            chip.setBackgroundResource(R.drawable.bg_chip);
+
+            LinearLayout.LayoutParams params =
+                    new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+            params.setMarginEnd(dp(8));
+
+            TextView label = new TextView(this);
+            label.setText(category);
+            label.setTextColor(getColor(R.color.ink_dim));
+            label.setTextSize(
+                    getResources().getDimension(R.dimen.text_body_sm)
+                            / getResources().getDisplayMetrics().scaledDensity
+            );
+            label.setTypeface(
+                    android.graphics.Typeface.create(
+                            "sans-serif-medium",
+                            android.graphics.Typeface.NORMAL
+                    )
+            );
+
+            chip.addView(label);
+            categoryList.addView(chip, params);
+
+            chip.setOnClickListener(v -> {
+                selectCategoryChip(chip, categoryList);
+                filterChannelsByCategory(category);
+            });
+        }
+    }
+
+    private int dp(int value) {
+        return (int) (value * getResources()
+                .getDisplayMetrics().density + 0.5f);
+    }
+
+    private void selectCategoryChip(
+            LinearLayout selectedChip,
+            LinearLayout categoryList
+    ) {
+        for (int i = 0; i < categoryList.getChildCount(); i++) {
+            View child = categoryList.getChildAt(i);
+            boolean selected = child == selectedChip;
+
+            child.setBackgroundResource(
+                    selected
+                            ? R.drawable.bg_chip_active
+                            : R.drawable.bg_chip
+            );
+
+            if (child instanceof ViewGroup) {
+                for (int j = 0; j < ((ViewGroup) child).getChildCount(); j++) {
+                    View inner = ((ViewGroup) child).getChildAt(j);
+                    if (inner instanceof TextView) {
+                        ((TextView) inner).setTextColor(
+                                getColor(selected
+                                        ? R.color.accent
+                                        : R.color.ink_dim)
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    private void filterChannelsByCategory(String category) {
+        List<PlaylistChannel> filtered = new ArrayList<>();
+
+        for (PlaylistChannel channel : playlistModel.channels) {
+            if (category.equalsIgnoreCase(channel.category)) {
+                filtered.add(channel);
+            }
+        }
+
+        adapter.setChannels(filtered);
+    }
+
+    private void setupChannelSearch(
+            TextInputEditText searchEditText,
+            List<PlaylistChannel> channels
+    ) {
+        allChannels = new ArrayList<>(channels);
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(
+                    CharSequence s, int start, int count, int after
+            ) {}
+
+            @Override
+            public void onTextChanged(
+                    CharSequence s, int start, int before, int count
+            ) {
+                searchQuery = s.toString().trim();
+                applyChannelFilters();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void applyChannelFilters() {
+        List<PlaylistChannel> filtered = new ArrayList<>();
+
+        for (PlaylistChannel channel : allChannels) {
+            boolean matchesCategory =
+                    selectedCategory.equals("All")
+                            || (selectedCategory.equalsIgnoreCase(channel.category));
+
+            boolean matchesSearch =
+                    channel.name != null
+                            && channel.name.toLowerCase(Locale.ROOT)
+                            .contains(searchQuery.toLowerCase(Locale.ROOT));
+
+            if (matchesCategory && matchesSearch) {
+                filtered.add(channel);
+            }
+        }
+
+        adapter.setChannels(filtered);
+    }
+
+    private List<String> getCategories() {
+        Set<String> uniqueCategories = new LinkedHashSet<>();
+
+        if (playlistModel == null || playlistModel.channels == null) {
+            return new ArrayList<>();
+        }
+
+        for (PlaylistChannel channel : playlistModel.channels) {
+            if (channel.category != null && !channel.category.trim().isEmpty()) {
+                uniqueCategories.add(channel.category.trim());
+            }
+        }
+
+        return new ArrayList<>(uniqueCategories);
     }
 
     @OptIn(markerClass = UnstableApi.class)

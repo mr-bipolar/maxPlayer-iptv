@@ -37,29 +37,23 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         ClickUtils.applyTouchEffect(binding.addPlaylistBtn, v -> {
-            Toast.makeText(requireContext(), "Image clicked!", Toast.LENGTH_SHORT).show();
+           startActivity(new Intent(getContext(), AddPlaylistActivity.class));
         });
 
         ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnAddPlaylist, v -> {
-            Intent intent = new Intent(getContext(), AddPlaylistActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(getContext(), AddPlaylistActivity.class));
         });
 
         ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnHowToAdd, v -> {
-
-            Intent intent = new Intent(getContext(), AddPlaylistHelperActivity.class);
-            startActivity(intent);
-
+            startActivity(new Intent(getContext(), AddPlaylistHelperActivity.class));
         });
 
         ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnPlayVideoUrl, v ->{
-            Intent intent = new Intent(getContext(), PlayVideoUrlActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(getContext(), PlayVideoUrlActivity.class));
         });
 
         ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnPlayAudioStream, v -> {
-            Intent intent = new Intent(getContext(), PlayAudioStreamActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(getContext(), PlayAudioStreamActivity.class));
         });
 
         View overlay = view.findViewById(R.id.audioPlayerOverlay);
