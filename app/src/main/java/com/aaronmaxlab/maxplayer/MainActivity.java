@@ -1,47 +1,22 @@
 package com.aaronmaxlab.maxplayer;
 
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.aaronmaxlab.maxplayer.databinding.ActivityMainBinding;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
-    // bottom nav icon and text space
-    private void adjustBottomNavGap(BottomNavigationView bottomNav) {
-        bottomNav.post(() -> {
-            View menuView = bottomNav.getChildAt(0);
-            if (menuView instanceof ViewGroup) {
-                ViewGroup menuViewGroup = (ViewGroup) menuView;
-                for (int i = 0; i < menuViewGroup.getChildCount(); i++) {
-                    View itemView = menuViewGroup.getChildAt(i);
-                    View labelGroup = itemView.findViewById(com.google.android.material.R.id.navigation_bar_item_labels_group);
-                    if (labelGroup != null) {
-                        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) labelGroup.getLayoutParams();
-
-                        // Convert 4dp to pixels dynamically
-                        params.topMargin = (int) (4 * getResources().getDisplayMetrics().density);
-
-                        labelGroup.setLayoutParams(params);
-                    }
-                }
-            }
-        });
-    }
+    private   ActivityMainBinding binding;
 
 
     @Override
@@ -52,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
 
         //  Inflate layout after super.onCreate()
-        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         // bottom nav set black
@@ -75,8 +50,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //  Adjust gap between Icon and Text label dynamically
-        adjustBottomNavGap(binding.bottomNavigation);
+       UIUtils.adjustBottomNavGap(binding.bottomNavigation);
     }
 
+    @Override
+    protected void onDestroy() {
+        binding = null;
+        super.onDestroy();
+    }
 }
 

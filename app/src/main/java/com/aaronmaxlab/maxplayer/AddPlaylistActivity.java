@@ -3,6 +3,7 @@ package com.aaronmaxlab.maxplayer;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.widget.Toast;
@@ -20,6 +21,9 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import com.aaronmaxlab.maxplayer.databinding.ActivityAddPlaylistBinding;
 import com.aaronmaxlab.maxplayer.filepicker.FileDetailsActivity;
 import com.aaronmaxlab.maxplayer.filepicker.MediaBrowserActivity;
+import com.aaronmaxlab.maxplayer.player.UrlPlayerActivity;
+import com.aaronmaxlab.maxplayer.player.VideoPlayerActivity;
+import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.Playlist;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
@@ -29,15 +33,18 @@ import java.util.Locale;
 public class AddPlaylistActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> mediaBrowserLauncher;
+    private  ActivityAddPlaylistBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        ActivityAddPlaylistBinding binding = ActivityAddPlaylistBinding.inflate(getLayoutInflater());
+        binding = ActivityAddPlaylistBinding.inflate(getLayoutInflater());
 
         setContentView(binding.getRoot());
 
+        // Navbar setup
         UIUtils.setLightNavigationBars(this, false);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -46,6 +53,7 @@ public class AddPlaylistActivity extends AppCompatActivity {
             return insets;
         });
 
+        // File pickers
         mediaBrowserLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -74,28 +82,16 @@ public class AddPlaylistActivity extends AppCompatActivity {
 
                     Uri mediaUri = Uri.parse(uriString);
 
-                    if (MediaBrowserActivity.TYPE_VIDEO.equals(type)) {
-                        // Later: pass mediaUri to your MPV player.
-                        Toast.makeText(
-                                this,
-                                "Video selected: " + name,
-                                Toast.LENGTH_SHORT
-                        ).show();
-
-                        // Example for future MPV integration:
-                        // mpvPlayer.open(mediaUri);
-
-                    } else if (MediaBrowserActivity.TYPE_PLAYLIST.equals(type)) {
+                   if (MediaBrowserActivity.TYPE_PLAYLIST.equals(type)) {
                         handleSelectedPlaylist(mediaUri);
-
                     }
                 }
         );
 
-        // back press
+        // Back button press
         ClickUtils.applyTouchEffect(binding.backAddPlaylist, v -> finish());
 
-        // open folder
+        // Open folder dir
         ClickUtils.applyTouchEffect(binding.buttonOpenFolder, v -> {
             Intent intent = new Intent(
                     getBaseContext(),
@@ -105,29 +101,40 @@ public class AddPlaylistActivity extends AppCompatActivity {
             mediaBrowserLauncher.launch(intent);
         });
 
-        // open single file
+        // Open single media file
         ClickUtils.applyTouchEffect(binding.buttonOpenFile, v ->
             openPlaylistPicker()
         );
 
-        // open playlist url
+        // Open playlist url
         ClickUtils.applyTouchEffect(binding.buttonOpenPlaylistUrl, v -> {
           startActivity(new Intent(getBaseContext(), AddPlaylistUrlActivity.class));
         });
 
         // open video url
         ClickUtils.applyTouchEffect(binding.buttonOpenVideoUrl, v -> {
-            startActivity(new Intent(getBaseContext(), PlayVideoUrlActivity.class));
+          startActivity(new Intent(getBaseContext(), PlayVideoUrlActivity.class));
+
         });
 
-        // open audio url
+        // Open audio url
         ClickUtils.applyTouchEffect(binding.buttonOpenAudioStream, v -> {
           startActivity(new Intent(getBaseContext(), PlayAudioStreamActivity.class));
         });
 
+        // Back  nav button press
+        getOnBackPressedDispatcher().addCallback(this,
+                new androidx.activity.OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                       finish();
+                    }
+                });
+
     }
 
 
+    // File picker launcher
     private final ActivityResultLauncher<String[]> pickPlaylistLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.OpenDocument(),
@@ -148,7 +155,7 @@ public class AddPlaylistActivity extends AppCompatActivity {
         });
     }
 
-
+    // handle selected playlist
     private void handleSelectedPlaylist(Uri uri) {
         String fileName = Playlist.getFileName(this, uri);
 
@@ -156,12 +163,7 @@ public class AddPlaylistActivity extends AppCompatActivity {
                 !(fileName.toLowerCase(Locale.ROOT).endsWith(".m3u")
                         || fileName.toLowerCase(Locale.ROOT).endsWith(".m3u8"))) {
 
-            Toast.makeText(
-                    this,
-                    "Please select an M3U or M3U8 playlist",
-                    Toast.LENGTH_LONG
-            ).show();
-
+            AppToast.warning(this, "Please select an M3U or M3U8 playlist");
             return;
         }
 
@@ -180,5 +182,9 @@ public class AddPlaylistActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
+    @Override
+    protected void onDestroy() {
+        binding = null;
+        super.onDestroy();
+    }
 }

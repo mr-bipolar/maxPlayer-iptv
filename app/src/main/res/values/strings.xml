@@ -127,16 +127,17 @@
     <string name="badge_live">LIVE</string>
     <string name="player_channel_name">Sky Sports Main Event</string>
     <string name="player_channel_sub">World Live TV · Sports</string>
-    <string name="player_buffer">Buffer 8s</string>
+    <string name="player_buffer">Buffer: %1$d%%</string>
     <string name="player_ctl_audio">Audio</string>
     <string name="player_ctl_subtitles">Subtitles</string>
     <string name="player_ctl_speed">Speed</string>
     <string name="player_ctl_aspect">Aspect</string>
     <string name="player_ctl_channels">Channels</string>
     <string name="player_ctl_fullscreen">Full screen</string>
+    <string name="player_ctl_exit_fullscreen">Exit full screen</string>
 
     <!-- Player — drawer -->
-    <string name="drawer_header">Sports · 186 channels</string>
+    <string name="drawer_header">%1$s · %2$d channels</string>
     <string name="chip_favorites">Favorites</string>
     <string name="drawer_bt_sport">BT Sport 2</string>
     <string name="drawer_bein_sports">beIN Sports</string>
@@ -150,9 +151,10 @@
 
     <!-- Audio player -->
     <string name="label_playing_from">PLAYING FROM RADIO STATIONS</string>
-    <string name="audio_station_name">Chillhop Radio</string>
-    <string name="audio_station_sub">Lofi beats to relax / study to</string>
+    <string name="audio_station_name">Live Radio</string>
+    <string name="audio_station_sub">Audio Streaming</string>
     <string name="audio_status_playing">Playing</string>
+    <string name="audio_status_stop">Stopped</string>
     <string name="audio_format">MP3 · 128 kbps</string>
     <string name="audio_buffer_note">Buffering smooth</string>
 
@@ -208,7 +210,8 @@
     <string name="audio_meta_separator">·</string>
     <string name="toggle_grid">Grid</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="streaming">Streaming..</string>
+    <string name="video_channel">Video Channel</string>
 
     <!-- How to add a playlist -->
     <string name="title_how_to_add">How to add a playlist</string>
@@ -264,5 +267,9 @@
     <string name="btn_save_playlist">Save playlist</string>
 
     <string name="label_playlist_name">Playlist name</string>
+    <string name="audio_play" />
+    <string name="todo">TODO</string>
+    <string name="playback_error">Playback error</string>
+    <string name="unable_to_play_this_channel">Unable to play this channel</string>
 
 </resources>

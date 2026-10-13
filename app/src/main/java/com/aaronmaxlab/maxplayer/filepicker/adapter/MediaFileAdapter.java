@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -129,7 +128,7 @@ public class MediaFileAdapter
         return files.size();
     }
 
-    static class MediaViewHolder extends RecyclerView.ViewHolder {
+    static  class MediaViewHolder extends RecyclerView.ViewHolder {
 
         final ImageView imageView;
         final TextView txtName;

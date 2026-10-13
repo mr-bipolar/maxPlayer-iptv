@@ -55,4 +55,8 @@
     <dimen name="stroke_thin">1.5dp</dimen>
     <dimen name="stroke_regular">2dp</dimen>
 
+    <!-- video player -->
+    <dimen name="player_progress_touch_height">32dp</dimen>
+    <dimen name="player_progress_bottom_offset">52dp</dimen>
+
 </resources>

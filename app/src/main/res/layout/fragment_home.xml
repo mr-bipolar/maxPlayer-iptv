@@ -409,4 +409,13 @@
         android:id="@+id/layoutHomeEmpty"
         layout="@layout/fragment_home_empty"
         android:visibility="visible" />
+
+    <!-- Audio mini player -->
+    <include
+        android:id="@+id/audioPlayerOverlay"
+        layout="@layout/audio_bg_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
 </FrameLayout>

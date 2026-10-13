@@ -16,13 +16,16 @@ import com.aaronmaxlab.maxplayer.AddPlaylistActivity;
 import com.aaronmaxlab.maxplayer.AddPlaylistHelperActivity;
 import com.aaronmaxlab.maxplayer.PlayAudioStreamActivity;
 import com.aaronmaxlab.maxplayer.PlayVideoUrlActivity;
+import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.databinding.FragmentHomeBinding;
+import com.aaronmaxlab.maxplayer.player.AudioMiniPlayer;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 
 
 public class HomeFragment extends Fragment {
 
    private FragmentHomeBinding binding;
+    private AudioMiniPlayer audioMiniPlayer;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -58,6 +61,14 @@ public class HomeFragment extends Fragment {
             Intent intent = new Intent(getContext(), PlayAudioStreamActivity.class);
             startActivity(intent);
         });
+
+        View overlay = view.findViewById(R.id.audioPlayerOverlay);
+
+        if (overlay != null) {
+            audioMiniPlayer = new AudioMiniPlayer(requireActivity(), overlay);
+            audioMiniPlayer.attach();
+        }
+
     }
 
     @Override
@@ -70,7 +81,13 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
+        if (audioMiniPlayer != null) {
+            audioMiniPlayer.release();
+            audioMiniPlayer = null;
+        }
+
         binding = null;
+        super.onDestroyView();
+
     }
 }
