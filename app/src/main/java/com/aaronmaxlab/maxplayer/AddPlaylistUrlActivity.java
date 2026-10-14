@@ -34,8 +34,8 @@ import java.util.concurrent.Executors;
 
 public class AddPlaylistUrlActivity extends AppCompatActivity {
 
-    private PlaylistInfo playlistModel;
     private ActivityAddPlaylistUrlBinding binding;
+    private String playlistUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,17 +76,17 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
 
             LinearLayout addPlaylistBtn = binding.btnAddPlaylistCall;
 
-             String url = String.valueOf(inputUrl.getText()).trim();
+             playlistUrl = String.valueOf(inputUrl.getText()).trim();
              String name = String.valueOf(inputName.getText()).trim();
 
 
-            if(url.isEmpty()){
+            if(playlistUrl.isEmpty()){
                 inputUrl.setError("Enter a video stream URL");
                 inputUrl.requestFocus();
                 return;
             }
 
-            if (!UrlUtils.isValidStreamUrl(url)) {
+            if (!UrlUtils.isValidStreamUrl(playlistUrl)) {
                 inputUrl.setError("Enter a valid HTTP or HTTPS URL");
                 inputUrl.requestFocus();
                 return;
@@ -105,15 +105,15 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
              executor.execute(() -> {
                  try {
 
-                     String fileName = UIUtils.extractLabel(url);
+                     String fileName = UIUtils.extractLabel(playlistUrl);
 
                      PlaylistInfo info = PlaylistParser.parseRemoteUrl(
-                             url,
+                             playlistUrl,
                              fileName
                      );
 
                      // Populate name and size into 'info'
-                     Playlist.loadRemoteMetadata( url, info);
+                     Playlist.loadRemoteMetadata( playlistUrl, info);
 
                       String channelCount = String.valueOf(info.channelCount);
                       String categoryCount = String.valueOf(info.categoryNames.size());
@@ -126,8 +126,6 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
                              successCard.setVisibility(VISIBLE);
                              playlistCount.setText(channelCount);
                              playlistCatCount.setText(categoryCount);
-
-                             playlistModel = info;
 
                              AppToast.success(this, "Playlist added.");
 
@@ -157,13 +155,13 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
         });
 
         ClickUtils.applyTouchEffect(binding.openPlaylistStream, v -> {
-            if (playlistModel == null) {
+            if (playlistUrl == null) {
                 AppToast.warning(this, "Please load a playlist first.");
                 return;
             }
 
             Intent intent = new Intent(this, VideoPlayerActivity.class);
-            intent.putExtra("playlist_model", playlistModel);
+            intent.putExtra("playlist_url", playlistUrl);
             startActivity(intent);
         });
 
