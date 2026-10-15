@@ -1,4 +1,4 @@
-package com.aaronmaxlab.maxplayer.player;
+package com.aaronmaxlab.maxplayer.player.media3.audio;
 
 import android.app.Activity;
 import android.content.ComponentName;

@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.aaronmaxlab.maxplayer.AddPlaylistActivity;
 import com.aaronmaxlab.maxplayer.AddPlaylistHelperActivity;
@@ -18,7 +17,8 @@ import com.aaronmaxlab.maxplayer.PlayAudioStreamActivity;
 import com.aaronmaxlab.maxplayer.PlayVideoUrlActivity;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.databinding.FragmentHomeBinding;
-import com.aaronmaxlab.maxplayer.player.AudioMiniPlayer;
+import com.aaronmaxlab.maxplayer.player.media3.audio.AudioMiniPlayer;
+import com.aaronmaxlab.maxplayer.player.mpv.MpvPlayerActivity;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 
 
@@ -37,7 +37,8 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         ClickUtils.applyTouchEffect(binding.addPlaylistBtn, v -> {
-           startActivity(new Intent(getContext(), AddPlaylistActivity.class));
+          startActivity(new Intent(getContext(), AddPlaylistActivity.class));
+         //   startActivity(new Intent(getContext(), MpvPlayerActivity.class));
         });
 
         ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnAddPlaylist, v -> {

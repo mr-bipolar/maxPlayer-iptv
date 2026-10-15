@@ -1,17 +1,11 @@
-package com.aaronmaxlab.maxplayer.player;
+package com.aaronmaxlab.maxplayer.player.media3.video;
 
-import android.app.PictureInPictureParams;
-import android.content.ComponentName;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Rational;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -21,27 +15,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.OptIn;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.lifecycle.Lifecycle;
-import androidx.media3.common.C;
-import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
-import androidx.media3.common.Player;
-import androidx.media3.common.Timeline;
-import androidx.media3.common.util.UnstableApi;
-import androidx.media3.common.util.Util;
-import androidx.media3.session.MediaController;
-import androidx.media3.session.SessionToken;
 import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -52,17 +30,13 @@ import com.aaronmaxlab.maxplayer.playlist.PlaylistParser;
 import com.aaronmaxlab.maxplayer.playlist.adapter.PlaylistAdapter;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistChannel;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
-import com.aaronmaxlab.maxplayer.service.VideoPlaybackService;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
-import com.aaronmaxlab.maxplayer.utils.AspectRatioUtils;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
-import com.aaronmaxlab.maxplayer.utils.PlayerUtils;
 import com.aaronmaxlab.maxplayer.utils.StreamErrorUtils;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -72,33 +46,18 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class VideoPlayerActivity extends AppCompatActivity {
+public class VideoPlayerActivity extends BasePlayerActivity {
 
     private static final String CATEGORY_ALL = "All";
-    private static final long BUFFER_UPDATE_INTERVAL_MS = 1000L;
+    private static final String STATE_CHANNEL_POSITION = "channel_position";
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private final Handler bufferHandler = new Handler(Looper.getMainLooper());
 
     private ActivityVideoPlayerBinding binding;
-    private MediaController player;
-    private ListenableFuture<MediaController> controllerFuture;
-    private PlayerView playerView;
-
-    // Views inside the PlayerView controller layout.
-    private ImageView playPauseBtn;
-    private TextView bufferSize;
-    private TextView bannerTitle;
-    private TextView bannerSubtext;
-    private TextView bannerIndicator;
 
     private PlaylistInfo playlistModel;
     private String streamUrl;
     private int currentChannelPosition = 0; // index in playlistModel.channels
-
-    private int aspectMode = 0;
-    private boolean isFullscreen = false;
-    private boolean wasInPipMode = false;
 
     // Bottom sheet state (reset every time the sheet opens).
     @Nullable private PlaylistAdapter adapter;
@@ -106,186 +65,80 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private String selectedCategory = CATEGORY_ALL;
     private String searchQuery = "";
 
-    private final Runnable bufferUpdateRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (player != null && bufferSize != null) {
-                bufferSize.setText(getString(
-                        R.string.player_buffer, player.getBufferedPercentage()));
-            }
-            bufferHandler.postDelayed(this, BUFFER_UPDATE_INTERVAL_MS);
-        }
-    };
+    // ---------------------------------------------------------------------
+    // Lifecycle / base hooks
+    // ---------------------------------------------------------------------
 
+    @NonNull
+    @Override
+    protected View inflateContent() {
+        binding = ActivityVideoPlayerBinding.inflate(getLayoutInflater());
+        return binding.getRoot();
+    }
 
-    // Lifecycle
+    @NonNull
+    @Override
+    protected PlayerView getBoundPlayerView() {
+        return binding.playerView;
+    }
 
-    @OptIn(markerClass = UnstableApi.class)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
 
-        binding = ActivityVideoPlayerBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        // System nav color change
-        UIUtils.setLightNavigationBars(this, false);
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
-            return insets;
-        });
-
-        // player controller items
-        playerView = binding.playerView;
-        playerView.setShutterBackgroundColor(Color.BLACK);
-        playerView.setKeepContentOnPlayerReset(false);
-        playPauseBtn = playerView.findViewById(R.id.play_icon);
-        bufferSize = playerView.findViewById(R.id.bufferSize);
-        bannerTitle = playerView.findViewById(R.id.playerTopLabel);
-        bannerSubtext = playerView.findViewById(R.id.playerSubLabel);
-        bannerIndicator = playerView.findViewById(R.id.indicator);
-
-        // Controller setups
-        setupControls();
-
-        // System bar back press
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                handleBackPress();
-            }
-        });
-
-        // load playlists
+        if (savedInstanceState != null) {
+            currentChannelPosition = savedInstanceState.getInt(STATE_CHANNEL_POSITION, 0);
+        }
         loadPlaylistAsync();
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        bufferHandler.removeCallbacks(bufferUpdateRunnable);
-        bufferHandler.post(bufferUpdateRunnable);
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_CHANNEL_POSITION, currentChannelPosition);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        UIUtils.setLightNavigationBars(this, false);
+    protected void onSetupPlaylistDrawer(@NonNull LinearLayout drawer) {
+        ClickUtils.applyTouchEffect(drawer, v -> showChannelsBottomSheet());
     }
 
     @Override
-    protected void onUserLeaveHint() {
-        super.onUserLeaveHint();
-        if (canEnterPip()) {
-            enterPipMode();
-        }
+    protected void onPlayerConnected() {
+        ensureStreamPlaying(streamUrl);
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        bufferHandler.removeCallbacks(bufferUpdateRunnable);
+    protected void onPlayingChanged(boolean isPlaying) {
+        if (isPlaying) StreamErrorUtils.hide(this);
+    }
 
-        // PiP window was closed by the user: stop playback and leave.
-        if (wasInPipMode && !isChangingConfigurations()) {
-            if (player != null) {
-                player.pause();
-                player.clearMediaItems();
-            }
-            finish();
-        }
+    @Override
+    protected void onPlaybackError(@NonNull PlaybackException error) {
+        StreamErrorUtils.show(this);
+
+        String info = "Error: " + error.getMessage()
+                + "\nError code: " + error.errorCode
+                + "\nError name: " + error.getErrorCodeName()
+                + "\nStream URL: " + streamUrl;
+
+        StreamErrorUtils.showCopyButton(this, streamUrl, info);
+
+        super.onPlaybackError(error); // toast
     }
 
     @Override
     protected void onDestroy() {
-        bufferHandler.removeCallbacks(bufferUpdateRunnable);
         executor.shutdownNow();
-
-        // The service player outlives this activity, so wipe its old item/error
-        // when the user really leaves (not on rotation).
-        if (player != null && isFinishing() && !isChangingConfigurations()) {
-            player.stop();
-            player.clearMediaItems();
-        }
-
-        if (playerView != null) {
-            playerView.setPlayer(null);
-        }
-        if (controllerFuture != null) {
-            MediaController.releaseFuture(controllerFuture);
-            controllerFuture = null;
-        }
-        player = null;
         adapter = null;
         binding = null;
         super.onDestroy();
     }
 
-
-    // Controls
-    private void setupControls() {
-        LinearLayout aspectRatio = playerView.findViewById(R.id.aspect_radio);
-        LinearLayout playlistDrawer = playerView.findViewById(R.id.playlistDrawer);
-        LinearLayout fullscreen = playerView.findViewById(R.id.fullscreen_enter_icon);
-        ImageView fullscreenIcon = playerView.findViewById(R.id.fullscreen_icon);
-        ImageView backBtn = playerView.findViewById(R.id.backPlayerView);
-        TextView exitText = playerView.findViewById(R.id.exit_fullscreen);
-
-        // play pause video
-        ClickUtils.applyTouchEffect(playPauseBtn, v -> {
-            if (player != null) {
-                Util.handlePlayPauseButtonAction(player);
-            }
-        });
-
-        // Aspect Ratio
-        ClickUtils.applyTouchEffect(aspectRatio, v ->
-                aspectMode = AspectRatioUtils.changeAspectRatio(playerView, aspectMode));
-
-        // Fullscreen  switch action
-        ClickUtils.applyTouchEffect(fullscreen, v -> {
-            isFullscreen = !isFullscreen;
-            PlayerUtils.toggleFullscreen(this, isFullscreen);
-            exitText.setText(getText(isFullscreen
-                    ? R.string.player_ctl_exit_fullscreen
-                    : R.string.player_ctl_fullscreen));
-            fullscreenIcon.setImageResource(isFullscreen
-                    ? R.drawable.ic_close_fullscreen
-                    : R.drawable.ic_expand);
-        });
-
-        // Video player back press
-        ClickUtils.applyTouchEffect(backBtn, v -> handleBackPress());
-        // Open bottom sheet
-        ClickUtils.applyTouchEffect(playlistDrawer, v -> showChannelsBottomSheet());
-    }
-
-    // Video banner setup
-    private void updateBanner(@NonNull PlaylistChannel channel) {
-        if (bannerTitle != null) bannerTitle.setText(channel.name);
-        if (bannerSubtext != null) bannerSubtext.setText(channel.category);
-        if (bannerIndicator != null) {
-            bannerIndicator.setText("LIVE");
-            bannerIndicator.setBackgroundResource(R.drawable.bg_badge_live);
-        }
-    }
-
-    // Player top bar indicator
-    private void updateIndicator() {
-        if (bannerIndicator == null || player == null) return;
-
-        boolean isLive = player.isCurrentMediaItemLive()
-                || player.getDuration() == C.TIME_UNSET;
-
-        bannerIndicator.setText(isLive ? "LIVE" : "VIDEO");
-        bannerIndicator.setBackgroundResource(
-                isLive ? R.drawable.bg_badge_live : R.drawable.bg_badge_video);
-    }
-
+    // ---------------------------------------------------------------------
     // Playlist loading
+    // ---------------------------------------------------------------------
+
     private void showParsingStatus(String status) {
         binding.layoutParsing.setVisibility(View.VISIBLE);
         binding.tvParsingStatus.setText(status);
@@ -302,9 +155,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
     }
 
     private void loadPlaylistAsync() {
-        playlistModel = null;
-        streamUrl = null;
-
         String url = getIntent().getStringExtra("playlist_url");
         if (url == null || url.trim().isEmpty()) {
             failAndFinish("Playlist URL not found");
@@ -342,94 +192,28 @@ public class VideoPlayerActivity extends AppCompatActivity {
         }
 
         playlistModel = model;
-        currentChannelPosition = 0;
 
-        PlaylistChannel first = model.channels.get(0);
-        streamUrl = first.url;
-        updateBanner(first);
+        // Restored after rotation, otherwise the first channel.
+        if (currentChannelPosition < 0 || currentChannelPosition >= model.channels.size()) {
+            currentChannelPosition = 0;
+        }
 
-        connectVideoService();
+        PlaylistChannel channel = model.channels.get(currentChannelPosition);
+        streamUrl = channel.url;
+        updateBanner(channel);
+
+        connectPlayer();
         hideParsingStatus();
     }
 
-
-    // Player service
-    @OptIn(markerClass = UnstableApi.class)
-    private void connectVideoService() {
-        SessionToken token = new SessionToken(
-                this, new ComponentName(this, VideoPlaybackService.class));
-
-        controllerFuture = new MediaController.Builder(this, token).buildAsync();
-        controllerFuture.addListener(this::onControllerReady,
-                ContextCompat.getMainExecutor(this));
+    private void updateBanner(@NonNull PlaylistChannel channel) {
+        setBanner(channel.name, channel.category);
     }
 
-    private void onControllerReady() {
-        if (isFinishing() || isDestroyed() || controllerFuture == null) return;
-
-        try {
-            player = controllerFuture.get();
-        } catch (Exception e) {
-            AppToast.error(this, "Unable to connect to video player");
-            finish();
-            return;
-        }
-
-        playerView.setPlayer(player);
-        playPauseBtn.setImageResource(player.isPlaying() ? R.drawable.ic_pause : R.drawable.ic_play);
-
-        // Add the listener only after the controller is connected.
-        player.addListener(new Player.Listener() {
-            @Override
-            public void onIsPlayingChanged(boolean isPlaying) {
-                if (isPlaying) StreamErrorUtils.hide(VideoPlayerActivity.this);
-                playPauseBtn.setImageResource(isPlaying ? R.drawable.ic_pause : R.drawable.ic_play);
-            }
-
-            @Override
-            public void onPlayerError(@NonNull PlaybackException error) {
-                StreamErrorUtils.show(VideoPlayerActivity.this);
-
-                String info = "Error: " + error.getMessage()
-                        + "\nError code: " + error.errorCode
-                        + "\nError name: " + error.getErrorCodeName()
-                        + "\nStream URL: " + streamUrl;
-
-                StreamErrorUtils.showCopyButton(VideoPlayerActivity.this, streamUrl, info);
-
-                AppToast.error(VideoPlayerActivity.this,
-                        error.getMessage() != null ? error.getMessage() : "Playback failed");
-            }
-
-            @Override
-            public void onPlaybackStateChanged(int state) {
-                if (state == Player.STATE_READY) updateIndicator();
-            }
-
-            @Override
-            public void onTimelineChanged(@NonNull Timeline timeline, int reason) {
-                updateIndicator();
-            }
-
-        });
-
-        boolean needsNewItem = player.getMediaItemCount() == 0
-                || player.getPlayerError() != null;
-
-        if (needsNewItem && streamUrl != null && !streamUrl.isEmpty()) {
-            playStream(streamUrl);
-        }
-    }
-
-    private void playStream(String url) {
-        StreamErrorUtils.hide(this);
-        player.setMediaItem(MediaItem.fromUri(url));
-        player.prepare();
-        player.play();
-    }
-
-
+    // ---------------------------------------------------------------------
     // Channels bottom sheet
+    // ---------------------------------------------------------------------
+
     private void showChannelsBottomSheet() {
         if (playlistModel == null || playlistModel.channels == null) return;
 
@@ -488,6 +272,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         currentChannelPosition = originalPosition;
         streamUrl = channel.url;
 
+        StreamErrorUtils.hide(this);
         playStream(channel.url);
         updateBanner(channel);
         playPauseBtn.setImageResource(R.drawable.ic_pause);
@@ -515,8 +300,10 @@ public class VideoPlayerActivity extends AppCompatActivity {
         }
     }
 
-
+    // ---------------------------------------------------------------------
     // Categories
+    // ---------------------------------------------------------------------
+
     private void setupCategoryList(@Nullable LinearLayout categoryList) {
         if (categoryList == null) return;
 
@@ -603,8 +390,10 @@ public class VideoPlayerActivity extends AppCompatActivity {
         return channel.category == null ? "" : channel.category.trim();
     }
 
-
+    // ---------------------------------------------------------------------
     // Search + filtering
+    // ---------------------------------------------------------------------
+
     private void setupSearch(BottomSheetDialog dialog) {
         ImageView searchBtn = dialog.findViewById(R.id.searchButton);
         TextInputLayout searchBox = dialog.findViewById(R.id.channelSearchLayout);
@@ -668,54 +457,5 @@ public class VideoPlayerActivity extends AppCompatActivity {
         if (playingIndex >= 0) {
             adapter.setPlayingPosition(playingIndex);
         }
-    }
-
-
-    // Picture-in-picture / back handling
-    private boolean canEnterPip() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-                && player != null
-                && player.isPlaying()
-                && !isInPictureInPictureMode();
-    }
-
-    private void enterPipMode() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
-
-        try {
-            enterPictureInPictureMode(new PictureInPictureParams.Builder()
-                    .setAspectRatio(new Rational(16, 9))
-                    .build());
-        } catch (IllegalStateException e) {
-            // PiP not supported/allowed on this device or window state.
-            finish();
-        }
-    }
-
-    private void handleBackPress() {
-        if (canEnterPip()) {
-            enterPipMode();
-        } else {
-            finish();
-        }
-    }
-
-    @Override
-    public void onPictureInPictureModeChanged(
-            boolean isInPictureInPictureMode, @NonNull Configuration newConfig) {
-        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
-
-        if (isInPictureInPictureMode) {
-            wasInPipMode = true;
-        } else if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-            // User expanded the PiP window back to the activity: not a close.
-            wasInPipMode = false;
-        }
-    }
-
-
-    // Helpers
-    private int dp(int value) {
-        return (int) (value * getResources().getDisplayMetrics().density + 0.5f);
     }
 }

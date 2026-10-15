@@ -42,7 +42,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/indicator"
+                android:id="@+id/playerIndicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_badge_live"
@@ -204,7 +204,7 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/exo_subtitles"
+                    android:id="@+id/subtitle_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="20dp"
@@ -293,6 +293,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="top"
                 android:orientation="horizontal">
+
 
                 <LinearLayout
                     android:id="@+id/playlistDrawer"

@@ -5,13 +5,10 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,7 +17,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.aaronmaxlab.maxplayer.databinding.ActivityAddPlaylistUrlBinding;
-import com.aaronmaxlab.maxplayer.player.VideoPlayerActivity;
+import com.aaronmaxlab.maxplayer.player.media3.video.VideoPlayerActivity;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
 import com.aaronmaxlab.maxplayer.playlist.PlaylistParser;
 import com.aaronmaxlab.maxplayer.utils.AppToast;

@@ -12,8 +12,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.aaronmaxlab.maxplayer.databinding.ActivityPlayAudioStreamBinding;
-import com.aaronmaxlab.maxplayer.player.AudioMiniPlayer;
-import com.aaronmaxlab.maxplayer.player.AudioPlayerActivity;
+import com.aaronmaxlab.maxplayer.player.media3.audio.AudioMiniPlayer;
+import com.aaronmaxlab.maxplayer.player.media3.audio.AudioPlayerActivity;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.StreamErrorUtils;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;

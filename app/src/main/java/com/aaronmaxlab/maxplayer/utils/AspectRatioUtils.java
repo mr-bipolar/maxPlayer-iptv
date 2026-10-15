@@ -1,39 +1,68 @@
 package com.aaronmaxlab.maxplayer.utils;
 
-import androidx.media3.ui.AspectRatioFrameLayout;
+import android.app.Activity;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.media3.common.util.UnstableApi;
+import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerView;
 
-public class AspectRatioUtils {
+import com.aaronmaxlab.maxplayer.R;
+
+public final class AspectRatioUtils {
+
+    private static final String[] LABELS = {
+            "Fit", "Fixed width", "Fixed height", "Fill", "Zoom"
+    };
 
     @OptIn(markerClass = UnstableApi.class)
-    public static int changeAspectRatio(PlayerView playerView, int aspectMode) {
+    private static final int[] RESIZE_MODES = {
+            AspectRatioFrameLayout.RESIZE_MODE_FIT,
+            AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
+            AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
+            AspectRatioFrameLayout.RESIZE_MODE_FILL,
+            AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+    };
 
-        aspectMode = (aspectMode % 4) + 1;
+    public interface OnModeSelected {
+        void onSelected(int index);
+    }
 
-        switch (aspectMode) {
-            case 1:
-                playerView.setResizeMode(
-                        AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
-                break;
+    private AspectRatioUtils() {
+    }
 
-            case 2:
-                playerView.setResizeMode(
-                        AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT);
-                break;
+    /** Shows a single-choice menu; applies the pick and reports its index. */
+    public static void showMenu(
+            @NonNull Activity activity,
+            @NonNull PlayerView playerView,
+            int selectedIndex,
+            @NonNull OnModeSelected callback
+    ) {
+        AlertDialog dialog = new AlertDialog.Builder(activity, R.style.PlayerDialogTheme)
+                .setTitle("Aspect ratio")
+                .setSingleChoiceItems(LABELS, selectedIndex, (d, which) -> {
+                    apply(playerView, which);
+                    callback.onSelected(which);
+                    d.dismiss();
+                })
+                .create();
 
-            case 3:
-                playerView.setResizeMode(
-                        AspectRatioFrameLayout.RESIZE_MODE_FILL);
-                break;
+        dialog.show();
 
-            case 4:
-                playerView.setResizeMode(
-                        AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
-                break;
+        TextView title = dialog.findViewById(androidx.appcompat.R.id.alertTitle);
+        if (title != null) {
+            title.setTextColor(ContextCompat.getColor(activity, R.color.accent));
         }
+    }
 
-        return aspectMode;
+    @OptIn(markerClass = UnstableApi.class)
+    public static void apply(@NonNull PlayerView playerView, int index) {
+        if (index >= 0 && index < RESIZE_MODES.length) {
+            playerView.setResizeMode(RESIZE_MODES[index]);
+        }
     }
 }

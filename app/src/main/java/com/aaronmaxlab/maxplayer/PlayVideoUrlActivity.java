@@ -4,20 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.aaronmaxlab.maxplayer.databinding.ActivityPlayVideoUrlBinding;
-import com.aaronmaxlab.maxplayer.filepicker.FileDetailsActivity;
-import com.aaronmaxlab.maxplayer.player.AudioPlayerActivity;
-import com.aaronmaxlab.maxplayer.player.UrlPlayerActivity;
+import com.aaronmaxlab.maxplayer.player.media3.video.UrlPlayerActivity;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.StreamErrorUtils;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;

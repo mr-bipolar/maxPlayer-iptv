@@ -1,12 +1,8 @@
 package com.aaronmaxlab.maxplayer;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.OpenableColumns;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
@@ -14,15 +10,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.aaronmaxlab.maxplayer.databinding.ActivityAddPlaylistBinding;
 import com.aaronmaxlab.maxplayer.filepicker.FileDetailsActivity;
 import com.aaronmaxlab.maxplayer.filepicker.MediaBrowserActivity;
-import com.aaronmaxlab.maxplayer.player.UrlPlayerActivity;
-import com.aaronmaxlab.maxplayer.player.VideoPlayerActivity;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.Playlist;

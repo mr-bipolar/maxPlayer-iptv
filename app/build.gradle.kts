@@ -20,7 +20,20 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        vectorDrawables.useSupportLibrary = true
+
+        ndk {
+            abiFilters += setOf(
+                "armeabi-v7a",
+                "arm64-v8a",
+                "x86",
+                "x86_64"
+            )
+        }
     }
+
+    packaging { jniLibs { useLegacyPackaging = true } }
 
     buildTypes {
         release {
@@ -48,9 +61,11 @@ dependencies {
     implementation(libs.media3.ui)
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.exoplayer.hls)
+    implementation(libs.media3.exoplayer.dash)
     implementation(libs.media3.ui.compose)
     implementation(libs.media3.ui.compose.material3)
     implementation(libs.media3.session)
+    implementation(files("libs/mpvengine-debug.aar"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.ext.junit)
