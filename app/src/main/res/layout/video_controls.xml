@@ -78,6 +78,9 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/btnFavorite"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_width="38dp"
             android:layout_height="38dp"
             android:layout_marginStart="8dp"
@@ -89,6 +92,9 @@
             app:tint="@color/white" />
 
         <ImageView
+            android:id="@+id/btnMore"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_width="38dp"
             android:layout_height="38dp"
             android:layout_marginStart="8dp"

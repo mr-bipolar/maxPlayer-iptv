@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/main"
+    android:background="@color/bg">
+
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_tv_plain" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingStart="@dimen/tv_margin_h"
+        android:paddingEnd="@dimen/tv_margin_h"
+        android:clipChildren="false">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_add_playlist"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_text_title"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tv_add_sub"
+            android:textColor="@color/ink_dim"
+            android:textSize="@dimen/tv_text_button"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="28dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="top"
+            android:layout_marginHorizontal="@dimen/space_24"
+            android:clipChildren="false">
+
+            <LinearLayout
+                android:id="@+id/buttonOpenPlaylistUrl"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:background="@drawable/bg_tv_source_tile"
+                android:padding="14dp"
+                android:layout_marginEnd="12dp"
+                android:clipChildren="false"
+                android:focusable="true"
+                android:stateListAnimator="@animator/tv_focus_scale_sm"
+                tools:background="@drawable/bg_tv_source_tile_focused"
+                tools:scaleX="1.04"
+                tools:scaleY="1.04">
+
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_card_2_icon"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_link"
+                        android:importantForAccessibility="no"
+                        android:layout_gravity="center"
+                        app:tint="@color/accent" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/source_url_title"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/tv_text_body"
+                    android:textStyle="bold"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tv_src_url_desc"
+                    android:textColor="@color/ink_faint"
+                    android:textSize="@dimen/tv_text_caption"
+                    android:gravity="center"
+                    android:layout_marginTop="6dp" />
+
+                <requestFocus />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/buttonOpenFolder"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:background="@drawable/bg_tv_source_tile"
+                android:padding="14dp"
+                android:layout_marginEnd="12dp"
+                android:clipChildren="false"
+                android:focusable="true"
+                android:stateListAnimator="@animator/tv_focus_scale_sm">
+
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_card_2_icon"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_folder"
+                        android:importantForAccessibility="no"
+                        android:layout_gravity="center"
+                        app:tint="@color/accent" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/source_folder_title"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/tv_text_body"
+                    android:textStyle="bold"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tv_src_folder_desc"
+                    android:textColor="@color/ink_faint"
+                    android:textSize="@dimen/tv_text_caption"
+                    android:gravity="center"
+                    android:layout_marginTop="6dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/buttonOpenFile"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:background="@drawable/bg_tv_source_tile"
+                android:padding="14dp"
+                android:layout_marginEnd="12dp"
+                android:clipChildren="false"
+                android:focusable="true"
+                android:stateListAnimator="@animator/tv_focus_scale_sm">
+
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_card_2_icon"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_file"
+                        android:importantForAccessibility="no"
+                        android:layout_gravity="center"
+                        app:tint="@color/accent" />
+                </FrameLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/source_file_title"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/tv_text_body"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tv_src_file_desc"
+                    android:textColor="@color/ink_faint"
+                    android:textSize="@dimen/tv_text_caption"
+                    android:gravity="center"
+                    android:layout_marginTop="6dp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/buttonOpenVideoUrl"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:background="@drawable/bg_tv_source_tile"
+                android:padding="14dp"
+                android:layout_marginEnd="12dp"
+                android:clipChildren="false"
+                android:focusable="true"
+                android:stateListAnimator="@animator/tv_focus_scale_sm">
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_card_2_icon"
+                    android:layout_marginBottom="10dp">
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_play"
+                        android:importantForAccessibility="no"
+                        android:layout_gravity="center"
+                        app:tint="@color/accent" />
+                </FrameLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/source_video_title"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/tv_text_body"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tv_src_video_desc"
+                    android:textColor="@color/ink_faint"
+                    android:textSize="@dimen/tv_text_caption"
+                    android:gravity="center"
+                    android:layout_marginTop="6dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/backAddPlaylist"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_gravity="top|start"
+        android:layout_margin="@dimen/tv_margin_v"
+        android:background="@drawable/bg_tv_btn_ghost"
+        android:contentDescription="@string/cd_back"
+        android:focusable="true"
+        android:src="@drawable/ic_back"
+        android:stateListAnimator="@animator/tv_focus_scale_sm"
+        app:tint="@color/ink_dim" />
+</FrameLayout>

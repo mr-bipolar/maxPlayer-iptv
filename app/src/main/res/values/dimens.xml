@@ -59,4 +59,22 @@
     <dimen name="player_progress_touch_height">32dp</dimen>
     <dimen name="player_progress_bottom_offset">52dp</dimen>
 
+
+    <!-- Android TV (designed on a 960 x 540dp canvas) -->
+    <dimen name="tv_margin_h">48dp</dimen>
+    <dimen name="tv_margin_v">27dp</dimen>
+    <dimen name="tv_text_hero">32sp</dimen>
+    <dimen name="tv_text_title">28sp</dimen>
+    <dimen name="tv_text_headline">22sp</dimen>
+    <dimen name="tv_text_row_title">18sp</dimen>
+    <dimen name="tv_text_button">15sp</dimen>
+    <dimen name="tv_text_body">14sp</dimen>
+    <dimen name="tv_text_label">12sp</dimen>
+    <dimen name="tv_text_caption">11sp</dimen>
+    <dimen name="tv_card_wide_w">160dp</dimen>
+    <dimen name="tv_card_wide_h">90dp</dimen>
+    <dimen name="tv_card_w">120dp</dimen>
+    <dimen name="tv_card_h">68dp</dimen>
+    <dimen name="tv_key_h">40dp</dimen>
+
 </resources>

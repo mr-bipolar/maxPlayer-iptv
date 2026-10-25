@@ -1,77 +1,82 @@
 package com.aaronmaxlab.maxplayer.utils;
 
+import android.app.Activity;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class UIUtils {
-    public static void setLightNavigationBars(@NonNull android.app.Activity activity, boolean isLight) {
-        WindowInsetsControllerCompat controller =
-                WindowCompat.getInsetsController(activity.getWindow(), activity.getWindow().getDecorView());
-        controller.setAppearanceLightNavigationBars(isLight);
+public final class UIUtils {
+
+    private static final String DEFAULT_LABEL = "playlist";
+
+    private UIUtils() {}
+
+    public static void setLightNavigationBars(@NonNull Activity activity, boolean isLight) {
+        Window window = activity.getWindow();
+        WindowCompat.getInsetsController(window, window.getDecorView())
+                .setAppearanceLightNavigationBars(isLight);
     }
 
-    public static String extractLabel(String url){
-        String fileName = Uri.parse(url).getLastPathSegment();
+    /** "https://x/y/list.m3u8?token=1" -> "list"; content://.../primary%3ADownload%2FTelegram%2Fplaylist.m3u -> "playlist". */
+    @NonNull
+    public static String extractLabel(@Nullable String url) {
+        if (url == null) return DEFAULT_LABEL;
 
-        if (fileName == null || fileName.trim().isEmpty()) {
-            fileName = "playlist";
-        } else {
-            // Remove query parameters if present
-            int queryIndex = fileName.indexOf("?");
-            if (queryIndex >= 0) {
-                fileName = fileName.substring(0, queryIndex);
-            }
+        String name = Uri.parse(url).getLastPathSegment();   // already excludes the query string
+        if (name == null) return DEFAULT_LABEL;
 
-            // Remove any file extension
-            int dotIndex = fileName.lastIndexOf(".");
-            if (dotIndex > 0) {
-                fileName = fileName.substring(0, dotIndex);
-            }
-        }
+        // document ids look like "primary:Download/Telegram/playlist.m3u": keep only the file name
+        name = name.substring(Math.max(name.lastIndexOf('/'), name.lastIndexOf(':')) + 1);
 
-        return fileName;
+        int dot = name.lastIndexOf('.');
+        if (dot > 0) name = name.substring(0, dot);
+
+        name = name.trim();
+        return name.isEmpty() ? DEFAULT_LABEL : name;
     }
 
-    // Adjust bottom navigation icon and text spacing
-    public static void adjustBottomNavGap(BottomNavigationView bottomNav) {
+    /** Adjust bottom navigation icon and text spacing. */
+    public static void adjustBottomNavGap(@NonNull BottomNavigationView bottomNav) {
+        final int gap = Math.round(4 * bottomNav.getResources().getDisplayMetrics().density);
+
         bottomNav.post(() -> {
-            View menuView = bottomNav.getChildAt(0);
+            if (!(bottomNav.getChildAt(0) instanceof ViewGroup)) return;
+            ViewGroup menu = (ViewGroup) bottomNav.getChildAt(0);
 
-            if (!(menuView instanceof ViewGroup)) {
-                return;
-            }
+            for (int i = 0; i < menu.getChildCount(); i++) {
+                View labels = menu.getChildAt(i)
+                        .findViewById(com.google.android.material.R.id.navigation_bar_item_labels_group);
+                if (labels == null || !(labels.getLayoutParams() instanceof ViewGroup.MarginLayoutParams)) continue;
 
-            ViewGroup menuViewGroup = (ViewGroup) menuView;
-
-            for (int i = 0; i < menuViewGroup.getChildCount(); i++) {
-                View itemView = menuViewGroup.getChildAt(i);
-
-                View labelGroup = itemView.findViewById(
-                        com.google.android.material.R.id.navigation_bar_item_labels_group
-                );
-
-                if (labelGroup == null) {
-                    continue;
-                }
-
-                ViewGroup.MarginLayoutParams params =
-                        (ViewGroup.MarginLayoutParams) labelGroup.getLayoutParams();
-
-                params.topMargin = (int) (
-                        4 * bottomNav.getResources()
-                                .getDisplayMetrics().density
-                );
-
-                labelGroup.setLayoutParams(params);
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) labels.getLayoutParams();
+                if (params.topMargin == gap) continue;      // already set: skip a needless layout pass
+                params.topMargin = gap;
+                labels.setLayoutParams(params);
             }
         });
     }
 
+    /** Pads the view away from the status bar, navigation bar and display cutout (edge-to-edge screens). */
+    public static void applySystemBarPadding(@NonNull View root, boolean includeBottom) {
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            Insets bars = insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            v.setPadding(bars.left, bars.top, bars.right, includeBottom ? bars.bottom : 0);
+            return insets;
+        });
+    }
+
+    public static void applySystemBarPadding(@NonNull View root) {
+        applySystemBarPadding(root, true);
+    }
 }

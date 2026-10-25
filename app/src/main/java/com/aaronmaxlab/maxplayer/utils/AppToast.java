@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -25,6 +26,13 @@ public final class AppToast {
             new Handler(Looper.getMainLooper());
 
     private static Toast currentToast;
+    private static View currentTvNotification;
+    private static final Runnable REMOVE_TV_NOTIFICATION = () -> {
+        if (currentTvNotification == null) return;
+        ViewGroup parent = (ViewGroup) currentTvNotification.getParent();
+        if (parent != null) parent.removeView(currentTvNotification);
+        currentTvNotification = null;
+    };
 
     private AppToast() {
     }
@@ -70,6 +78,7 @@ public final class AppToast {
                 return;
             }
 
+            final boolean isTv = DeviceUtils.isTv(activity);
             View view = activity.getLayoutInflater()
                     .inflate(R.layout.toast_stream_error, null);
 
@@ -93,6 +102,30 @@ public final class AppToast {
                     Color.blue(accentColor)
             ));
             iconBackground.setBackground(iconShape);
+
+            if (isTv) {
+                if (currentToast != null) {
+                    currentToast.cancel();
+                    currentToast = null;
+                }
+                HANDLER.removeCallbacks(REMOVE_TV_NOTIFICATION);
+                REMOVE_TV_NOTIFICATION.run();
+
+                view.setFocusable(false);
+                view.setFocusableInTouchMode(false);
+                view.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+                view.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+                ViewGroup decor = (ViewGroup) activity.getWindow().getDecorView();
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                        dp(activity, 560),
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+                params.bottomMargin = dp(activity, 150);
+                decor.addView(view, params);
+                currentTvNotification = view;
+                HANDLER.postDelayed(REMOVE_TV_NOTIFICATION, 4000);
+                return;
+            }
 
             if (currentToast != null) {
                 currentToast.cancel();

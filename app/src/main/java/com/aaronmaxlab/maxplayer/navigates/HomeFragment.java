@@ -18,7 +18,6 @@ import com.aaronmaxlab.maxplayer.PlayVideoUrlActivity;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.databinding.FragmentHomeBinding;
 import com.aaronmaxlab.maxplayer.player.media3.audio.AudioMiniPlayer;
-import com.aaronmaxlab.maxplayer.player.mpv.MpvPlayerActivity;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 
 
@@ -38,7 +37,7 @@ public class HomeFragment extends Fragment {
 
         ClickUtils.applyTouchEffect(binding.addPlaylistBtn, v -> {
           startActivity(new Intent(getContext(), AddPlaylistActivity.class));
-         //   startActivity(new Intent(getContext(), MpvPlayerActivity.class));
+
         });
 
         ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnAddPlaylist, v -> {

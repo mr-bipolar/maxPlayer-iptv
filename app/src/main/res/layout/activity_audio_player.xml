@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -8,6 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/bg"
     tools:context=".player.media3.audio.AudioPlayerActivity">
+
 
     <LinearLayout
         android:id="@+id/audioPlayerContent"
@@ -63,6 +63,19 @@
                     android:textSize="@dimen/text_caption_sm" />
 
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/audioCatSaveBtn"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_circle_card"
+                android:clickable="true"
+                android:contentDescription="@string/cd_more"
+                android:focusable="true"
+                android:padding="11dp"
+                android:layout_marginEnd="@dimen/space_8"
+                android:src="@drawable/ic_add_music"
+                app:tint="@color/ink" />
 
             <ImageView
                 android:id="@+id/audioMoreBtn"
@@ -153,25 +166,25 @@
                 app:tint="@color/accent_dim" />
 
             <FrameLayout
+                android:id="@+id/playPauseContainer"
                 android:layout_width="@dimen/audio_play_main_size"
                 android:layout_height="@dimen/audio_play_main_size"
                 android:layout_marginStart="30dp"
                 android:layout_marginEnd="30dp"
                 android:background="@drawable/bg_circle_accent"
-                android:elevation="4dp">
+                android:clickable="true"
+                android:contentDescription="@string/audio_play"
+                android:elevation="4dp"
+                android:focusable="true">
 
                 <ImageView
                     android:id="@+id/playPauseBtn"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_gravity="center"
-                    android:clickable="true"
-                    android:contentDescription="@string/audio_play"
-                    android:focusable="true"
-                    android:padding="2dp"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/ic_play"
                     app:tint="@color/accent_ink" />
-
             </FrameLayout>
 
             <ImageView
@@ -238,4 +251,4 @@
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

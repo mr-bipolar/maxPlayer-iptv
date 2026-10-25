@@ -63,7 +63,7 @@
     <!-- Playlist URL -->
     <string name="title_add_playlist_url">Add playlist URL</string>
     <string name="label_playlist_url">Playlist URL</string>
-    <string name="hint_playlist_url">https://example.com/playlist.m3u8</string>
+    <string name="hint_playlist_url">https://iptv-org.github.io/iptv/languages/mal.m3u</string>
     <string name="label_playlist_name_optional">Playlist name (optional)</string>
     <string name="hint_playlist_name">e.g. World Live TV</string>
     <string name="label_states">STATES</string>
@@ -136,6 +136,8 @@
     <string name="player_ctl_channels">Channels</string>
     <string name="player_ctl_fullscreen">Full screen</string>
     <string name="player_ctl_exit_fullscreen">Exit full screen</string>
+    <string name="player_seek_back">Back 10 seconds</string>
+    <string name="player_seek_forward">Forward 10 seconds</string>
 
     <!-- Player — drawer -->
     <string name="drawer_header">%1$s · %2$d channels</string>
@@ -151,13 +153,19 @@
     <string name="btn_stream_info">Stream information</string>
 
     <!-- Audio player -->
-    <string name="label_playing_from">PLAYING FROM RADIO STATIONS</string>
+    <string name="label_playing_from">ON AIR FROM RADIO</string>
     <string name="audio_station_name">Live Radio</string>
     <string name="audio_station_sub">Audio Streaming</string>
     <string name="audio_status_playing">Playing</string>
     <string name="audio_status_stop">Stopped</string>
     <string name="audio_format">MP3 · 128 kbps</string>
     <string name="audio_buffer_note">Buffering smooth</string>
+    <!-- Menu -->
+    <string name="menu_share_stream">Share stream</string>
+    <string name="menu_copy_url">Copy stream URL</string>
+    <string name="menu_stream_info">Stream info</string>
+    <string name="menu_stop_close">Stop &amp; close</string>
+    <string name="toast_link_copied">Stream URL copied</string>
 
     <!-- Settings -->
     <string name="title_settings">Settings</string>
@@ -314,5 +322,19 @@
     <string name="mp_sub_medium">Medium</string>
     <string name="mp_sub_large">Large</string>
     <string name="mp_sub_xl">Extra large</string>
+
+    <string name="player_engine_title">Video player</string>
+    <string name="player_engine_media3">Media3 (ExoPlayer)</string>
+    <string name="player_engine_mpv">MPV</string>
+    <string name="player_menu_engine">Player engine…</string>
+    <string name="player_mpv_unavailable">MPV could not start on this device, using Media3 instead.</string>
+    <string name="player_pip_prev">Previous channel</string>
+    <string name="player_pip_next">Next channel</string>
+
+    <string name="save_channel_title">Save channel</string>
+    <string name="save_channel_category_label">CATEGORY</string>
+    <string name="save_channel_category_hint">Select a category</string>
+    <string name="save_channel_choose_category">Choose category</string>
+    <string name="save_channel_submit">Save</string>
 
 </resources>

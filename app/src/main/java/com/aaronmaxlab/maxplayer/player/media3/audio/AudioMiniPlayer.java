@@ -1,202 +1,221 @@
 package com.aaronmaxlab.maxplayer.player.media3.audio;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.os.Build;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
+import androidx.activity.ComponentActivity;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.Player;
 import androidx.media3.session.MediaController;
 import androidx.media3.session.SessionToken;
 
+import com.aaronmaxlab.maxplayer.PlayAudioStreamActivity;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.service.PlaybackService;
 import com.aaronmaxlab.maxplayer.utils.AudioUtils;
 import com.google.common.util.concurrent.ListenableFuture;
 
-public class AudioMiniPlayer {
+/**
+ * Mini player overlay. Connects to the playback service while the host activity
+ * is started and disconnects when it stops. Call {@link #attach()} once;
+ * {@link #release()} is optional and safe to call more than once.
+ */
+public class AudioMiniPlayer implements DefaultLifecycleObserver {
 
-    private final Activity activity;
+    private final ComponentActivity activity;
     private final View overlay;
-
-    private MediaController mediaController;
-    private ListenableFuture<MediaController> controllerFuture;
-    private Player.Listener playerListener;
-
     private final TextView stationName;
     private final TextView status;
     private final ImageView playPause;
-    private final ImageView expand;
 
-    public AudioMiniPlayer(Activity activity, View overlay) {
+    private final String textPlaying;
+    private final String textStopped;
+    private final String descPause;
+    private final String descPlay;
+
+    private MediaController controller;
+    private ListenableFuture<MediaController> controllerFuture;
+    private Boolean lastPlaying; // null until first render
+
+    public AudioMiniPlayer(@NonNull ComponentActivity activity, @NonNull View overlay) {
         this.activity = activity;
         this.overlay = overlay;
 
         stationName = overlay.findViewById(R.id.miniPlayerStationName);
         status = overlay.findViewById(R.id.miniPlayerStatus);
         playPause = overlay.findViewById(R.id.miniPlayerPlayPause);
-        expand = overlay.findViewById(R.id.miniPlayerExpand);
+        ImageView expand = overlay.findViewById(R.id.miniPlayerExpand);
+
+        // resolve strings once instead of on every update
+        textPlaying = activity.getString(R.string.audio_status_playing);
+        textStopped = activity.getString(R.string.audio_status_stop);
+        descPause = activity.getString(R.string.cd_pause);
+        descPlay = activity.getString(R.string.cd_play);
+
+        playPause.setOnClickListener(v -> togglePlayback());
+        expand.setOnClickListener(v -> openPlayer());
 
         overlay.setVisibility(View.GONE);
     }
 
+
+    // Lifecycle
     public void attach() {
+        activity.getLifecycle().addObserver(this);
+    }
+
+    public void release() {
+        disconnect();
+        activity.getLifecycle().removeObserver(this);
+    }
+
+    @Override
+    public void onStart(@NonNull LifecycleOwner owner) {
+        connect();
+    }
+
+    @Override
+    public void onStop(@NonNull LifecycleOwner owner) {
+        disconnect();
+    }
+
+    @Override
+    public void onDestroy(@NonNull LifecycleOwner owner) {
+        release();
+    }
+
+
+    // Connection
+    private void connect() {
+        if (controllerFuture != null) return;
+
         SessionToken token = new SessionToken(
-                activity,
-                new ComponentName(activity, PlaybackService.class)
-        );
+                activity, new ComponentName(activity, PlaybackService.class));
 
-        controllerFuture = new MediaController.Builder(activity, token)
-                .buildAsync();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            controllerFuture.addListener(() -> {
-                if (activity.isFinishing() || activity.isDestroyed()) {
-                    MediaController.releaseFuture(controllerFuture);
-                    return;
-                }
-
-                try {
-                    mediaController = controllerFuture.get();
-                    setupControls();
-                    update();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    overlay.setVisibility(View.GONE);
-                }
-            }, activity.getMainExecutor());
-        }
+        ListenableFuture<MediaController> future =
+                new MediaController.Builder(activity, token).buildAsync();
+        controllerFuture = future;
+        future.addListener(() -> onConnected(future), ContextCompat.getMainExecutor(activity));
     }
 
-    private void setupControls() {
-        playerListener = new Player.Listener() {
-            @Override
-            public void onIsPlayingChanged(boolean isPlaying) {
-                update();
-            }
+    private void onConnected(@NonNull ListenableFuture<MediaController> future) {
+        if (future != controllerFuture) return; // released while connecting
 
-            @Override
-            public void onMediaItemTransition(
-                    @Nullable MediaItem mediaItem,
-                    int reason
-            ) {
-                update();
-            }
-
-            @Override
-            public void onMediaMetadataChanged(MediaMetadata metadata) {
-                update();
-            }
-
-            @Override
-            public void onPlaybackStateChanged(int playbackState) {
-                update();
-            }
-        };
-
-        mediaController.addListener(playerListener);
-
-        playPause.setOnClickListener(v -> {
-            if (mediaController == null) return;
-
-            if (mediaController.isPlaying()) {
-                mediaController.pause();
-            } else {
-                AudioUtils.setAudioStopped(activity, false);
-
-                if (mediaController.getPlaybackState() == Player.STATE_IDLE) {
-                    mediaController.prepare();
-                }
-
-                mediaController.play();
-            }
-        });
-
-        expand.setOnClickListener(v -> openPlayer());
-    }
-
-    private void update() {
-
-
-        if (mediaController == null) {
+        try {
+            controller = future.get();
+        } catch (Exception e) {
             overlay.setVisibility(View.GONE);
             return;
         }
 
-        MediaItem item = mediaController.getCurrentMediaItem();
-        boolean stopped = AudioUtils.isAudioStopped(activity);
+        controller.addListener(playerListener);
+        update(); // fresh state on every (re)connect
+    }
+
+    private void disconnect() {
+        if (controller != null) {
+            controller.removeListener(playerListener);
+            controller = null;
+        }
+        if (controllerFuture != null) {
+            MediaController.releaseFuture(controllerFuture);
+            controllerFuture = null;
+        }
+    }
 
 
-        if (item == null || stopped) {
+    // Actions
+    private void togglePlayback() {
+        MediaController c = controller;
+        if (c == null) return;
+
+        if (c.isPlaying()) {
+            c.pause();
+            return;
+        }
+
+        AudioUtils.setAudioStopped(activity, false);
+        if (c.getPlaybackState() == Player.STATE_IDLE) {
+            c.prepare();
+        }
+        c.play();
+    }
+
+    private void openPlayer() {
+        MediaController c = controller;
+        if (c == null) return;
+
+        MediaItem item = c.getCurrentMediaItem();
+        if (item == null) return;
+
+        /** localConfiguration can be stripped over IPC;
+          * the full player sets mediaId = stream URI
+         */
+        String uri = item.localConfiguration != null
+                ? item.localConfiguration.uri.toString()
+                : item.mediaId;
+        if (TextUtils.isEmpty(uri)) return;
+
+        MediaMetadata md = c.getMediaMetadata();
+        CharSequence station = AudioPlayerActivity.firstNonBlank(md.station, md.artist);
+
+        activity.startActivity(new Intent(activity, AudioPlayerActivity.class)
+                .putExtra(PlayAudioStreamActivity.EXTRA_STREAM_URI, uri)
+                .putExtra(PlayAudioStreamActivity.EXTRA_STREAM_NAME,
+                        station != null ? station.toString() : ""));
+    }
+
+
+    // UI
+    private void update() {
+        MediaController c = controller;
+
+        if (c == null || c.getCurrentMediaItem() == null || AudioUtils.isAudioStopped(activity)) {
             overlay.setVisibility(View.GONE);
             return;
         }
 
         overlay.setVisibility(View.VISIBLE);
 
-        CharSequence title = mediaController.getMediaMetadata().title;
-
-        if (title != null && !title.toString().trim().isEmpty()) {
-            stationName.setText(title);
-        } else {
-            stationName.setText(R.string.audio_station_name);
+        MediaMetadata md = c.getMediaMetadata();
+        CharSequence name = AudioPlayerActivity.firstNonBlank(
+                md.title, md.displayTitle, md.station, md.artist);
+        if (name == null) {
+            name = activity.getString(R.string.audio_station_name);
+        }
+        if (!TextUtils.equals(name, stationName.getText())) {
+            stationName.setText(name);
         }
 
-        boolean isPlaying = mediaController.isPlaying();
-
-        playPause.setImageResource(
-                isPlaying ? R.drawable.ic_pause : R.drawable.ic_play
-        );
-
-        playPause.setContentDescription(
-                activity.getString(
-                        isPlaying ? R.string.cd_pause : R.string.cd_play
-                )
-        );
-
-        status.setText(
-                isPlaying
-                        ? R.string.audio_status_playing
-                        : R.string.audio_status_stop
-        );
-    }
-
-    private void openPlayer() {
-        if (mediaController == null) return;
-
-        MediaItem item = mediaController.getCurrentMediaItem();
-
-        if (item == null || item.localConfiguration == null) return;
-
-        Intent intent = new Intent(activity, AudioPlayerActivity.class);
-        intent.putExtra(
-                "stream_uri",
-                item.localConfiguration.uri.toString()
-        );
-
-        CharSequence title = mediaController.getMediaMetadata().title;
-        intent.putExtra("stream_name", title != null ? title.toString() : "");
-
-        activity.startActivity(intent);
-    }
-
-    public void release() {
-        if (mediaController != null && playerListener != null) {
-            mediaController.removeListener(playerListener);
-            playerListener = null;
+        boolean playing = c.isPlaying();
+        if (lastPlaying == null || lastPlaying != playing) {
+            lastPlaying = playing;
+            playPause.setImageResource(playing ? R.drawable.ic_pause : R.drawable.ic_play);
+            playPause.setContentDescription(playing ? descPause : descPlay);
+            status.setText(playing ? textPlaying : textStopped);
         }
-
-        if (controllerFuture != null) {
-            MediaController.releaseFuture(controllerFuture);
-            controllerFuture = null;
-        }
-
-        mediaController = null;
     }
+
+    private final Player.Listener playerListener = new Player.Listener() {
+        @Override
+        public void onEvents(@NonNull Player player, @NonNull Player.Events events) {
+            // one callback per batch of changes instead of four separate ones
+            if (events.containsAny(
+                    Player.EVENT_IS_PLAYING_CHANGED,
+                    Player.EVENT_MEDIA_ITEM_TRANSITION,
+                    Player.EVENT_MEDIA_METADATA_CHANGED,
+                    Player.EVENT_PLAYBACK_STATE_CHANGED)) {
+                update();
+            }
+        }
+    };
 }

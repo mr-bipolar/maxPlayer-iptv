@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aaronmaxlab.maxplayer.R;
@@ -16,6 +17,7 @@ import com.aaronmaxlab.maxplayer.playlist.models.PlaylistChannel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class PlaylistAdapter
@@ -84,6 +86,10 @@ public class PlaylistAdapter
         PlaylistChannel channel = channels.get(position);
 
         holder.tvChannelName.setText(channel.name);
+        holder.itemView.setSelected(position == playingPosition);
+        if (holder.tvChannelNumber != null) {
+            holder.tvChannelNumber.setText(String.format(Locale.ROOT, "%02d", position + 1));
+        }
 
         if (position == playingPosition) {
             holder.startEqualizer();
@@ -118,6 +124,7 @@ public class PlaylistAdapter
 
         final ImageView ivPlaying;
         final TextView tvChannelName;
+        @Nullable final TextView tvChannelNumber;
 
 
         PlayViewHolder(@NonNull View itemView) {
@@ -125,6 +132,7 @@ public class PlaylistAdapter
 
             ivPlaying = itemView.findViewById(R.id.ivPlaying);
             tvChannelName = itemView.findViewById(R.id.tvChannelName);
+            tvChannelNumber = itemView.findViewById(R.id.tvChannelNumber);
         }
 
         void startEqualizer() {
