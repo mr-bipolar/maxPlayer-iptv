@@ -1,0 +1,46 @@
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Bar 1 -->
+    <item
+        android:left="0dp"
+        android:bottom="0dp"
+        android:width="3dp"
+        android:height="9dp"
+        android:gravity="bottom"
+        >
+        <shape android:shape="rectangle">
+            <corners android:radius="1dp" />
+            <solid android:color="@color/accent" />
+        </shape>
+    </item>
+
+    <!-- Bar 2 -->
+    <item
+        android:left="6dp"
+        android:bottom="0dp"
+        android:width="3dp"
+        android:height="5dp"
+        android:gravity="bottom"
+        >
+        <shape android:shape="rectangle">
+            <corners android:radius="1dp" />
+            <solid android:color="@color/accent" />
+        </shape>
+    </item>
+
+    <!-- Bar 3 -->
+    <item
+        android:left="12dp"
+        android:bottom="0dp"
+        android:width="3dp"
+        android:height="14dp"
+        android:gravity="bottom"
+        >
+        <shape android:shape="rectangle">
+            <corners android:radius="1dp" />
+            <solid android:color="@color/accent" />
+        </shape>
+    </item>
+
+</layer-list>

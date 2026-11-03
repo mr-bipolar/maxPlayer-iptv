@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
 
-import com.aaronmaxlab.maxplayer.filepicker.models.PlaylistInfo;
+import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

@@ -127,16 +127,18 @@
     <string name="badge_live">LIVE</string>
     <string name="player_channel_name">Sky Sports Main Event</string>
     <string name="player_channel_sub">World Live TV · Sports</string>
-    <string name="player_buffer">Buffer 8s</string>
+    <string name="player_buffer">Buffer: %1$d%%</string>
+    <string name="player_ctl_add">Add Subtitle</string>
     <string name="player_ctl_audio">Audio</string>
     <string name="player_ctl_subtitles">Subtitles</string>
     <string name="player_ctl_speed">Speed</string>
     <string name="player_ctl_aspect">Aspect</string>
     <string name="player_ctl_channels">Channels</string>
     <string name="player_ctl_fullscreen">Full screen</string>
+    <string name="player_ctl_exit_fullscreen">Exit full screen</string>
 
     <!-- Player — drawer -->
-    <string name="drawer_header">Sports · 186 channels</string>
+    <string name="drawer_header">%1$s · %2$d channels</string>
     <string name="chip_favorites">Favorites</string>
     <string name="drawer_bt_sport">BT Sport 2</string>
     <string name="drawer_bein_sports">beIN Sports</string>
@@ -150,9 +152,10 @@
 
     <!-- Audio player -->
     <string name="label_playing_from">PLAYING FROM RADIO STATIONS</string>
-    <string name="audio_station_name">Chillhop Radio</string>
-    <string name="audio_station_sub">Lofi beats to relax / study to</string>
+    <string name="audio_station_name">Live Radio</string>
+    <string name="audio_station_sub">Audio Streaming</string>
     <string name="audio_status_playing">Playing</string>
+    <string name="audio_status_stop">Stopped</string>
     <string name="audio_format">MP3 · 128 kbps</string>
     <string name="audio_buffer_note">Buffering smooth</string>
 
@@ -208,7 +211,8 @@
     <string name="audio_meta_separator">·</string>
     <string name="toggle_grid">Grid</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="streaming">Streaming..</string>
+    <string name="video_channel">Video Channel</string>
 
     <!-- How to add a playlist -->
     <string name="title_how_to_add">How to add a playlist</string>
@@ -264,5 +268,51 @@
     <string name="btn_save_playlist">Save playlist</string>
 
     <string name="label_playlist_name">Playlist name</string>
+    <string name="audio_play" />
+    <string name="todo">TODO</string>
+    <string name="playback_error">Playback error</string>
+    <string name="unable_to_play_this_channel">Unable to play this channel</string>
+
+
+    <!-- New strings used by MpvVideoPlayer (prefix mp_ avoids clashes with the existing set) -->
+    <string name="mp_untitled">Stream</string>
+    <string name="mp_stream_label">STREAM</string>
+    <string name="mp_time_zero">0:00</string>
+    <string name="mp_buffer_fmt">Buffer %1$ds</string>
+    <string name="mp_off">Off</string>
+    <string name="mp_dlg_audio">Audio</string>
+    <string name="mp_dlg_subtitles">Subtitles</string>
+    <string name="mp_dlg_speed">Playback speed</string>
+    <string name="mp_dlg_channels">Channels</string>
+    <string name="mp_add_subtitle_file">Add subtitle file…</string>
+    <string name="mp_track_fmt">Track %1$d</string>
+    <string name="mp_no_audio">No audio tracks</string>
+    <string name="mp_no_channels">No channel list loaded</string>
+    <string name="mp_speed_live">Speed can\'t be changed on live streams</string>
+    <string name="mp_aspect_fit">Fit</string>
+    <string name="mp_aspect_16_9">16:9</string>
+    <string name="mp_aspect_4_3">4:3</string>
+    <string name="mp_aspect_fill">Fill</string>
+    <string name="mp_aspect_stretch">Stretch</string>
+    <string name="mp_menu_info">Stream info</string>
+    <string name="mp_menu_screenshot">Take screenshot</string>
+    <string name="mp_menu_reload">Reload stream</string>
+    <string name="mp_menu_jump_live">Jump to live</string>
+    <string name="mp_menu_copy_url">Copy stream URL</string>
+    <string name="mp_url_copied">Stream URL copied</string>
+    <string name="mp_screenshot_saved">Saved: %1$s</string>
+    <string name="mp_screenshot_failed">Screenshot failed</string>
+    <string name="mp_close">Close</string>
+    <string name="mp_cancel">Cancel</string>
+    <string name="mp_playlist_failed">Could not load the playlist: %1$s</string>
+    <string name="mp_no_url">No stream URL was provided</string>
+    <string name="mp_cert_failed">Could not prepare the HTTPS certificate bundle; HTTPS streams may fail</string>
+    <string name="mp_not_seekable">This stream can\'t be seeked</string>
+    <string name="mp_sub_size_item">Subtitle size…</string>
+    <string name="mp_dlg_sub_size">Subtitle size</string>
+    <string name="mp_sub_small">Small</string>
+    <string name="mp_sub_medium">Medium</string>
+    <string name="mp_sub_large">Large</string>
+    <string name="mp_sub_xl">Extra large</string>
 
 </resources>

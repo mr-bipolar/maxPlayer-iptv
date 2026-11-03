@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
@@ -24,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.databinding.ActivityMediaBrowserBinding;
 import com.aaronmaxlab.maxplayer.filepicker.adapter.MediaFileAdapter;
+import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 
 import java.util.ArrayList;
@@ -46,6 +46,7 @@ public class MediaBrowserActivity extends AppCompatActivity {
 
     private final List<DocumentFile> folderStack = new ArrayList<>();
 
+    private ActivityMediaBrowserBinding binding;
     private ActivityResultLauncher<Intent> folderPicker;
 
     private MediaFileAdapter adapter;
@@ -64,7 +65,7 @@ public class MediaBrowserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        ActivityMediaBrowserBinding binding = ActivityMediaBrowserBinding.inflate(getLayoutInflater());
+        binding = ActivityMediaBrowserBinding.inflate(getLayoutInflater());
 
         setContentView(binding.getRoot());
 
@@ -141,11 +142,7 @@ public class MediaBrowserActivity extends AppCompatActivity {
                     try {
                         getContentResolver().takePersistableUriPermission(selectedUri, takeFlags);
                     } catch (SecurityException e) {
-                        Toast.makeText(
-                                this,
-                                "Could not save folder access. Please select again.",
-                                Toast.LENGTH_LONG
-                        ).show();
+                        AppToast.warning(this, "Could not save folder access. Please select again.");
                         return;
                     }
 
@@ -155,11 +152,7 @@ public class MediaBrowserActivity extends AppCompatActivity {
                     if (selectedFolder == null
                             || !selectedFolder.isDirectory()
                             || !selectedFolder.canRead()) {
-                        Toast.makeText(
-                                this,
-                                "Cannot read the selected folder.",
-                                Toast.LENGTH_LONG
-                        ).show();
+                       AppToast.info(this, "Cannot read the selected folder.");
                         return;
                     }
 
@@ -247,11 +240,7 @@ public class MediaBrowserActivity extends AppCompatActivity {
         DocumentFile currentFolder = getCurrentFolder();
 
         if (currentFolder == null || !currentFolder.canRead()) {
-            Toast.makeText(
-                    this,
-                    "Cannot access this folder.",
-                    Toast.LENGTH_SHORT
-            ).show();
+            AppToast.error(this, "Cannot access this folder.");
             navigateUp();
             return;
         }
@@ -316,11 +305,7 @@ public class MediaBrowserActivity extends AppCompatActivity {
                 }
             }
         } catch (SecurityException e) {
-            Toast.makeText(
-                    this,
-                    "Permission denied while reading folder.",
-                    Toast.LENGTH_SHORT
-            ).show();
+            AppToast.error(this, "Permission denied while reading folder.");
         }
 
         Comparator<MediaFile> byName =
@@ -338,24 +323,16 @@ public class MediaBrowserActivity extends AppCompatActivity {
     private MediaFile.Type getMediaType(String fileName) {
         String lowerName = fileName.toLowerCase(Locale.ROOT);
 
-        if (lowerName.endsWith(".m3u") ||
-                lowerName.endsWith(".m3u8") ||
-                lowerName.endsWith(".pls") ||
-                lowerName.endsWith(".xspf")) {
-
+        if (lowerName.endsWith(".m3u")
+                || lowerName.endsWith(".m3u8")
+                || lowerName.endsWith(".pls")
+                || lowerName.endsWith(".xspf")) {
             return MediaFile.Type.PLAYLIST;
         }
 
-        String[] videoExtensions = {
-                ".mp4", ".mkv", ".avi", ".mov", ".webm",
-                ".ts", ".m2ts", ".mpg", ".mpeg", ".m4v",
-                ".wmv", ".flv", ".vob", ".3gp", ".ogv"
-        };
-
-        for (String extension : videoExtensions) {
-            if (lowerName.endsWith(extension)) {
-                return MediaFile.Type.VIDEO;
-            }
+        if (lowerName.endsWith(".ts")
+                || lowerName.endsWith(".m2ts")) {
+            return MediaFile.Type.VIDEO;
         }
 
         return null;
@@ -416,7 +393,9 @@ public class MediaBrowserActivity extends AppCompatActivity {
         }
     }
 
-
-
-
+    @Override
+    protected void onDestroy() {
+        binding = null;
+        super.onDestroy();
+    }
 }

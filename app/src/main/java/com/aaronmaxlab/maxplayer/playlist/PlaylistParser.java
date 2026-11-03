@@ -1,9 +1,10 @@
-package com.aaronmaxlab.maxplayer.filepicker.parser;
+package com.aaronmaxlab.maxplayer.playlist;
 
 import android.content.ContentResolver;
 import android.net.Uri;
 
-import com.aaronmaxlab.maxplayer.filepicker.models.PlaylistInfo;
+import com.aaronmaxlab.maxplayer.playlist.models.PlaylistChannel;
+import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -188,9 +189,21 @@ public final class PlaylistParser {
                                          java.nio.charset.StandardCharsets.UTF_8))) {
 
                 String line;
+                String pendingName = null;
+                String pendingCategory = "";
+                String pendingLogo = "";
+
+                Pattern logoPattern = Pattern.compile(
+                        "tvg-logo\\s*=\\s*\"([^\"]*)\"",
+                        Pattern.CASE_INSENSITIVE
+                );
 
                 while ((line = reader.readLine()) != null) {
                     line = line.trim();
+
+                    if (line.isEmpty()) {
+                        continue;
+                    }
 
                     if (line.startsWith("#EXT-X-")) {
                         isHls = true;
@@ -199,21 +212,63 @@ public final class PlaylistParser {
                     if (line.startsWith("#EXTINF:")) {
                         entries++;
 
-                        java.util.regex.Matcher matcher =
-                                java.util.regex.Pattern.compile(
-                                        "group-title\\s*=\\s*\"([^\"]*)\"",
-                                        java.util.regex.Pattern.CASE_INSENSITIVE
-                                ).matcher(line);
+                        int comma = line.indexOf(',');
+                        pendingName = comma >= 0
+                                ? line.substring(comma + 1).trim()
+                                : "";
 
+                        pendingCategory = "";
+                        pendingLogo = "";
+
+                        Matcher matcher = GROUP_TITLE.matcher(line);
                         if (matcher.find()) {
-                            String category = matcher.group(1).trim();
+                            pendingCategory = matcher.group(1).trim();
 
-                            if (!category.isEmpty()) {
-                                categories.add(category);
+                            if (!pendingCategory.isEmpty()) {
+                                categories.add(pendingCategory);
                             }
                         }
+
+                        Matcher logoMatcher = logoPattern.matcher(line);
+                        if (logoMatcher.find()) {
+                            pendingLogo = logoMatcher.group(1).trim();
+                        }
+
+                        continue;
                     }
+
+                    if (line.regionMatches(true, 0, "#EXTGRP:", 0, 8)) {
+                        pendingCategory = line.substring(8).trim();
+
+                        if (!pendingCategory.isEmpty()) {
+                            categories.add(pendingCategory);
+                        }
+
+                        continue;
+                    }
+
+                    // Ignore comments and tags; the next non-comment line is the URL.
+                    if (line.startsWith("#")) {
+                        continue;
+                    }
+
+                    // Keep HLS manifest handling unchanged.
+                    if (!isHls && pendingName != null) {
+                        PlaylistChannel channel = new PlaylistChannel(
+                                pendingName.isEmpty() ? line : pendingName,
+                                line,
+                                pendingCategory
+                        );
+
+                        channel.logoUrl = pendingLogo;
+                        info.channels.add(channel);
+                    }
+
+                    pendingName = null;
+                    pendingCategory = "";
+                    pendingLogo = "";
                 }
+
             }
 
             info.isHlsManifest = isHls;
@@ -233,4 +288,113 @@ public final class PlaylistParser {
             }
         }
     }
+
+
+    private static void parseM3uContent(
+            BufferedReader reader,
+            PlaylistInfo info
+    ) throws IOException {
+
+        Set<String> categories = new LinkedHashSet<>();
+
+        Pattern groupTitle = Pattern.compile(
+                "group-title\\s*=\\s*\"([^\"]*)\"",
+                Pattern.CASE_INSENSITIVE
+        );
+
+        Pattern logoPattern = Pattern.compile(
+                "tvg-logo\\s*=\\s*\"([^\"]*)\"",
+                Pattern.CASE_INSENSITIVE
+        );
+
+        String line;
+        String pendingName = null;
+        String pendingCategory = "";
+        String pendingLogo = "";
+        boolean hasHlsTags = false;
+
+        while ((line = reader.readLine()) != null) {
+            line = line.trim();
+
+            if (line.isEmpty()) {
+                continue;
+            }
+
+            if (line.startsWith("#EXT-X-")) {
+                hasHlsTags = true;
+            }
+
+            if (line.regionMatches(true, 0, "#EXTGRP:", 0, 8)) {
+                pendingCategory = line.substring(8).trim();
+                continue;
+            }
+
+            if (line.startsWith("#EXTINF:")) {
+                int comma = line.indexOf(',');
+
+                pendingName = comma >= 0
+                        ? line.substring(comma + 1).trim()
+                        : "";
+
+                Matcher groupMatcher = groupTitle.matcher(line);
+                Matcher logoMatcher = logoPattern.matcher(line);
+
+                String category = pendingCategory;
+
+                if (groupMatcher.find()) {
+                    category = groupMatcher.group(1).trim();
+                }
+
+                pendingCategory = category;
+
+                if (logoMatcher.find()) {
+                    pendingLogo = logoMatcher.group(1).trim();
+                } else {
+                    pendingLogo = "";
+                }
+
+                continue;
+            }
+
+            // Ignore comments and other M3U metadata.
+            if (line.startsWith("#")) {
+                continue;
+            }
+
+            // This is the stream URL belonging to the pending entry.
+            if (pendingName != null && !line.isEmpty()) {
+                PlaylistChannel channel = new PlaylistChannel(
+                        pendingName,
+                        line,
+                        pendingCategory
+                );
+
+                channel.logoUrl = pendingLogo;
+
+                info.channels.add(channel);
+
+                if (!pendingCategory.isEmpty()) {
+                    categories.add(pendingCategory);
+                }
+
+                pendingName = null;
+                pendingCategory = "";
+                pendingLogo = "";
+            }
+        }
+
+        info.isHlsManifest = hasHlsTags;
+
+        if (hasHlsTags) {
+            info.format = "HLS M3U8";
+            info.channelCount = 0;
+            info.channels.clear();
+            info.categoryNames.clear();
+        } else {
+            info.channelCount = info.channels.size();
+            info.categoryNames.clear();
+            info.categoryNames.addAll(categories);
+        }
+    }
+
 }

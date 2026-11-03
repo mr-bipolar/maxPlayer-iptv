@@ -9,7 +9,6 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,8 +18,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.databinding.ActivityFileDetailsBinding;
-import com.aaronmaxlab.maxplayer.filepicker.models.PlaylistInfo;
-import com.aaronmaxlab.maxplayer.filepicker.parser.PlaylistParser;
+import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
+import com.aaronmaxlab.maxplayer.playlist.PlaylistParser;
+import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.Playlist;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
@@ -32,12 +32,14 @@ import java.util.concurrent.Executors;
 
 public class FileDetailsActivity extends AppCompatActivity {
 
+   private ActivityFileDetailsBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        ActivityFileDetailsBinding binding = ActivityFileDetailsBinding.inflate(getLayoutInflater());
+        binding = ActivityFileDetailsBinding.inflate(getLayoutInflater());
 
         setContentView(binding.getRoot());
 
@@ -51,8 +53,8 @@ public class FileDetailsActivity extends AppCompatActivity {
             return insets;
         });
 
-        String playlistUri = getIntent().getStringExtra("playlist_uri");
-        String fileName = getIntent().getStringExtra("playlist_file_name");
+       final String playlistUri = getIntent().getStringExtra("playlist_uri");
+       final String fileName = getIntent().getStringExtra("playlist_file_name");
 
 
         ClickUtils.applyTouchEffect(binding.backPlaylistFound, view -> finish());
@@ -71,6 +73,8 @@ public class FileDetailsActivity extends AppCompatActivity {
         if (playlistUri != null && fileName != null) {
             inspectPlaylist(Uri.parse(playlistUri), fileName);
         }
+
+
     }
 
     private void showCategories(List<String> categories) {
@@ -163,14 +167,15 @@ public class FileDetailsActivity extends AppCompatActivity {
                 });
 
             } catch (Exception e) {
-                runOnUiThread(() ->
-                        Toast.makeText(
-                                this,
-                                "Unable to read playlist: " + e.getMessage(),
-                                Toast.LENGTH_LONG
-                        ).show()
+                runOnUiThread(() -> AppToast.error(this, "Unable to read playlist: " + e.getMessage())
                 );
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        binding = null;
+        super.onDestroy();
     }
 }

@@ -11,6 +11,7 @@ navigation = "2.10.2"
 recyclerview = "1.4.0"
 documentfile = "1.1.0"
 flexbox = "3.0.0"
+media3 = "1.11.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -25,6 +26,13 @@ navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version
 recyclerview = {group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview"}
 documentfile = {group = "androidx.documentfile", name = "documentfile", version.ref = "documentfile"}
 flexbox = {group = "com.google.android.flexbox", name = "flexbox", version.ref = "flexbox"}
+media3-exoplayer = {group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3"}
+media3-ui = {group = "androidx.media3", name = "media3-ui", version.ref = "media3"}
+media3-exoplayer-hls = {group = "androidx.media3", name = "media3-exoplayer-hls", version.ref = "media3"}
+media3-ui-compose = {group = "androidx.media3", name = "media3-ui-compose", version.ref = "media3"}
+media3-ui-compose-material3 = {group = "androidx.media3", name = "media3-ui-compose-material3", version.ref = "media3"}
+media3-session = {group = "androidx.media3" , name = "media3-session", version.ref = "media3"}
+media3-exoplayer-dash = {group = "androidx.media3" , name = "media3-exoplayer-dash", version.ref = "media3"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

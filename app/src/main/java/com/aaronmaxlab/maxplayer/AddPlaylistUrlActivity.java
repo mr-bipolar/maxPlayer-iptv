@@ -4,38 +4,42 @@ import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.aaronmaxlab.maxplayer.databinding.ActivityAddPlaylistUrlBinding;
-import com.aaronmaxlab.maxplayer.filepicker.models.PlaylistInfo;
-import com.aaronmaxlab.maxplayer.filepicker.parser.PlaylistParser;
+import com.aaronmaxlab.maxplayer.player.media3.video.VideoPlayerActivity;
+import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
+import com.aaronmaxlab.maxplayer.playlist.PlaylistParser;
+import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.Playlist;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
+import com.aaronmaxlab.maxplayer.utils.UrlUtils;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class AddPlaylistUrlActivity extends AppCompatActivity {
 
+    private ActivityAddPlaylistUrlBinding binding;
+    private String playlistUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        ActivityAddPlaylistUrlBinding binding = ActivityAddPlaylistUrlBinding.inflate(getLayoutInflater());
+         binding = ActivityAddPlaylistUrlBinding.inflate(getLayoutInflater());
 
         setContentView(binding.getRoot());
 
@@ -51,48 +55,62 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
 
         binding.errorCard.setVisibility(INVISIBLE);
 
+
         ClickUtils.applyTouchEffect(binding.backAddPlayListUrlOpen, v -> finish());
 
         ClickUtils.applyTouchEffect(binding.btnAddPlaylistCall, v -> {
 
-           final String url = String.valueOf(binding.inputPlaylistUrl.getText());
-           final String name = String.valueOf(binding.inputPlaylistName.getText());
-            TextView errorCard = findViewById(R.id.errorCard);
-            TextView statusLabel = findViewById(R.id.statesLabel);
-            LinearLayout  loading = findViewById(R.id.loadingState);
-            LinearLayout successCard = findViewById(R.id.successCard);
+            EditText inputUrl = binding.inputPlaylistUrl;
+            EditText inputName = binding.inputPlaylistName;
 
-            TextView playlistCount = findViewById(R.id.playlistAddedCount);
-            TextView playlistCatCount = findViewById(R.id.playlistAddedCatCount);
+            TextView errorCard = binding.errorCard;
+            TextView statusLabel = binding.statesLabel;
+            LinearLayout  loading = binding.loadingState;
+            LinearLayout successCard = binding.successCard;
+
+            TextView playlistCount = binding.playlistAddedCount;
+            TextView playlistCatCount = binding.playlistAddedCatCount;
+
+            LinearLayout addPlaylistBtn = binding.btnAddPlaylistCall;
+
+             playlistUrl = String.valueOf(inputUrl.getText()).trim();
+             String name = String.valueOf(inputName.getText()).trim();
+
+
+            if(playlistUrl.isEmpty()){
+                inputUrl.setError("Enter a video stream URL");
+                inputUrl.requestFocus();
+                return;
+            }
+
+            if (!UrlUtils.isValidStreamUrl(playlistUrl)) {
+                inputUrl.setError("Enter a valid HTTP or HTTPS URL");
+                inputUrl.requestFocus();
+                return;
+            }
 
             loading.setVisibility(VISIBLE);
             statusLabel.setVisibility(INVISIBLE);
             errorCard.setVisibility(INVISIBLE);
             successCard.setVisibility(GONE);
 
-            if (url.trim().isEmpty()) {
-                Toast.makeText(this, "Enter a playlist URL.", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            addPlaylistBtn.setEnabled(false);
 
              final ExecutorService executor =
                     Executors.newSingleThreadExecutor();
 
              executor.execute(() -> {
                  try {
-                     String fileName = Uri.parse(url).getLastPathSegment();
 
-                     if (fileName == null || fileName.trim().isEmpty()) {
-                         fileName = "playlist.m3u";
-                     }
+                     String fileName = UIUtils.extractLabel(playlistUrl);
 
                      PlaylistInfo info = PlaylistParser.parseRemoteUrl(
-                             url,
+                             playlistUrl,
                              fileName
                      );
 
                      // Populate name and size into 'info'
-                     Playlist.loadRemoteMetadata( url, info);
+                     Playlist.loadRemoteMetadata( playlistUrl, info);
 
                       String channelCount = String.valueOf(info.channelCount);
                       String categoryCount = String.valueOf(info.categoryNames.size());
@@ -106,11 +124,12 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
                              playlistCount.setText(channelCount);
                              playlistCatCount.setText(categoryCount);
 
-                             Toast.makeText(this, "Playlist added.", Toast.LENGTH_SHORT).show();
+                             AppToast.success(this, "Playlist added.");
 
                          }else{
-                             Toast.makeText(this, "It's not a playlist.", Toast.LENGTH_SHORT).show();
+                             AppToast.info(this, "It's not a playlist.");
                          }
+                         addPlaylistBtn.setEnabled(true);
 
                      });
                  } catch (Exception e) {
@@ -124,15 +143,30 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
                          loading.setVisibility(GONE);
                          statusLabel.setVisibility(VISIBLE);
 
-
-
-                             }
+                         addPlaylistBtn.setEnabled(true);
+                        }
 
                      );
                  }
              });
         });
 
+        ClickUtils.applyTouchEffect(binding.openPlaylistStream, v -> {
+            if (playlistUrl == null) {
+                AppToast.warning(this, "Please load a playlist first.");
+                return;
+            }
 
+            Intent intent = new Intent(this, VideoPlayerActivity.class);
+            intent.putExtra("playlist_url", playlistUrl);
+            startActivity(intent);
+        });
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        binding = null;
+        super.onDestroy();
     }
 }

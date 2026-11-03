@@ -6,4 +6,6 @@
     <item name="navFavorites" type="id" />
     <item name="navHistory" type="id" />
     <item name="navSettings" type="id" />
+    <item name="play_icon" type="id" />
+    <item name="fullscreen_icon" type="id" />
 </resources>

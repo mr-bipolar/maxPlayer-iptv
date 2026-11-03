@@ -1,28 +1,33 @@
 package com.aaronmaxlab.maxplayer;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.aaronmaxlab.maxplayer.databinding.ActivityPlayVideoUrlBinding;
+import com.aaronmaxlab.maxplayer.player.media3.video.UrlPlayerActivity;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
+import com.aaronmaxlab.maxplayer.utils.StreamErrorUtils;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
+import com.aaronmaxlab.maxplayer.utils.UrlUtils;
 
 public class PlayVideoUrlActivity extends AppCompatActivity {
+
+    ActivityPlayVideoUrlBinding  binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        ActivityPlayVideoUrlBinding  binding = ActivityPlayVideoUrlBinding.inflate(getLayoutInflater());
+        binding = ActivityPlayVideoUrlBinding.inflate(getLayoutInflater());
 
         setContentView(binding.getRoot());
 
@@ -35,17 +40,59 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
             return insets;
         });
 
+        // back button
         ClickUtils.applyTouchEffect(binding.backPlayVideoUrl, v -> finish());
-        ClickUtils.applyTouchEffect(binding.playVideoUrl, v -> {
-            final String videoUrl = binding.videoUrlForPlay.getText().toString();
-            final String videoName = binding.videoNameForPlay.getText().toString();
 
-            if(videoUrl.trim().isEmpty()){
-                Toast.makeText(this, "Enter a video URL.", Toast.LENGTH_SHORT).show();
+        // play video
+        ClickUtils.applyTouchEffect(binding.playVideoUrl, v -> {
+
+            EditText urlBox = binding.videoUrlForPlay;
+            EditText nameBox = binding.videoNameForPlay;
+            LinearLayout playVideo = binding.playVideoUrl;
+
+             String videoUrl = urlBox.getText().toString().trim();
+             String videoName = nameBox.getText().toString();
+
+            if(videoUrl.isEmpty()){
+                urlBox.setError("Enter a video stream URL");
+                urlBox.requestFocus();
                 return;
             }
 
-            // later add this on local db and move to player
+            if (!UrlUtils.isValidStreamUrl(videoUrl)) {
+                urlBox.setError("Enter a valid HTTP or HTTPS URL");
+                urlBox.requestFocus();
+                return;
+            }
+
+            playVideo.setEnabled(false);
+
+            java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+                boolean reachable = UrlUtils.isStreamReachable(videoUrl);
+
+                runOnUiThread(() -> {
+                    playVideo.setEnabled(true);
+
+
+                    if (!reachable) {
+                        StreamErrorUtils.show(this);
+                        return;
+                    }
+
+                    Intent intent = new Intent(this, UrlPlayerActivity.class);
+                    intent.putExtra("playlist_uri", videoUrl);
+                    intent.putExtra("playlist_file_name", videoName);
+                    startActivity(intent);
+                });
+            });
+
+
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        binding = null;
+        super.onDestroy();
     }
 }

@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="gone"
+        android:visibility="visible"
        >
 
         <ScrollView
@@ -322,85 +322,7 @@
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="8dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:background="@drawable/bg_mini_player">
-            <FrameLayout
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:background="@drawable/bg_card_icon_square_sm">
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_tv"
-                    android:importantForAccessibility="no"
-                    android:layout_gravity="center"
-                    app:tint="@color/ink_faint" />
-            </FrameLayout>
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_weight="1"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/now_playing_bbc"
-                    android:textColor="@color/ink"
-                    android:textSize="@dimen/text_body_sm"
-                    android:textStyle="bold"
-                    android:maxLines="1"
-                    android:ellipsize="end"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-                    <View
-                        android:layout_width="6dp"
-                        android:layout_height="6dp"
-                        android:background="@drawable/bg_circle_live"
-                        android:layout_marginEnd="5dp"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/now_playing_bbc_sub"
-                        android:textColor="@color/ink_faint"
-                        android:textSize="@dimen/text_caption_sm"
-                        android:maxLines="1"/>
-                </LinearLayout>
-            </LinearLayout>
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_pause"
-                android:padding="8dp"
-                android:background="@color/transparent"
-                android:scaleType="fitCenter"
-                android:contentDescription="@string/cd_pause"
-                app:tint="@color/ink" />
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_expand"
-                android:padding="8dp"
-                android:background="@color/transparent"
-                android:scaleType="fitCenter"
-                android:contentDescription="@string/cd_expand"
-                app:tint="@color/ink" />
-        </LinearLayout>
+
 
     </LinearLayout>
 
@@ -408,5 +330,14 @@
     <include
         android:id="@+id/layoutHomeEmpty"
         layout="@layout/fragment_home_empty"
-        android:visibility="visible" />
+        android:visibility="gone" />
+
+    <!-- Audio mini player -->
+    <include
+        android:id="@+id/audioPlayerOverlay"
+        layout="@layout/audio_bg_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
 </FrameLayout>

@@ -1,26 +1,39 @@
+
 package com.aaronmaxlab.maxplayer;
 
 import android.content.Context;
 
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import com.maxplayer.mpv.MpvPlayer;
+import com.maxplayer.mpv.MpvPlayerConfig;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
-/**
- * Instrumented test, which will execute on an Android device.
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
+
     @Test
-    public void useAppContext() {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.aaronmaxlab.maxplayer", appContext.getPackageName());
+    public void mpvEngineInitializesAndReleases() {
+        Context context = InstrumentationRegistry
+                .getInstrumentation()
+                .getTargetContext();
+
+        MpvPlayer player = MpvPlayer.create(
+                context,
+                MpvPlayerConfig.defaults()
+        );
+
+        assertNotNull(player);
+
+        try {
+            player.initialize();
+        } finally {
+            player.release();
+        }
     }
 }

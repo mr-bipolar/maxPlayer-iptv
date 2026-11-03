@@ -18,12 +18,14 @@ import com.aaronmaxlab.maxplayer.utils.UIUtils;
 
 public class AddPlaylistHelperActivity extends AppCompatActivity {
 
+    private ActivityAddPlaylistHelperBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        ActivityAddPlaylistHelperBinding binding = ActivityAddPlaylistHelperBinding.inflate(getLayoutInflater());
+         binding = ActivityAddPlaylistHelperBinding.inflate(getLayoutInflater());
 
         setContentView(binding.getRoot());
 
@@ -43,14 +45,18 @@ public class AddPlaylistHelperActivity extends AppCompatActivity {
 
         // add playlist
         ClickUtils.applyTouchEffect(binding.helperAddPlaylistBtn, v -> {
-            Intent intent = new Intent(getBaseContext(), AddPlaylistActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(getBaseContext(), AddPlaylistActivity.class));
         });
 
         // play url
         ClickUtils.applyTouchEffect(binding.helperPlayaUrl, v -> {
-            Intent intent = new Intent(getBaseContext(), PlayVideoUrlActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(getBaseContext(), PlayVideoUrlActivity.class));
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        binding = null;
+        super.onDestroy();
     }
 }
