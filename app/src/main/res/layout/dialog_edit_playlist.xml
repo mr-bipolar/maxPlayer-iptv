@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+   >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Edit playlist"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_title_sm"
+        android:textStyle="bold"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:textColor="@color/white_alpha_75"
+        android:textSize="@dimen/text_body_sm"
+        android:layout_marginBottom="6dp" />
+
+    <EditText
+        android:id="@+id/playlistNameInput"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Playlist name"
+        android:singleLine="true"
+        android:inputType="textCapSentences"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white_alpha_55"
+        android:paddingHorizontal="12dp"
+        android:background="@drawable/bg_edit_text"
+        android:textSize="@dimen/text_body"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="URL"
+        android:textColor="@color/white_alpha_75"
+        android:textSize="@dimen/text_body_sm"
+        android:layout_marginBottom="6dp" />
+
+    <EditText
+        android:id="@+id/playlistUrlInput"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Playlist URL"
+        android:singleLine="true"
+        android:inputType="textUri"
+        android:imeOptions="actionDone"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white_alpha_55"
+        android:paddingHorizontal="12dp"
+        android:textSize="@dimen/text_body"
+        android:background="@drawable/bg_edit_text" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="24dp">
+
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_body_sm"
+            android:backgroundTint="@android:color/transparent" />
+
+        <Button
+            android:id="@+id/updateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/update_channel_submit"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:backgroundTint="@color/accent"
+            android:textSize="@dimen/text_body_sm"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

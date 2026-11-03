@@ -189,16 +189,21 @@
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <LinearLayout
+                <FrameLayout
                     android:id="@+id/successCard"
                     android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="18dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:background="@drawable/bg_card_lg"
                     android:gravity="center_horizontal"
                     android:orientation="vertical"
                     android:padding="20dp">
+
 
                     <FrameLayout
                         android:layout_width="48dp"
@@ -302,6 +307,21 @@
                             android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
+
+                    <!-- Favorite button: top-right -->
+                    <ImageButton
+                        android:id="@+id/btnFavorite"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="top|end"
+                        android:layout_margin="12dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/todo"
+                        android:padding="16dp"
+                        android:src="@drawable/media3_icon_star_unfilled"
+                        app:tint="@color/white_alpha_75" />
+
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/errorCard"

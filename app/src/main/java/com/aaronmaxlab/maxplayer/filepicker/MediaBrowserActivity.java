@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
@@ -176,21 +177,20 @@ public class MediaBrowserActivity extends AppCompatActivity {
 
     private void openFolderPicker() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        if (intent.resolveActivity(getPackageManager()) == null) {
-            String message = isTv
-                    ? "Android does not expose files in Download/MaxPlayer to MaxPlayer, and this TV has no folder picker to grant access."
-                    : "No system folder picker is available on this device.";
-            showEmpty(message);
-            AppToast.warning(this, message);
-            return;
-        }
 
         try {
             folderPicker.launch(intent);
+
         } catch (ActivityNotFoundException e) {
-            String message = "No system folder picker is available on this device.";
+
+            String message = isTv
+                    ? "No folder picker is available on this TV."
+                    : "No system folder picker is available on this device.";
+
             showEmpty(message);
             AppToast.warning(this, message);
+
+            Log.e("FOLDER_PICKER", "Folder picker unavailable", e);
         }
     }
 
@@ -399,7 +399,14 @@ public class MediaBrowserActivity extends AppCompatActivity {
     }
 
     private static final class Api29 {
-        static final Uri DOWNLOADS_URI = MediaStore.Downloads.EXTERNAL_CONTENT_URI;
+        static final Uri DOWNLOADS_URI = getDownloadsUri();
+    }
+
+    private static Uri getDownloadsUri() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return MediaStore.Downloads.EXTERNAL_CONTENT_URI;
+        }
+        return null;
     }
 
     private File downloadsFolderFile() {

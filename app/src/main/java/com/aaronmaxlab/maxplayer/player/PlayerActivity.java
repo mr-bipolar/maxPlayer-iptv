@@ -30,6 +30,7 @@ import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Rational;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
@@ -80,6 +81,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.animations.LoaderAnimator;
+import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbChannel;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbFavorites;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbHistory;
 import com.aaronmaxlab.maxplayer.databinding.ActivityPlayerBinding;
 import com.aaronmaxlab.maxplayer.player.mpv.MpvPlayerAdapter;
 import com.aaronmaxlab.maxplayer.playlist.PlaylistParser;
@@ -89,9 +94,11 @@ import com.aaronmaxlab.maxplayer.playlist.models.PlaylistChannel;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
 import com.aaronmaxlab.maxplayer.service.VideoPlaybackService;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
+import com.aaronmaxlab.maxplayer.utils.AppUtils;
 import com.aaronmaxlab.maxplayer.utils.AspectRatioUtils;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
+import com.aaronmaxlab.maxplayer.utils.PlaylistType;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
@@ -108,6 +115,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -130,6 +138,7 @@ public class PlayerActivity extends AppCompatActivity {
     public static final String EXTRA_TITLE = "playlist_file_name";         // title for a single stream
     public static final String EXTRA_LIVE = "extra_live";                  // boolean hint (optional)
     public static final String EXTRA_START_INDEX = "extra_start_index";    // first channel of a playlist
+    public static final String EXTRA_POSITION = "extra_position";          // video resume position
     public static final String EXTRA_ENGINE = "extra_engine";              // "media3" | "mpv" (overrides the setting)
     private static final long SEEK_STEP_MS = 10_000;
 
@@ -153,10 +162,19 @@ public class PlayerActivity extends AppCompatActivity {
         return new Intent(c, PlayerActivity.class).putExtra(EXTRA_PLAYLIST_URL, m3uUrl);
     }
 
-    public static Intent forStream(Context c, String url, @Nullable String title, @Nullable Boolean live) {
+    public static Intent forStream(Context c, String url, @Nullable String title, @Nullable Boolean live,  @Nullable Long position) {
         Intent i = new Intent(c, PlayerActivity.class).putExtra(EXTRA_STREAM_URL, url).putExtra(EXTRA_TITLE, title);
         if (live != null) i.putExtra(EXTRA_LIVE, live.booleanValue());
+        if (position != null) {
+            i.putExtra(EXTRA_POSITION, position);
+        }
         return i;
+    }
+
+    public static Intent forStream(Context context, String url,
+            @Nullable String title,
+            @Nullable Boolean live) {
+        return forStream(context, url, title, live, null);
     }
 
     /** Playlist (URL or file) that starts at channel startIndex; the full list stays available. */
@@ -216,6 +234,9 @@ public class PlayerActivity extends AppCompatActivity {
     private int currentChannelPosition = 0;
     private String streamUrl;
     private String currentUrl;
+    private String currentTitle;
+    @Nullable private Long pendingHistoryPosition;
+    private boolean resumePromptPending;
 
     // ---- ui state
     private int aspectMode = 0;
@@ -232,16 +253,10 @@ public class PlayerActivity extends AppCompatActivity {
     private String searchQuery = "";
 
     // ---- static categories
+    private static final List<String> IPTV_CATEGORIES = AppUtils.showCategories();
 
-    private static final List<String> IPTV_CATEGORIES =
-        new ArrayList<>(Arrays.asList(
-            "Live TV", "Sports", "News", "Movies",
-            "Series", "Kids", "Documentary",
-            "Entertainment", "Music", "Radio", "Talk",
-            "Lifestyle", "Education", "Religious",
-            "Regional", "International", "Other"
-        ));
-
+    // ---- local db
+    private SqlDbHelper sqlDbHelper;
 
 
     private final ActivityResultLauncher<String[]> subtitlePicker =
@@ -274,6 +289,7 @@ public class PlayerActivity extends AppCompatActivity {
         isTv = DeviceUtils.isTv(this);
         if (isTv) setupTvPlaylist();
         prefs = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        sqlDbHelper = new SqlDbHelper(this);
 
         // Never two players at once: mpv is a single native engine ("already initialized") and the Media3
         // service player is shared. Free the old screen's player/surface BEFORE this one creates its own.
@@ -315,6 +331,7 @@ public class PlayerActivity extends AppCompatActivity {
         resolveSourceAndStart();
 
 
+
     }
 
     @Override
@@ -349,8 +366,12 @@ public class PlayerActivity extends AppCompatActivity {
     /** Loads the resolved stream: into the existing player if there is one, otherwise connects the engine first. */
     private void startOrConnect() {
         if (player != null) {
-            playStream(streamUrl);
-            updatePipParams();
+            if (resumePromptPending) {
+                prepareHistoryResume();
+            } else {
+                playStream(streamUrl);
+                updatePipParams();
+            }
         } else if (controllerFuture == null) {        // not already connecting (then onPlayerReady uses the new streamUrl)
             connectPlayer();
         }
@@ -413,6 +434,7 @@ public class PlayerActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        saveHistoryPosition(sqlDbHelper);
         // PiP window was closed by the user: stop playback and leave.
         if (wasInPipMode && !isChangingConfigurations()) {
             if (player != null) player.pause();
@@ -435,14 +457,18 @@ public class PlayerActivity extends AppCompatActivity {
         if (mpv != null) mpv.onConfigurationChanged();
     }
 
+
     @Override
     protected void onDestroy() {
+        AppToast.info(this, "destroy called");
         final boolean owner = active == this;
         if (owner) active = null;
         unregisterPipReceiver();
         handler.removeCallbacksAndMessages(null);
         executor.shutdownNow();
         if (dialog != null) { dialog.setOnDismissListener(null); dialog.dismiss(); dialog = null; }
+
+        // Save playback position and duration BEFORE stopping or releasing the player.
 
         if (ui != null) ui.release();
         if (player != null && playerListener != null) player.removeListener(playerListener);
@@ -465,6 +491,7 @@ public class PlayerActivity extends AppCompatActivity {
                 controllerFuture = null;
             }
         }
+
         player = null;
         adapter = null;
         binding = null;
@@ -479,6 +506,91 @@ public class PlayerActivity extends AppCompatActivity {
         WindowInsetsControllerCompat c = new WindowInsetsControllerCompat(w, w.getDecorView());
         c.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
         c.hide(WindowInsetsCompat.Type.systemBars());
+    }
+
+    private void saveHistory(PlaylistInfo playlistModel, SqlDbHelper dbHelper, PlaylistType playlistType){
+        if (playlistModel == null
+                || playlistModel.channels == null
+                || currentChannelPosition < 0
+                || currentChannelPosition >= playlistModel.channels.size()) {
+            return;
+        }
+
+        try {
+            PlaylistChannel channel =
+                    playlistModel.channels.get(currentChannelPosition);
+
+            if (channel == null) return;
+
+            LocalDbHistory dbHistory = new LocalDbHistory(
+                    channel.name,
+                    channel.category,
+                    channel.url,
+                    channel.logoUrl,
+                    playlistType,
+                    null,
+                    null
+            );
+            dbHelper.saveHistory(dbHistory);
+        } catch (Exception e) {
+            Log.e("HISTORY", Objects.requireNonNull(e.getMessage()));
+        }
+    }
+
+
+    private void saveBeforeLeaving() {
+        saveHistoryPosition(sqlDbHelper);
+    }
+
+
+    private void saveHistoryPosition(SqlDbHelper sqlDbHelper) {
+        try {
+            if (currentUrl == null || currentUrl.isEmpty()
+                    || sqlDbHelper == null || player == null) {
+                return;
+            }
+
+            final boolean isVideo = isVod();
+            final PlaylistType expectedType =
+                    isVideo ? PlaylistType.VOD : PlaylistType.LIVE;
+
+            final boolean isExists = sqlDbHelper.isHistoryExists(currentUrl);
+
+            // Insert new history.
+            if (!isExists) {
+                saveHistory(playlistModel, sqlDbHelper, expectedType);
+                return;
+            }
+
+            // Correct history type if needed.
+            if (!sqlDbHelper.isHistoryTypeMatch(currentUrl, expectedType)) {
+                boolean updated = sqlDbHelper.updateHistoryType(currentUrl, expectedType);
+                Log.d("HISTORY", "History type updated: " + updated);
+            }
+
+            // Update playback position only for videos.
+            if (isVideo) {
+                long positionMs = Math.max(0L, player.getCurrentPosition());
+                long durationMs = Math.max(0L, player.getDuration());
+
+                sqlDbHelper.updateHistoryPosition(
+                        currentUrl,
+                        positionMs,
+                        durationMs
+                );
+            }
+
+        } catch (Exception e) {
+            Log.e("PLAYER_DB", "Failed to save history position", e);
+        }
+    }
+
+
+
+    private boolean isVod() {
+        assert player != null;
+        long d = player.getDuration();
+        return !player.isCurrentMediaItemLive() && d != C.TIME_UNSET && d > 0;
     }
 
     // =====================================================================================
@@ -506,9 +618,23 @@ public class PlayerActivity extends AppCompatActivity {
             failAndFinish("Stream URL not found");
             return;
         }
+
+        pendingHistoryPosition = null;
+        resumePromptPending = false;
+
+        if (i.hasExtra(EXTRA_POSITION)) {
+            long position = i.getLongExtra(EXTRA_POSITION, 0L);
+
+            if (position > 0) {
+                pendingHistoryPosition = position;
+                resumePromptPending = true;
+            }
+        }
+
         String title = i.getStringExtra(EXTRA_TITLE);
         if (title == null || title.trim().isEmpty()) title = getString(R.string.video_channel);
         ui.setHeader(title, hostOf(streamUrl));
+        currentTitle = title;
         updateNav();
         startOrConnect();
     }
@@ -586,6 +712,84 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
+    private void prepareHistoryResume() {
+        if (player == null || TextUtils.isEmpty(streamUrl)) {
+            return;
+        }
+
+        currentUrl = streamUrl;
+
+        if (mpv != null) {
+            mpv.setNextLiveHint(liveHint);
+        }
+
+        // Prepare the media without starting playback.
+        player.pause();
+        player.setMediaItem(
+                new MediaItem.Builder()
+                        .setMediaId(streamUrl)
+                        .setUri(streamUrl)
+                        .build()
+        );
+        player.prepare();
+
+        // The dialog is shown when the media reaches STATE_READY.
+    }
+
+    private void showResumeDialogIfReady() {
+        if (!resumePromptPending
+                || pendingHistoryPosition == null
+                || player == null
+                || player.getPlaybackState() != Player.STATE_READY
+                || isFinishing()
+                || isDestroyed()) {
+            return;
+        }
+
+        if (mpv != null && !mpv.isMediaLoaded()) {
+            return;
+        }
+
+        long position = pendingHistoryPosition;
+
+        resumePromptPending = false;
+        pendingHistoryPosition = null;
+
+        long totalDuration = player.getDuration();
+
+        String message = "Resume from "
+                + android.text.format.DateUtils.formatElapsedTime(position / 1000);
+
+        if (totalDuration > 0) {
+            message += " of "
+                    + android.text.format.DateUtils.formatElapsedTime(
+                    totalDuration / 1000);
+        }
+
+        new android.app.AlertDialog.Builder(this, R.style.PlayerDialogTheme)
+                .setTitle("Resume playback?")
+                .setMessage(message)
+                .setPositiveButton("Resume", (dialog, which) -> {
+                    if (mpv != null) {
+                        mpv.setStartPaused(false);
+                        mpv.seekWhenLoaded(position);
+                    } else {
+                        player.seekTo(position);
+                        player.play();
+                    }
+                })
+                .setNegativeButton("Start Over", (dialog, which) -> {
+                    if (mpv != null) {
+                        mpv.setStartPaused(false);
+                    }
+
+                    player.seekTo(0);
+                    player.play();
+                })
+                .setCancelable(false)
+                .show();
+    }
+
     // =====================================================================================
     // Engine connection
     // =====================================================================================
@@ -635,11 +839,30 @@ public class PlayerActivity extends AppCompatActivity {
                         Player.EVENT_PLAYBACK_STATE_CHANGED, Player.EVENT_VIDEO_SIZE_CHANGED)) {
                     updatePipParams();                        // keeps the PiP play/pause icon correct
                 }
+
+                if (resumePromptPending) {
+                    showResumeDialogIfReady();
+                }
+            }
+
+            @Override
+            public void onPlaybackStateChanged(int playbackState) {
+                if (playbackState == Player.STATE_READY) {
+                    showResumeDialogIfReady();
+                }
             }
         };
         p.addListener(playerListener);
 
-        ensureStreamPlaying(streamUrl);
+        if (resumePromptPending) {
+            if (mpv != null) {
+                mpv.setStartPaused(true);
+            }
+            prepareHistoryResume();
+        } else {
+            ensureStreamPlaying(streamUrl);
+        }
+
     }
 
     private void playStream(String url) {
@@ -654,7 +877,8 @@ public class PlayerActivity extends AppCompatActivity {
         player.setMediaItem(new MediaItem.Builder().setMediaId(url).setUri(url).build());
         player.prepare();
         player.play();
-        ui.setFavorite(isFavorite());
+        ui.setFavorite(isFavorite(currentUrl));
+
     }
 
     /** The Media3 service player outlives the Activity: keep a healthy current item (rotation), replace a stale/failed one. */
@@ -665,7 +889,7 @@ public class PlayerActivity extends AppCompatActivity {
         boolean healthy = current != null && url.equals(current.mediaId) && player.getPlayerError() == null
                 && player.getPlaybackState() != Player.STATE_IDLE;
         if (!healthy) playStream(url);
-        ui.setFavorite(isFavorite());
+        ui.setFavorite(isFavorite(currentUrl));
     }
 
     /**
@@ -709,7 +933,7 @@ public class PlayerActivity extends AppCompatActivity {
 
     private void setupButtons() {
         setPlayerClick(binding.btnBack, v -> handleBackPress());
-        setPlayerClick(binding.btnFavorite, v -> toggleFavorite());
+        setPlayerClick(binding.btnFavorite, v -> toggleFavorite(playlistModel));
         setPlayerClick(binding.btnMore, v -> showMoreMenu());
         setPlayerClick(binding.playPause, v -> togglePlayPause());
         setPlayerClick(binding.btnPrev, v -> changeChannel(-1));
@@ -884,34 +1108,75 @@ public class PlayerActivity extends AppCompatActivity {
         binding.playPause.setNextFocusRightId(visible ? R.id.tvPlaylistRecycler : View.NO_ID);
     }
 
-    private void showAddChannelDialog(){
+    private void showAddChannelDialog() {
         String channelUrl = currentUrl != null ? currentUrl : streamUrl;
+
         if (TextUtils.isEmpty(channelUrl)) {
             AppToast.error(this, "Unable to save this channel");
             return;
         }
+
         if (saveDialog != null) saveDialog.dismiss();
+
         saveDialog = SaveChannelDialog.show(
                 this,
                 channelUrl,
-                IPTV_CATEGORIES, //  categories
+                IPTV_CATEGORIES,
                 null,
                 category -> {
-                    saveChannelFavorite(channelUrl);
-                });
+                    int index = IPTV_CATEGORIES.indexOf(category);
+
+                    if (index == -1) return;
+
+                    try {
+                        LocalDbChannel dbChannel = getDbChannel(channelUrl, index);
+
+                        boolean result = sqlDbHelper.addChannel(dbChannel);
+
+                        if (result) {
+                            AppToast.success(this, "Channel Added.");
+                        } else {
+                            AppToast.error(this, "Channel already exists or insert failed.");
+                        }
+
+                    } catch (Exception e) {
+                        Log.e("PLAYER_DB", "Add channel failed", e);
+                        AppToast.error(this, "Unable to add channel.");
+                    }
+                }
+        );
     }
 
-    private void saveChannelFavorite(@NonNull String channelUrl) {
-        Set<String> saved = new HashSet<>(prefs.getStringSet(KEY_FAVORITES, new HashSet<>()));
-        boolean alreadySaved = saved.contains(channelUrl);
-        if (!alreadySaved) saved.add(channelUrl);
-        if (!prefs.edit().putStringSet(KEY_FAVORITES, saved).commit()) {
-            AppToast.error(this, "Could not save channel");
-            return;
+
+    @NonNull
+    private LocalDbChannel getDbChannel(String channelUrl, int index) {
+        LocalDbChannel dbChannel;
+
+        if (playlistModel != null
+                && currentChannelPosition >= 0
+                && currentChannelPosition < playlistModel.channels.size()) {
+
+            PlaylistChannel channel =
+                    playlistModel.channels.get(currentChannelPosition);
+
+            dbChannel = new LocalDbChannel(
+                    channel.name,
+                    channel.logoUrl,
+                    channelUrl,
+                    index
+            );
+
+        } else {
+            dbChannel = new LocalDbChannel(
+                    currentTitle,
+                    null,
+                    channelUrl,
+                    index
+            );
         }
-        if (channelUrl.equals(currentUrl) || channelUrl.equals(streamUrl)) ui.setFavorite(true);
-        AppToast.success(this, alreadySaved ? "Channel already saved" : "Channel saved");
+        return dbChannel;
     }
+
 
     private String buildErrorInfo() {
         StringBuilder s = new StringBuilder("Engine: ").append(engineType.key);
@@ -925,6 +1190,7 @@ public class PlayerActivity extends AppCompatActivity {
     private boolean isLiveNow() {
         return player != null && (player.isCurrentMediaItemLive() || player.getDuration() == C.TIME_UNSET);
     }
+
 
     private void jumpToLive() {
         if (player == null) return;
@@ -1111,21 +1377,48 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     // ---- favorites (local, keyed by stream URL)
-    private boolean isFavorite() {
-        return currentUrl != null && prefs.getStringSet(KEY_FAVORITES, new HashSet<>()).contains(currentUrl);
+    private boolean isFavorite(String url) {
+        return url != null && sqlDbHelper.isFavorite(url);
     }
 
-    private void toggleFavorite() {
-        if (currentUrl == null) return;
-        Set<String> copy = new HashSet<>(prefs.getStringSet(KEY_FAVORITES, new HashSet<>()));   // never edit the returned set
-        boolean removing = copy.remove(currentUrl);
-        if (!removing) copy.add(currentUrl);
-        if (!prefs.edit().putStringSet(KEY_FAVORITES, copy).commit()) {
-            AppToast.error(this, "Could not update saved channel");
-            return;
+    private void toggleFavorite(PlaylistInfo playlistModel) {
+        try {
+            if (TextUtils.isEmpty(currentUrl)) return;
+            LocalDbFavorites favorite = getDbFavorites(playlistModel);
+            boolean status = sqlDbHelper.setFavorite(favorite);
+            if (!status) {
+                AppToast.error(this, "Could not update saved channel");
+                return;
+            }
+            boolean isSaved = isFavorite(currentUrl);
+            ui.setFavorite(isSaved);
+            if (isTv) {
+                AppToast.success(
+                        this,
+                        isSaved ? "Channel saved" : "Channel removed from saved"
+                );
+            }
+        } catch (Exception e) {
+            Log.e("PLAYER_DB", "Favorite update failed", e);
         }
-        ui.setFavorite(isFavorite());
-        if (isTv) AppToast.success(this, removing ? "Channel removed from saved" : "Channel saved");
+    }
+
+    @NonNull
+    private LocalDbFavorites getDbFavorites(PlaylistInfo playlistModel) {
+        String name = currentTitle;
+        String category = "Other";
+        String channelIcon = null;
+
+        if (playlistModel != null
+                && playlistModel.channels != null
+                && currentChannelPosition >= 0
+                && currentChannelPosition < playlistModel.channels.size()) {
+            PlaylistChannel channel = playlistModel.channels.get(currentChannelPosition);
+            if (channel.name != null) {name = channel.name;}
+            if (channel.category != null) {category = channel.category;}
+            if(channel.logoUrl != null) {channelIcon = channel.logoUrl;}
+        }
+        return new LocalDbFavorites(name, category, currentUrl, channelIcon, PlaylistType.VOD);
     }
 
     // ---- "more" menu: info, reload, jump to live, copy url, screenshot (mpv), switch engine
@@ -1333,6 +1626,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void handleBackPress() {
+        saveBeforeLeaving();
         if (canEnterPip()) enterPipMode();
         else finish();
     }

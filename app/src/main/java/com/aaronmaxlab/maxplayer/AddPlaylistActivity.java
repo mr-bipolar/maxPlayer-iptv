@@ -83,8 +83,10 @@ public class AddPlaylistActivity extends AppCompatActivity {
 
 
         if(!isTv){
+            assert binding.buttonOpenAudioStream != null;
             openOnClick(binding.buttonOpenAudioStream, PlayAudioStreamActivity.class);
         }
+
     }
 
     private void openOnClick(@NonNull View button, @NonNull Class<? extends Activity> target) {

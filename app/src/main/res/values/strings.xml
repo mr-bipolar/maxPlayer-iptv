@@ -332,9 +332,13 @@
     <string name="player_pip_next">Next channel</string>
 
     <string name="save_channel_title">Save channel</string>
+    <string name="update_channel_title">Update channel</string>
     <string name="save_channel_category_label">CATEGORY</string>
     <string name="save_channel_category_hint">Select a category</string>
     <string name="save_channel_choose_category">Choose category</string>
     <string name="save_channel_submit">Save</string>
+    <string name="update_channel_submit">Update</string>
+    <string name="no_favorites_yet">No Favorites Yet</string>
+    <string name="empty_fav">Your favorite channels will appear here. Add channels to your favorites for quick and easy access.</string>
 
 </resources>

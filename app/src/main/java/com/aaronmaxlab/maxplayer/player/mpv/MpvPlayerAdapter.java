@@ -91,6 +91,8 @@ public final class MpvPlayerAdapter extends SimpleBasePlayer {
     private boolean resumeAfterSurface;
     private boolean destroyed;
     private boolean tracksDirty = true;
+    @Nullable private Long pendingSeekPositionMs;
+    private boolean startPaused;
 
     private int subtitleSizeIndex;
     @Nullable private Integer userSubtitleId;
@@ -289,12 +291,17 @@ public final class MpvPlayerAdapter extends SimpleBasePlayer {
         tracksDirty = true;
         cachedTracks = Tracks.EMPTY;
 
+        if (startPositionMs > 0) {
+            pendingSeekPositionMs = startPositionMs;
+        }
+
         LoadOptions.Builder lo = LoadOptions.builder();
         if (nextLiveHint != null) lo.liveHint(nextLiveHint ? LiveStatus.LIVE : LiveStatus.VOD);
         nextLiveHint = null;
         e.load(toMpvPath(item.localConfiguration.uri), lo.build());
         return Futures.immediateVoidFuture();
     }
+
 
     @NonNull
     @Override
@@ -667,6 +674,12 @@ public final class MpvPlayerAdapter extends SimpleBasePlayer {
                     + " seekable=" + info.isSeekable() + " live=" + info.getLiveStatus() + " (" + info.getLiveStatusReason() + ")");
             loaded = true;
             tracksDirty = true;
+
+            if (startPaused) {
+                assert engine != null;
+                engine.pause();
+            }
+            applyPendingSeekIfReady();
             notifyChanged();
         }
         @Override public void onLiveStatusChanged(LiveStatus status, String reason) { notifyChanged(); }
@@ -690,6 +703,32 @@ public final class MpvPlayerAdapter extends SimpleBasePlayer {
     }
 
     // =====================================================================================
+    // History seeks
+    // =====================================================================================
+    public void setStartPaused(boolean paused) {
+        startPaused = paused;
+    }
+
+    public void seekWhenLoaded(long positionMs) {if (positionMs <= 0) return; pendingSeekPositionMs = positionMs; applyPendingSeekIfReady();
+    }
+
+    private void applyPendingSeekIfReady() {
+        MpvPlayer e = engine;
+        if (e == null || !loaded || pendingSeekPositionMs == null) {return;}
+
+        long positionMs = pendingSeekPositionMs;
+        pendingSeekPositionMs = null;
+        if (!e.isSeekable()) {return;}
+
+        e.pause();
+        e.seekTo(positionMs / 1000d);
+    }
+
+    public boolean isMediaLoaded() {
+        return loaded;
+    }
+
+    // =====================================================================================
     // Helpers
     // =====================================================================================
 
@@ -700,4 +739,6 @@ public final class MpvPlayerAdapter extends SimpleBasePlayer {
     private static boolean notEmpty(String s) {
         return s != null && !s.trim().isEmpty();
     }
+
+
 }

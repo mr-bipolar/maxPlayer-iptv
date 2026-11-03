@@ -4,14 +4,19 @@ import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.aaronmaxlab.maxplayer.animations.LoaderAnimator;
+import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbFavorites;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbHistory;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbPlaylist;
 import com.aaronmaxlab.maxplayer.databinding.ActivityAddPlaylistUrlBinding;
 import com.aaronmaxlab.maxplayer.player.PlayerActivity;
 import com.aaronmaxlab.maxplayer.playlist.PlaylistParser;
@@ -19,9 +24,11 @@ import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.Playlist;
+import com.aaronmaxlab.maxplayer.utils.PlaylistType;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.aaronmaxlab.maxplayer.utils.UrlUtils;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -35,6 +42,9 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
     /** Set only after a playlist was loaded successfully; "Open stream" uses it. */
     @Nullable private String loadedPlaylistUrl;
 
+    SqlDbHelper sqlDbHelper;
+    LocalDbFavorites favorites;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,11 +56,15 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
         UIUtils.setLightNavigationBars(this, false);
         UIUtils.applySystemBarPadding(binding.getRoot());
 
+        sqlDbHelper = new SqlDbHelper(this);
+
         binding.errorCard.setVisibility(INVISIBLE);
+        assert binding.btnFavorite != null;
 
         ClickUtils.applyTouchEffect(binding.backAddPlayListUrlOpen, v -> finish());
         ClickUtils.applyTouchEffect(binding.btnAddPlaylistCall, v -> onAddPlaylistClicked());
         ClickUtils.applyTouchEffect(binding.openPlaylistStream, v -> onOpenStreamClicked());
+        ClickUtils.applyTouchEffect(binding.btnFavorite, v -> onAddFavorite());
     }
 
     @Override
@@ -63,6 +77,11 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
     // Actions
     private void onAddPlaylistClicked() {
         String url = String.valueOf(binding.inputPlaylistUrl.getText()).trim();
+        String inputName = binding.inputPlaylistName.getText().toString().trim();
+
+        final String fileName = inputName.isEmpty()
+                ? UIUtils.extractLabel(url)
+                : inputName;
 
         if (url.isEmpty()) {
             binding.inputPlaylistUrl.setError("Enter a playlist URL");
@@ -80,8 +99,8 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
 
         executor.execute(() -> {
             try {
-                PlaylistInfo info = PlaylistParser.parseRemoteUrl(url, UIUtils.extractLabel(url));
-                Playlist.loadRemoteMetadata(url, info);                 // populate name and size into 'info'
+                PlaylistInfo info = PlaylistParser.parseRemoteUrl(url, fileName);
+                Playlist.loadRemoteMetadata(url, info);  // populate name and size into 'info'
                 runOnUiThread(() -> onLoaded(url, info));
             } catch (Exception e) {
                 runOnUiThread(() -> onLoadFailed(e));
@@ -122,7 +141,12 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
             binding.playlistAddedCatCount.setText(String.valueOf(info.categoryNames.size()));
             binding.statesLabel.setVisibility(VISIBLE);
             binding.successCard.setVisibility(VISIBLE);
-            AppToast.success(this, "Playlist added.");
+            // check favorites
+            isFavItem(loadedPlaylistUrl);
+            // add playlist
+            addPlaylist(info, url);
+            // add history
+            addHistory(info, url);
         } else {
             AppToast.info(this, "It's not a playlist.");
         }
@@ -140,5 +164,52 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
         binding.loadingState.setVisibility(GONE);
         binding.btnAddPlaylistCall.setEnabled(true);
     }
+
+    private void isFavItem(String url){
+        boolean isFav = sqlDbHelper.isFavorite(url);
+            if (isFav) {AppToast.success(this, "Added to favorites.");}
+            else {AppToast.success(this, "Removed from favorites.");}
+        // Update heart icon
+        if(binding.btnFavorite == null) return;
+        binding.btnFavorite.setImageResource(
+                isFav ? androidx.media3.session.R.drawable.media3_icon_star_filled : androidx.media3.session.R.drawable.media3_icon_star_unfilled
+        );
+    }
+
+
+    private  void onAddFavorite(){
+        try {if(favorites == null) { return;}
+            boolean result = sqlDbHelper.setFavorite(favorites);
+            if (result) {isFavItem(favorites.getFavUrl());}
+        } catch (Exception e) {
+            AppToast.error(this, e.getMessage());
+            Log.e("FAV", Objects.requireNonNull(e.getMessage()));
+        }
+    }
+
+    private void addPlaylist(PlaylistInfo info, String url){
+        try {
+            if(info == null || url.isEmpty()) return;
+            favorites = new LocalDbFavorites(info.fileName, info.channelCount + " Channels", url, null, PlaylistType.PLAYLIST);
+            LocalDbPlaylist playlist = new LocalDbPlaylist(info.fileName, url, info.channelCount);
+            boolean result = sqlDbHelper.addPlaylist(playlist);
+
+            if (result) {AppToast.success(this, "Playlist added.");}
+            else {AppToast.error(this, "Playlist already exists or could not be saved.");}
+
+        } catch (Exception e) {
+            AppToast.error(this, e.getMessage());
+        }
+    }
+
+    private void addHistory(PlaylistInfo info, String url){
+        try {
+            LocalDbHistory dbHistory = new LocalDbHistory(info.fileName, String.valueOf(info.channelCount) + " Channels", url, null, PlaylistType.PLAYLIST, null, null);
+            sqlDbHelper.saveHistory(dbHistory);
+        }catch (Exception e) {
+            AppToast.error(this, e.getMessage());
+        }
+    }
+
 
 }

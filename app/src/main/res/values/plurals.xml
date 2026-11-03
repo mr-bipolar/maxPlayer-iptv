@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="playlist_channel_count">
+        <item quantity="one">%d Channel</item>
+        <item quantity="other">%d Channels</item>
+    </plurals>
+</resources>
