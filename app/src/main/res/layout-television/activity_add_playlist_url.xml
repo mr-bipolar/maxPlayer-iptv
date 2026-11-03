@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/bg" tools:context=".AddPlaylistUrlActivity">
+    <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_tv_plain" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:clipChildren="false" android:scrollbars="none">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical" android:paddingStart="@dimen/tv_margin_h" android:paddingEnd="@dimen/tv_margin_h" android:paddingTop="@dimen/tv_margin_v" android:paddingBottom="@dimen/tv_margin_v" android:clipChildren="false">
+            <LinearLayout android:id="@+id/linearLayout7" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center" android:background="@drawable/bg_tv_source_tile_default" android:padding="@dimen/space_24" android:clipChildren="false">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/title_add_playlist_url" android:textColor="@color/white" android:textSize="@dimen/tv_text_title" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/space_6" android:layout_marginBottom="@dimen/space_20" android:text="@string/tv_add_sub" android:textColor="@color/ink_dim" android:textSize="@dimen/tv_text_button" />
+                <LinearLayout android:layout_width="640dp" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_20">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="@dimen/space_8" android:text="@string/label_playlist_url" android:textColor="@color/ink_dim" android:textSize="@dimen/tv_text_label" android:textStyle="bold" />
+                    <EditText android:id="@+id/inputPlaylistUrl" android:layout_width="match_parent" android:layout_height="58dp" android:layout_marginBottom="@dimen/space_16" android:background="@drawable/bg_input" android:focusable="true" android:focusableInTouchMode="true" android:importantForAutofill="no" android:inputType="textUri" android:paddingStart="@dimen/space_16" android:paddingEnd="@dimen/space_16" android:singleLine="true" android:text="@string/hint_playlist_url" android:textColor="@color/ink" android:textColorHint="@color/ink_faint" android:textSize="@dimen/tv_text_body" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="@dimen/space_8" android:text="@string/label_playlist_name_optional" android:textColor="@color/ink_dim" android:textSize="@dimen/tv_text_label" android:textStyle="bold" />
+                    <EditText android:id="@+id/inputPlaylistName" android:layout_width="match_parent" android:layout_height="58dp" android:layout_marginBottom="@dimen/space_16" android:background="@drawable/bg_input" android:focusable="true" android:importantForAutofill="no" android:inputType="textUri" android:hint="@string/hint_playlist_name" android:paddingStart="@dimen/space_16" android:paddingEnd="@dimen/space_16" android:singleLine="true" android:textColor="@color/ink" android:textColorHint="@color/ink_faint" android:textSize="@dimen/tv_text_body" />
+                    <LinearLayout android:id="@+id/btnAddPlaylistCall" android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginBottom="@dimen/space_12" android:background="@drawable/bg_tv_btn_primary" android:clickable="true" android:focusable="true" android:stateListAnimator="@animator/tv_focus_scale_sm" android:gravity="center">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/btn_add_playlist" android:textColor="@color/accent_ink" android:textSize="@dimen/tv_text_button" android:textStyle="bold" />
+                    </LinearLayout>
+                    <TextView android:id="@+id/statesLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="invisible" android:text="@string/label_states" android:textColor="@color/ink_faint" android:textSize="@dimen/tv_text_caption" />
+                    <LinearLayout android:id="@+id/loadingState" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone" android:background="@drawable/bg_pill_card_2" android:gravity="center_vertical" android:padding="@dimen/space_12">
+                        <ProgressBar style="?android:attr/progressBarStyleSmall" android:layout_width="16dp" android:layout_height="16dp" android:layout_marginEnd="@dimen/space_8" android:indeterminate="true" android:indeterminateTint="@color/accent" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/state_parsing" android:textColor="@color/ink" android:textSize="@dimen/tv_text_caption" />
+                    </LinearLayout>
+                    <LinearLayout android:id="@+id/successCard" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" android:orientation="vertical" android:gravity="center" android:padding="@dimen/space_16" android:background="@drawable/bg_card_lg">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/result_playlist_added" android:textColor="@color/ink" android:textSize="@dimen/tv_text_body" android:textStyle="bold" />
+                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/space_8" android:orientation="horizontal">
+                            <TextView android:id="@+id/playlistAddedCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="@color/ink" android:textSize="@dimen/tv_text_body" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/space_6" android:text="@string/stat_channels" android:textColor="@color/ink_dim" android:textSize="@dimen/tv_text_caption" />
+                            <TextView android:id="@+id/playlistAddedCatCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/space_16" android:text="0" android:textColor="@color/ink" android:textSize="@dimen/tv_text_body" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/space_6" android:text="@string/stat_categories" android:textColor="@color/ink_dim" android:textSize="@dimen/tv_text_caption" />
+                        </LinearLayout>
+                        <LinearLayout android:id="@+id/openPlaylistStream" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="@dimen/space_12" android:background="@drawable/bg_tv_btn_ghost" android:clickable="true" android:focusable="true" android:gravity="center">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/btn_open_playlist" android:textColor="@color/white" android:textSize="@dimen/tv_text_button" />
+                        </LinearLayout>
+                    </LinearLayout>
+                    <TextView android:id="@+id/errorCard" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="invisible" android:background="@drawable/bg_glass_error" android:padding="@dimen/space_12" android:textColor="@color/error_text" android:textSize="@dimen/tv_text_caption" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+    <ImageButton android:id="@+id/backAddPlayListUrlOpen" android:layout_width="52dp" android:layout_height="52dp" android:layout_gravity="top|start" android:layout_margin="@dimen/tv_margin_v" android:background="@drawable/bg_tv_btn_ghost" android:contentDescription="@string/cd_back" android:focusable="true" android:src="@drawable/ic_back" android:stateListAnimator="@animator/tv_focus_scale_sm" app:tint="@color/ink_dim" />
+</FrameLayout>

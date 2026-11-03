@@ -9,6 +9,7 @@ public class MediaFile {
     public enum Type {
         FOLDER,
         VIDEO,
+        AUDIO,
         PLAYLIST
     }
 

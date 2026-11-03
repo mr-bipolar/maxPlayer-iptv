@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_share" android:title="@string/menu_share_stream" />
+    <item android:id="@+id/action_copy_url" android:title="@string/menu_copy_url" />
+    <item android:id="@+id/action_stream_info" android:title="@string/menu_stream_info" />
+    <item android:id="@+id/action_stop_close" android:title="@string/menu_stop_close" />
+</menu>

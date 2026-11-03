@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:clipChildren="false"
+    tools:context=".filepicker.FileDetailsActivity">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_tv_plain"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout8"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/tv_margin_h"
+        android:layout_marginTop="@dimen/space_16"
+        android:layout_marginEnd="@dimen/tv_margin_h"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:clipChildren="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/backPlaylistFound"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_tv_btn_ghost"
+            android:contentDescription="@string/cd_back"
+            android:focusable="true"
+            android:src="@drawable/ic_back"
+            android:stateListAnimator="@animator/tv_focus_scale_sm"
+            app:tint="@color/ink_dim" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_16"
+            android:layout_weight="1"
+            android:text="@string/title_playlist_found"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_text_title"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView4"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout8">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/tv_margin_h"
+            android:paddingTop="@dimen/space_16"
+            android:paddingEnd="@dimen/tv_margin_h"
+            android:paddingBottom="@dimen/space_20">
+
+            <LinearLayout
+                android:layout_width="720dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_16"
+                android:background="@drawable/bg_tv_source_tile_default"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/space_24">
+
+                <FrameLayout
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/bg_card_icon_playlist">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_playlist_filled"
+                        app:tint="@color/accent" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_20"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtPlaylistFileName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="middle"
+                        android:maxLines="2"
+                        android:text="live.m3u"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/tv_text_headline"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtPlaylistFileMeta"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_6"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="@string/details_file_meta"
+                        android:textColor="@color/ink_dim"
+                        android:textSize="@dimen/tv_text_body" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="720dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_16"
+                android:background="@drawable/bg_tv_source_tile_default"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/space_16"
+                android:paddingBottom="@dimen/space_16">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/channelCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/details_channels"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/tv_text_headline"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_4"
+                        android:text="@string/stat_channels"
+                        android:textColor="@color/ink_dim"
+                        android:textSize="@dimen/tv_text_caption" />
+                </LinearLayout>
+
+                <View android:layout_width="1dp" android:layout_height="48dp" android:background="@color/line" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/categoryCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/details_categories"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/tv_text_headline"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_4"
+                        android:text="@string/stat_categories"
+                        android:textColor="@color/ink_dim"
+                        android:textSize="@dimen/tv_text_caption" />
+                </LinearLayout>
+
+                <View android:layout_width="1dp" android:layout_height="48dp" android:background="@color/line" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/fileFormat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/details_format"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/tv_text_headline"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_4"
+                        android:text="@string/stat_format"
+                        android:textColor="@color/ink_dim"
+                        android:textSize="@dimen/tv_text_caption" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="720dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_tv_source_tile_default"
+                android:padding="@dimen/space_24">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/space_8"
+                    android:text="@string/label_playlist_name"
+                    android:textColor="@color/ink_dim"
+                    android:textSize="@dimen/tv_text_label"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/editPlaylistName"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:background="@drawable/bg_tv_input"
+                    android:focusable="true"
+                    android:importantForAutofill="no"
+                    android:inputType="textUri"
+                    android:paddingStart="@dimen/space_16"
+                    android:paddingEnd="@dimen/space_16"
+                    android:singleLine="true"
+                    android:text="@string/details_name_value"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/ink_faint"
+                    android:textSize="@dimen/tv_text_body" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/categoryLabel"
+                android:layout_width="720dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_20"
+                android:layout_marginBottom="@dimen/space_10"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/section_categories_detected"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/tv_text_body"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/categoryContainer"
+                android:layout_width="720dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/space_12"
+                app:flexWrap="wrap"
+                app:alignItems="flex_start"
+                app:justifyContent="flex_start" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/linearLayout9"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_nav_bar"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/line_soft" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingStart="@dimen/tv_margin_h"
+            android:paddingTop="@dimen/space_12"
+            android:paddingEnd="@dimen/tv_margin_h"
+            android:paddingBottom="@dimen/space_16">
+
+            <LinearLayout
+                android:id="@+id/savePlaylist"
+                android:layout_width="720dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_tv_btn_primary"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:stateListAnimator="@animator/tv_focus_scale_sm">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="@dimen/space_8"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_play_round"
+                    app:tint="@color/accent_ink" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_play"
+                    android:textColor="@color/accent_ink"
+                    android:textSize="@dimen/tv_text_button"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

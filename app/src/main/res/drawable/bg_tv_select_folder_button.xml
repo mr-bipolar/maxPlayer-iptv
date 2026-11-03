@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false" android:drawable="@drawable/bg_tv_select_folder_disabled" />
+    <item android:state_pressed="true" android:drawable="@drawable/bg_tv_select_folder_pressed" />
+    <item android:state_focused="true" android:drawable="@drawable/bg_tv_btn_primary_focused" />
+    <item android:drawable="@drawable/bg_pill_accent" />
+</selector>

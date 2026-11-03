@@ -5,6 +5,7 @@ import android.net.Uri;
 
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistChannel;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
+import com.aaronmaxlab.maxplayer.utils.MediaTypes;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,6 +26,58 @@ public final class PlaylistParser {
     );
 
     private PlaylistParser() {}
+
+    public enum LocalKind {
+        PLAYLIST,      // .m3u / .m3u8 with channels (#EXTINF entries)
+        HLS_STREAM,    // .m3u8 that is a single HLS stream (#EXT-X- tags)
+        MEDIA_FILE,    // mp4, mkv, ts, mp3 ... one playable file
+        UNSUPPORTED
+    }
+
+    /** Tells a local file apart: channel playlist, single stream or single media file. */
+    public static LocalKind detectLocal(ContentResolver resolver, Uri uri, String fileName) {
+        String lower = fileName == null ? "" : fileName.toLowerCase(Locale.ROOT);
+        String mime = resolver.getType(uri);
+        mime = mime == null ? "" : mime.toLowerCase(Locale.ROOT);
+
+        boolean m3uMime = mime.contains("mpegurl");
+        boolean m3uExt = lower.endsWith(".m3u") || lower.endsWith(".m3u8");
+
+        // 1) a plain media file (not a playlist)
+        if (!m3uExt && !m3uMime
+                && (MediaTypes.isMedia(lower) || mime.startsWith("video/") || mime.startsWith("audio/"))) {
+            return LocalKind.MEDIA_FILE;
+        }
+
+        // 2) look inside: playlist or HLS stream
+        try (InputStream input = resolver.openInputStream(uri)) {
+            if (input == null) return LocalKind.UNSUPPORTED;
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(input, StandardCharsets.UTF_8))) {
+
+                boolean first = true;
+                String line;
+                int guard = 0;
+                while ((line = reader.readLine()) != null && guard++ < 5000) {
+                    line = line.trim();
+                    if (line.startsWith("\\uFEFF")) line = line.substring(1).trim();   // BOM
+                    if (line.isEmpty()) continue;
+
+                    if (first) {
+                        first = false;
+                        boolean header = line.regionMatches(true, 0, "#EXTM3U", 0, 7);
+                        if (!m3uExt && !m3uMime && !header) return LocalKind.UNSUPPORTED;
+                    }
+                    if (line.startsWith("#EXT-X-")) return LocalKind.HLS_STREAM;   // HLS tags come before the first segment
+                    if (line.startsWith("#EXTINF:")) return LocalKind.PLAYLIST;
+                }
+            }
+        } catch (IOException e) {
+            return LocalKind.UNSUPPORTED;
+        }
+        return LocalKind.UNSUPPORTED;   // m3u without #EXTINF entries
+    }
+
 
     public static PlaylistInfo parse(
             ContentResolver resolver,
@@ -290,7 +343,7 @@ public final class PlaylistParser {
     }
 
 
-    private static void parseM3uContent(
+    public static void parseM3uContent(
             BufferedReader reader,
             PlaylistInfo info
     ) throws IOException {
@@ -395,6 +448,33 @@ public final class PlaylistParser {
             info.categoryNames.clear();
             info.categoryNames.addAll(categories);
         }
+    }
+
+    /** Local playlist file -> full PlaylistInfo WITH channels.
+     *  parse() only reads metadata (format, counts); parseM3uContent() fills the channel list. */
+    public static PlaylistInfo parseLocal(
+            ContentResolver resolver,
+            Uri uri,
+            String fileName
+    ) throws IOException {
+
+        PlaylistInfo info = parse(resolver, uri, fileName);      // validates extension + format
+
+        String format = info.format == null ? "" : info.format;
+        if (!format.equals("M3U") && !format.equals("M3U8") && !format.equals("HLS M3U8")) {
+            return info;                                         // .pls/.xspf/etc: no channel parsing yet
+        }
+
+        try (InputStream input = resolver.openInputStream(uri)) {
+            if (input == null) {
+                throw new IOException("Unable to open selected file");
+            }
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(input, StandardCharsets.UTF_8))) {
+                parseM3uContent(reader, info);
+            }
+        }
+        return info;
     }
 
 }

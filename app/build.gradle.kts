@@ -65,7 +65,7 @@ dependencies {
     implementation(libs.media3.ui.compose)
     implementation(libs.media3.ui.compose.material3)
     implementation(libs.media3.session)
-    implementation(files("libs/mpvengine-debug.aar"))
+    implementation(files("libs/mpvengine-release.aar"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.ext.junit)
