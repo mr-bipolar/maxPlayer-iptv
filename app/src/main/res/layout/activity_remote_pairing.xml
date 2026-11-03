@@ -764,6 +764,25 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text=":"
+                            android:textColor="@color/ink"
+                            android:textSize="@dimen/tv_text_body"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/tv_key_h"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_tv_key"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:focusable="true"
+                        android:stateListAnimator="@animator/tv_focus_scale_sm">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:text="z"
                             android:textColor="@color/ink"
                             android:textSize="@dimen/tv_text_body"
@@ -882,6 +901,24 @@
                             android:textColor="@color/ink"
                             android:textSize="@dimen/tv_text_body"
                             android:textStyle="bold"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/keyBackspace"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/tv_key_h"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_tv_key"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:focusable="true"
+                        android:stateListAnimator="@animator/tv_focus_scale_sm">
+                        <ImageView
+                            android:layout_width="@dimen/space_18"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_back_press"
+                            />
                     </LinearLayout>
                     <LinearLayout
                         android:id="@+id/keyClear"

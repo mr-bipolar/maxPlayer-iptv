@@ -78,7 +78,7 @@
                 android:contentDescription="@string/cd_settings"
                 android:padding="@dimen/space_10"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_info"
+                android:src="@drawable/ic_remote"
                 app:tint="@color/ink" />
         </LinearLayout>
 
