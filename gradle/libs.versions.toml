@@ -12,6 +12,10 @@ recyclerview = "1.4.0"
 documentfile = "1.1.0"
 flexbox = "3.0.0"
 media3 = "1.11.1"
+glide = "5.0.9"
+core = "3.5.4"
+javaWebSocket = "1.6.0"
+zxingEmbedded = "4.3.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -33,6 +37,10 @@ media3-ui-compose = {group = "androidx.media3", name = "media3-ui-compose", vers
 media3-ui-compose-material3 = {group = "androidx.media3", name = "media3-ui-compose-material3", version.ref = "media3"}
 media3-session = {group = "androidx.media3" , name = "media3-session", version.ref = "media3"}
 media3-exoplayer-dash = {group = "androidx.media3" , name = "media3-exoplayer-dash", version.ref = "media3"}
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+zxing = { group = "com.google.zxing", name = "core", version.ref = "core" }
+java-websocket = { group = "org.java-websocket", name = "Java-WebSocket", version.ref = "javaWebSocket" }
+zxing-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingEmbedded" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

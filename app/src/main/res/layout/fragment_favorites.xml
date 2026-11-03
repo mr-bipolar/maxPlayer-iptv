@@ -4,358 +4,60 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".navigates.FavoritesFragment"
-    android:background="@color/bg">
+    android:background="@color/bg"
+    tools:context=".navigates.FavoritesFragment">
 
-
-    <ScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/favoritesRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:scrollbars="none"
-        android:fillViewport="true"
-        android:overScrollMode="never">
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingBottom="16dp"
+        tools:listitem="@layout/item_favorite" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/emptyFav"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/space_22"
+        android:visibility="gone"
+        android:gravity="center">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:background="@drawable/bg_card_lg"
+            android:padding="@dimen/space_12">
 
+            <ImageView
+                android:layout_width="@dimen/space_22"
+                android:layout_height="@dimen/space_22"
+                android:src="@drawable/ic_empty"
+                app:tint="@color/ink_dim" />
 
+        </FrameLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/group_channels"
-                android:textColor="@color/ink_faint"
-                android:textSize="@dimen/text_caption_sm"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:letterSpacing="0.05"
-                android:paddingStart="18dp"
-                android:paddingEnd="18dp"
-                android:paddingTop="14dp"
-                android:paddingBottom="8dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_favorites_yet"
+            android:textSize="@dimen/text_title"
+            android:layout_marginTop="@dimen/space_8"
+            android:textColor="@color/ink_dim"
+            android:textStyle="bold"
+            />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingStart="18dp"
-                android:paddingEnd="18dp"
-                android:paddingTop="11dp"
-                android:paddingBottom="11dp">
-
-                <FrameLayout
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_card_icon_square">
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:src="@drawable/ic_tv"
-                        android:importantForAccessibility="no"
-                        android:layout_gravity="center"
-                        app:tint="@color/ink_faint" />
-                </FrameLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fav_bbc_news"
-                        android:textColor="@color/ink"
-                        android:textSize="@dimen/text_body"
-                        android:textStyle="bold"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:layout_marginBottom="2dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fav_bbc_news_cat"
-                        android:textColor="@color/ink_faint"
-                        android:textSize="@dimen/text_caption_sm" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="17dp"
-                        android:layout_height="17dp"
-                        android:src="@drawable/ic_heart_filled"
-                        android:importantForAccessibility="no"
-                        android:layout_marginEnd="6dp"
-                        app:tint="@color/accent" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/line_soft"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="18dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingStart="18dp"
-                android:paddingEnd="18dp"
-                android:paddingTop="11dp"
-                android:paddingBottom="11dp">
-
-                <FrameLayout
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_card_icon_square">
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:src="@drawable/ic_tv"
-                        android:importantForAccessibility="no"
-                        android:layout_gravity="center"
-                        app:tint="@color/ink_faint" />
-                </FrameLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fav_sky_sports"
-                        android:textColor="@color/ink"
-                        android:textSize="@dimen/text_body"
-                        android:textStyle="bold"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:layout_marginBottom="2dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fav_sky_sports_cat"
-                        android:textColor="@color/ink_faint"
-                        android:textSize="@dimen/text_caption_sm" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="17dp"
-                        android:layout_height="17dp"
-                        android:src="@drawable/ic_heart_filled"
-                        android:importantForAccessibility="no"
-                        android:layout_marginEnd="6dp"
-                        app:tint="@color/accent" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/line_soft"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="18dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/group_playlists"
-                android:textColor="@color/ink_faint"
-                android:textSize="@dimen/text_caption_sm"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:letterSpacing="0.05"
-                android:paddingStart="18dp"
-                android:paddingEnd="18dp"
-                android:paddingTop="14dp"
-                android:paddingBottom="8dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingStart="18dp"
-                android:paddingEnd="18dp"
-                android:paddingTop="11dp"
-                android:paddingBottom="11dp">
-
-                <FrameLayout
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_card_icon_square">
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:src="@drawable/ic_folder"
-                        android:importantForAccessibility="no"
-                        android:layout_gravity="center"
-                        app:tint="@color/ink_faint" />
-                </FrameLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fav_world_live_tv"
-                        android:textColor="@color/ink"
-                        android:textSize="@dimen/text_body"
-                        android:textStyle="bold"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:layout_marginBottom="2dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fav_world_live_tv_cat"
-                        android:textColor="@color/ink_faint"
-                        android:textSize="@dimen/text_caption_sm" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="17dp"
-                        android:layout_height="17dp"
-                        android:src="@drawable/ic_heart_filled"
-                        android:importantForAccessibility="no"
-                        android:layout_marginEnd="6dp"
-                        app:tint="@color/accent" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/line_soft"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="18dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/group_streams"
-                android:textColor="@color/ink_faint"
-                android:textSize="@dimen/text_caption_sm"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:letterSpacing="0.05"
-                android:paddingStart="18dp"
-                android:paddingEnd="18dp"
-                android:paddingTop="14dp"
-                android:paddingBottom="8dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingStart="18dp"
-                android:paddingEnd="18dp"
-                android:paddingTop="11dp"
-                android:paddingBottom="11dp">
-
-                <FrameLayout
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_card_icon_square">
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:src="@drawable/ic_radio"
-                        android:importantForAccessibility="no"
-                        android:layout_gravity="center"
-                        app:tint="@color/ink_faint" />
-                </FrameLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fav_chillhop"
-                        android:textColor="@color/ink"
-                        android:textSize="@dimen/text_body"
-                        android:textStyle="bold"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:layout_marginBottom="2dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fav_chillhop_cat"
-                        android:textColor="@color/ink_faint"
-                        android:textSize="@dimen/text_caption_sm" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="17dp"
-                        android:layout_height="17dp"
-                        android:src="@drawable/ic_heart_filled"
-                        android:importantForAccessibility="no"
-                        android:layout_marginEnd="6dp"
-                        app:tint="@color/accent" />
-                    </LinearLayout>
-                </LinearLayout>
-            </LinearLayout>
-        </ScrollView>
-
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_fav"
+            android:textSize="@dimen/text_body"
+            android:layout_marginTop="@dimen/space_4"
+            android:textColor="@color/ink_faint"
+            android:textAlignment="center"
+            />
+    </LinearLayout>
 
 </FrameLayout>

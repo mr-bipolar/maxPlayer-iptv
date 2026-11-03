@@ -7,15 +7,6 @@
     tools:context=".navigates.PlaylistsFragment"
     android:background="@color/bg">
 
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:scrollbars="none"
-        android:fillViewport="true"
-        android:overScrollMode="never">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,13 +33,18 @@
                     android:src="@drawable/ic_search"
                     android:importantForAccessibility="no"
                     app:tint="@color/ink_faint" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/hint_search_channels"
-                        android:textColor="@color/ink_faint"
-                        android:textSize="@dimen/text_body"
-                        android:layout_marginStart="10dp"/>
+
+                <EditText
+                    android:id="@+id/categorySearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Search categories"
+                    android:singleLine="true"
+                    android:paddingStart="@dimen/space_12"
+                    android:textSize="@dimen/text_body"
+                    android:background="@android:color/transparent"
+                    android:textColor="@color/ink"
+                    android:textColorHint="@color/ink_faint"/>
                 </LinearLayout>
                 <HorizontalScrollView
                     android:layout_width="match_parent"
@@ -64,25 +60,7 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
                         <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:background="@drawable/bg_chip_active"
-                            android:paddingStart="14dp"
-                            android:paddingEnd="14dp"
-                            android:paddingTop="8dp"
-                            android:paddingBottom="8dp"
-                            android:layout_marginEnd="8dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/toggle_gallery"
-                                android:textColor="@color/accent"
-                                android:textSize="@dimen/text_body_sm"
-                                android:textStyle="bold"/>
-                        </LinearLayout>
-                        <LinearLayout
+                            android:id="@+id/gridView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
@@ -94,6 +72,28 @@
                             android:paddingBottom="8dp"
                             android:layout_marginEnd="8dp">
                             <TextView
+                                android:id="@+id/gridText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/toggle_gallery"
+                                android:textColor="@color/ink_dim"
+                                android:textSize="@dimen/text_body_sm"
+                                android:textStyle="bold"/>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/listView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="@drawable/bg_chip"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:layout_marginEnd="8dp">
+                            <TextView
+                                android:id="@+id/listText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/toggle_list"
@@ -102,6 +102,7 @@
                                 android:fontFamily="sans-serif-medium"/>
                         </LinearLayout>
                         <LinearLayout
+                            android:id="@+id/filterBtn"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
@@ -128,6 +129,7 @@
                                 android:fontFamily="sans-serif-medium"/>
                         </LinearLayout>
                         <LinearLayout
+                            android:id="@+id/sortBtn"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
@@ -173,281 +175,19 @@
                         android:textStyle="bold"
                         android:layout_weight="1"/>
                 </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="top"
-                    android:layout_marginStart="18dp"
-                    android:layout_marginEnd="18dp"
-                    android:layout_marginBottom="12dp">
-                    <FrameLayout
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/cat_card_height"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_cat_card"
-                        android:clipToOutline="true"
-                        android:layout_marginEnd="6dp">
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/bg_cat_scrim"/>
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_tv"
-                            android:importantForAccessibility="no"
-                            android:alpha="0.5"
-                            android:layout_gravity="top|start"
-                            android:layout_margin="12dp"
-                            app:tint="@color/ink" />
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_gravity="bottom|start"
-                            android:padding="14dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/cat_live_tv"
-                                android:textColor="@color/ink"
-                                android:textSize="@dimen/text_body"
-                                android:textStyle="bold"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/cat_live_tv_count"
-                                android:textColor="@color/ink_dim"
-                                android:textSize="@dimen/text_caption_sm"/>
-                        </LinearLayout>
-                    </FrameLayout>
-                    <FrameLayout
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/cat_card_height"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_cat_card"
-                        android:clipToOutline="true"
-                        android:layout_marginStart="6dp">
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/bg_cat_scrim"/>
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_cat_sport"
-                            android:importantForAccessibility="no"
-                            android:alpha="0.5"
-                            android:layout_gravity="top|start"
-                            android:layout_margin="12dp"
-                            app:tint="@color/ink" />
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_gravity="bottom|start"
-                            android:padding="14dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/cat_sports"
-                                android:textColor="@color/ink"
-                                android:textSize="@dimen/text_body"
-                                android:textStyle="bold"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/cat_sports_count"
-                                android:textColor="@color/ink_dim"
-                                android:textSize="@dimen/text_caption_sm"/>
-                        </LinearLayout>
-                    </FrameLayout>
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="top"
-                    android:layout_marginStart="18dp"
-                    android:layout_marginEnd="18dp"
-                    android:layout_marginBottom="12dp">
-                    <FrameLayout
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/cat_card_height"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_cat_card"
-                        android:clipToOutline="true"
-                        android:layout_marginEnd="6dp">
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/bg_cat_scrim"/>
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_cat_news"
-                            android:importantForAccessibility="no"
-                            android:alpha="0.5"
-                            android:layout_gravity="top|start"
-                            android:layout_margin="12dp"
-                            app:tint="@color/ink" />
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_gravity="bottom|start"
-                            android:padding="14dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/cat_news"
-                                android:textColor="@color/ink"
-                                android:textSize="@dimen/text_body"
-                                android:textStyle="bold"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/cat_news_count"
-                                android:textColor="@color/ink_dim"
-                                android:textSize="@dimen/text_caption_sm"/>
-                        </LinearLayout>
-                    </FrameLayout>
-                    <FrameLayout
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/cat_card_height"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_cat_card"
-                        android:clipToOutline="true"
-                        android:layout_marginStart="6dp">
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/bg_cat_scrim"/>
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_cat_movies"
-                            android:importantForAccessibility="no"
-                            android:alpha="0.5"
-                            android:layout_gravity="top|start"
-                            android:layout_margin="12dp"
-                            app:tint="@color/ink" />
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_gravity="bottom|start"
-                            android:padding="14dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/cat_movies"
-                                android:textColor="@color/ink"
-                                android:textSize="@dimen/text_body"
-                                android:textStyle="bold"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/cat_movies_count"
-                                android:textColor="@color/ink_dim"
-                                android:textSize="@dimen/text_caption_sm"/>
-                        </LinearLayout>
-                    </FrameLayout>
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="top"
-                    android:layout_marginStart="18dp"
-                    android:layout_marginEnd="18dp"
-                    android:layout_marginBottom="12dp">
-                    <FrameLayout
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/cat_card_height"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_cat_card"
-                        android:clipToOutline="true"
-                        android:layout_marginEnd="6dp">
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/bg_cat_scrim"/>
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_cat_kids"
-                            android:importantForAccessibility="no"
-                            android:alpha="0.5"
-                            android:layout_gravity="top|start"
-                            android:layout_margin="12dp"
-                            app:tint="@color/ink" />
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_gravity="bottom|start"
-                            android:padding="14dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/cat_kids"
-                                android:textColor="@color/ink"
-                                android:textSize="@dimen/text_body"
-                                android:textStyle="bold"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/cat_kids_count"
-                                android:textColor="@color/ink_dim"
-                                android:textSize="@dimen/text_caption_sm"/>
-                        </LinearLayout>
-                    </FrameLayout>
-                    <FrameLayout
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/cat_card_height"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_cat_card"
-                        android:clipToOutline="true"
-                        android:layout_marginStart="6dp">
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/bg_cat_scrim"/>
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_radio"
-                            android:importantForAccessibility="no"
-                            android:alpha="0.5"
-                            android:layout_gravity="top|start"
-                            android:layout_margin="12dp"
-                            app:tint="@color/ink" />
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_gravity="bottom|start"
-                            android:padding="14dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/cat_radio"
-                                android:textColor="@color/ink"
-                                android:textSize="@dimen/text_body"
-                                android:textStyle="bold"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/cat_radio_count"
-                                android:textColor="@color/ink_dim"
-                                android:textSize="@dimen/text_caption_sm"/>
-                        </LinearLayout>
-                    </FrameLayout>
-                </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/categoryRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp"
+                android:paddingBottom="12dp"
+                android:overScrollMode="never"/>
             </LinearLayout>
-        </ScrollView>
+
 
 
 

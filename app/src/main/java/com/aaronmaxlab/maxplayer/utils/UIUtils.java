@@ -79,4 +79,12 @@ public final class UIUtils {
     public static void applySystemBarPadding(@NonNull View root) {
         applySystemBarPadding(root, true);
     }
+
+    public static String toCapitalize(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+
+        return text.substring(0, 1).toUpperCase() + text.substring(1);
+    }
 }

@@ -2,22 +2,35 @@ package com.aaronmaxlab.maxplayer;
 
 import static android.view.View.VISIBLE;
 
+
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.aaronmaxlab.maxplayer.animations.LoaderAnimator;
+import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
+import com.aaronmaxlab.maxplayer.database.adapter.LocalDbRecentViewAdapter;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbFavorites;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbRecentView;
 import com.aaronmaxlab.maxplayer.databinding.ActivityPlayVideoUrlBinding;
 import com.aaronmaxlab.maxplayer.player.PlayerActivity;
+import com.aaronmaxlab.maxplayer.utils.AppToast;
+import com.aaronmaxlab.maxplayer.utils.AppUtils;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
+import com.aaronmaxlab.maxplayer.utils.PlaylistType;
 import com.aaronmaxlab.maxplayer.utils.StreamErrorUtils;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.aaronmaxlab.maxplayer.utils.UrlUtils;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,6 +41,9 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
     private ActivityPlayVideoUrlBinding binding;
     private boolean isChecking;
     private View loader;
+    private SqlDbHelper sqlDbHelper;
+    private LocalDbRecentViewAdapter adapter;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +53,15 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
         binding = ActivityPlayVideoUrlBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        recyclerView = binding.recyclerRecentViews;
+
+        sqlDbHelper = new SqlDbHelper(this);
+
         UIUtils.setLightNavigationBars(this, false); // black bottom nav
         UIUtils.applySystemBarPadding(binding.getRoot());
+
+        setupRecentViews(sqlDbHelper);
+
 
         loader = findViewById(R.id.loaderOverlay);
 
@@ -51,8 +74,11 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
 
         EditText urlBox = binding.videoUrlForPlay;
         String videoUrl = urlBox.getText().toString().trim();
-        String videoName = binding.videoNameForPlay.getText().toString().trim();
+        String inputName = binding.videoNameForPlay.getText().toString().trim();
 
+        final String videoName = inputName.isEmpty()
+                ? UIUtils.extractLabel(videoUrl)
+                : inputName;
 
         if (!validateUrl(urlBox, videoUrl)) return;
 
@@ -62,7 +88,7 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
         ioExecutor.execute(() -> {
             boolean reachable = UrlUtils.isStreamReachable(videoUrl);
             boolean isStream = reachable && UrlUtils.isMediaStreamUrl(videoUrl);
-            runOnUiThread(() -> onReachabilityResult(reachable, isStream, videoUrl, videoName));
+            runOnUiThread(() -> onReachabilityResult(reachable, isStream, videoUrl, videoName, true));
         });
     }
 
@@ -83,8 +109,13 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
         input.requestFocus();
     }
 
-    private void onReachabilityResult(boolean reachable, boolean isStream,
-                                      String url, String name) {
+    private void onReachabilityResult(
+            boolean reachable,
+            boolean isStream,
+            String url,
+            String name,
+            boolean saveRecentView) {
+
         if (isFinishing() || isDestroyed()) return;
 
         setChecking(false);
@@ -97,6 +128,13 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
 
         startActivity(PlayerActivity.forStream(this, url, name, isStream));
         LoaderAnimator.stopLoader(loader);
+
+        if (saveRecentView) {
+            LocalDbRecentView recentView =
+                    new LocalDbRecentView(name, url, PlaylistType.VOD, null);
+
+            addRecentView(recentView);
+        }
     }
 
     private void setChecking(boolean checking) {
@@ -106,6 +144,145 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
 
 
 
+    private void setupRecentViews(SqlDbHelper helper) {
+        this.sqlDbHelper = helper;
+
+        adapter = new LocalDbRecentViewAdapter(
+                this,
+                new LocalDbRecentViewAdapter.Listener() {
+
+                    @Override
+                    public void onItemClick(LocalDbRecentView item) {
+                        if (isChecking) return;
+
+                        String url = item.getChannelUrl();
+                        String name = item.getChannelName();
+
+                        LoaderAnimator.startLoader(loader);
+                        setChecking(true);
+
+                        ioExecutor.execute(() -> {
+                            boolean reachable = UrlUtils.isStreamReachable(url);
+                            boolean isStream =
+                                    reachable && UrlUtils.isMediaStreamUrl(url);
+
+                            runOnUiThread(() ->
+                                    onReachabilityResult(
+                                            reachable,
+                                            isStream,
+                                            url,
+                                            name,
+                                            false
+                                    )
+                            );
+                        });
+
+                    }
+
+                    @Override
+                    public void onFavoriteClick(LocalDbRecentView item) {
+                        // Toggle favorite in your database.
+                        LocalDbFavorites favorites = new LocalDbFavorites(item.getChannelName(), item.getChannelType(), item.getChannelUrl(), item.getChannelIcon(), PlaylistType.VOD);
+                        boolean result =  sqlDbHelper.setFavorite(favorites);
+
+                        if(result){
+                            boolean isFav = sqlDbHelper.isFavorite(item.getChannelUrl());
+
+                            if (isFav) {
+                                AppToast.success( PlayVideoUrlActivity.this, "Added to favorites.");
+                            } else {
+                                AppToast.success(PlayVideoUrlActivity.this, "Removed from favorites.");
+                            }
+
+                            ImageView favButton = findViewById(R.id.mediaFav);
+
+                            if (favButton != null) {
+                                favButton.setImageResource(
+                                        isFav
+                                                ? R.drawable.ic_heart_filled
+                                                : R.drawable.ic_heart_outline
+                                );
+                            }
+
+                        }
+
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onDeleteClick(LocalDbRecentView item) {
+
+                        AppUtils.showDeleteConfirmation(
+                                PlayVideoUrlActivity.this,
+                                item.getChannelName(),
+                                () -> {
+                                    try {
+                                        boolean result =
+                                                sqlDbHelper.removeRecentItem(item.getId());
+
+                                        if (result) {
+                                            refreshRecentViews();
+                                            AppToast.success(
+                                                    PlayVideoUrlActivity.this,
+                                                    "Recent view deleted."
+                                            );
+                                        } else {
+                                            AppToast.error(
+                                                    PlayVideoUrlActivity.this,
+                                                    "Delete failed."
+                                            );
+                                        }
+
+                                    } catch (Exception e) {
+                                        Log.e("RECENT_VIEW", "Delete failed", e);
+
+                                        AppToast.error(
+                                                PlayVideoUrlActivity.this,
+                                                "Delete failed."
+                                        );
+                                    }
+                                }
+                        );
+                    }
+                }
+        );
+
+        recyclerView.setLayoutManager(
+                new LinearLayoutManager(this)
+        );
+
+        recyclerView.setAdapter(adapter);
+
+        refreshRecentViews();
+    }
+
+    private void refreshRecentViews() {
+        try {
+            List<LocalDbRecentView> recentViews =
+                    sqlDbHelper.getAllRecentViews(PlaylistType.VOD);
+
+            assert binding.recentLabel != null;
+
+            binding.recentLabel.setVisibility( recentViews.isEmpty() ? View.GONE : VISIBLE);
+
+            adapter.submitList(recentViews);
+            Log.d("RECENT_VIEW", "Loaded recent views: " + recentViews.size());
+
+        } catch (Exception e) {
+            Log.e("RECENT_VIEW", "Failed to load recent views", e);
+        }
+    }
+
+    private void addRecentView(LocalDbRecentView recentView) {
+        try {
+            sqlDbHelper.setRecentViews(recentView);
+            // Reload the RecyclerView after inserting.
+            refreshRecentViews();
+
+        } catch (Exception e) {
+            Log.e("RECENT_VIEW", "Failed to add recent view", e);
+        }
+    }
 
 
     @Override

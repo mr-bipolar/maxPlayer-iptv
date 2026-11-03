@@ -11,6 +11,7 @@ import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -41,12 +42,15 @@ import androidx.media3.session.SessionToken;
 
 import com.aaronmaxlab.maxplayer.PlayAudioStreamActivity;
 import com.aaronmaxlab.maxplayer.R;
+import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbHistory;
 import com.aaronmaxlab.maxplayer.databinding.ActivityAudioPlayerBinding;
 import com.aaronmaxlab.maxplayer.playlist.SaveChannelDialog;
 import com.aaronmaxlab.maxplayer.service.PlaybackService;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.AudioUtils;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
+import com.aaronmaxlab.maxplayer.utils.PlaylistType;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -54,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 @OptIn(markerClass = UnstableApi.class)
 public class AudioPlayerActivity extends AppCompatActivity {
@@ -87,6 +92,7 @@ public class AudioPlayerActivity extends AppCompatActivity {
                     "Podcast",  "Radio", "Mp3"
             ));
 
+    private SqlDbHelper sqlDbHelper;
 
     // Lifecycle
     @Override
@@ -110,8 +116,10 @@ public class AudioPlayerActivity extends AppCompatActivity {
         UIUtils.setLightNavigationBars(this, false);
         UIUtils.applySystemBarPadding(binding.getRoot());
 
+        sqlDbHelper = new SqlDbHelper(this);
+
         binding.audioStationName.setText(streamChannelName);
-        favorite = AudioFavorites.isFavorite(this, streamUri);
+        favorite = AudioFavorites.isFavorite(this,  streamUri);
         renderFavorite();
 
         setupArtworkRotation();
@@ -151,8 +159,31 @@ public class AudioPlayerActivity extends AppCompatActivity {
             MediaController.releaseFuture(controllerFuture);
             controllerFuture = null;
         }
+
+        setHistory(sqlDbHelper);
+
         binding = null;
         super.onDestroy();
+    }
+
+    private void setHistory(SqlDbHelper sqlDbHelper){
+        try {
+           final LocalDbHistory history = new LocalDbHistory(
+                   streamChannelName,
+                   "Audio stream",
+                   streamUri,
+                   null,
+                   PlaylistType.AUDIO,
+                   null,
+                   null);
+
+            sqlDbHelper.saveHistory(history);
+
+        } catch (Exception e) {
+            Log.e("HISTORY", Objects.requireNonNull(e.getMessage()));
+        }finally {
+            sqlDbHelper.close();
+        }
     }
 
 
@@ -163,7 +194,7 @@ public class AudioPlayerActivity extends AppCompatActivity {
         ClickUtils.applyTouchEffect(binding.audioCatSaveBtn, v -> showAddChannelDialog());
 
         ClickUtils.applyTouchEffect(binding.audioFavoriteBtn, v -> {
-            favorite = AudioFavorites.toggle(this, streamUri);
+            favorite = AudioFavorites.toggle(this, streamChannelName, streamUri);
             renderFavorite();
         });
 

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="bottom"
+    android:background="@drawable/bg_drawer_sheet"
+    android:orientation="vertical"
+    android:minHeight="400dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/bg_drawer_handle" />
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_8"
+        android:layout_marginStart="@dimen/space_16"
+        android:layout_marginEnd="@dimen/space_16"
+        android:layout_marginBottom="@dimen/space_8"
+        android:hint="Search channels"
+        android:textColorHint="@color/ink_dim"
+        app:boxBackgroundMode="outline"
+        app:boxCornerRadiusTopStart="@dimen/space_12"
+        app:boxCornerRadiusTopEnd="@dimen/space_12"
+        app:boxCornerRadiusBottomStart="@dimen/space_12"
+        app:boxCornerRadiusBottomEnd="@dimen/space_12"
+        app:boxStrokeColor="@color/channel_search_stroke"
+        app:startIconDrawable="@drawable/ic_search"
+        app:startIconTint="@color/accent_alpha_35"
+        app:hintTextColor="@color/accent"
+        android:paddingBottom="@dimen/space_10"
+        app:cursorColor="@color/white_alpha_45">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ChannelSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:inputType="text"
+            android:gravity="center_vertical"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:textColor="@color/ink"
+            android:textSelectHandle="@drawable/search_handle"
+            android:textSelectHandleLeft="@drawable/search_handle"
+            android:textSelectHandleRight="@drawable/search_handle"
+            android:textColorHint="@color/ink_dim"
+            android:textCursorDrawable="@drawable/search_cursor" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/channelsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingBottom="12dp"
+        android:scrollbars="vertical"
+        />
+
+</LinearLayout>

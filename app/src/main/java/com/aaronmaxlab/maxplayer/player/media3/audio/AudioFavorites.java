@@ -1,38 +1,45 @@
 package com.aaronmaxlab.maxplayer.player.media3.audio;
 
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbFavorites;
+import com.aaronmaxlab.maxplayer.utils.PlaylistType;
+
+import java.util.Objects;
 
 
 final class AudioFavorites {
 
-    private static final String PREFS = "audio_favorites";
-    private static final String KEY_URIS = "uris";
+
 
     private AudioFavorites() {}
 
-    static boolean isFavorite(@NonNull Context c, @NonNull String uri) {
-        return prefs(c).getStringSet(KEY_URIS, Collections.emptySet()).contains(uri);
+    static boolean isFavorite(@NonNull Context c,  @NonNull String uri) {
+       try {
+           SqlDbHelper sqlDbHelper = new SqlDbHelper(c);
+           return  sqlDbHelper.isFavorite(uri);
+       } catch (Exception e) {
+           Log.e("AUDIO", Objects.requireNonNull(e.getMessage()));
+           return  false;
+       }
     }
 
     /** @return true if the stream is now a favorite. */
-    static boolean toggle(@NonNull Context c, @NonNull String uri) {
-        SharedPreferences p = prefs(c);
-        // never mutate the set returned by SharedPreferences
-        Set<String> set = new HashSet<>(p.getStringSet(KEY_URIS, Collections.emptySet()));
-        boolean added = set.add(uri);
-        if (!added) set.remove(uri);
-        p.edit().putStringSet(KEY_URIS, set).apply();
-        return added;
+    static boolean toggle(@NonNull Context c,  @NonNull String streamName, @NonNull String uri) {
+        try {
+            SqlDbHelper sqlDbHelper = new SqlDbHelper(c);
+            LocalDbFavorites favorites = new LocalDbFavorites(streamName, "Audio Stream", uri, null, PlaylistType.AUDIO);
+
+            return sqlDbHelper.setFavorite(favorites);
+        } catch (Exception e) {
+            Log.e("AUDIO", Objects.requireNonNull(e.getMessage()));
+            return  false;
+        }
+
     }
 
-    private static SharedPreferences prefs(Context c) {
-        return c.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-    }
 }

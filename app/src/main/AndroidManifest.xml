@@ -5,16 +5,17 @@
     <uses-feature
         android:name="android.software.leanback"
         android:required="false" />
-
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
 
-
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -66,7 +67,6 @@
             android:name=".filepicker.FileDetailsActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".player.media3.audio.AudioPlayerActivity"
             android:exported="false"
@@ -77,34 +77,38 @@
             android:exported="true"
             android:foregroundServiceType="mediaPlayback"
             android:permission="android.permission.FOREGROUND_SERVICE">
-
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaSessionService" />
             </intent-filter>
-
         </service>
-
         <service
             android:name=".service.VideoPlaybackService"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback"
             android:permission="android.permission.FOREGROUND_SERVICE">
-
             <intent-filter>
-                <action
-                    android:name="androidx.media3.session.MediaSessionService" />
+                <action android:name="androidx.media3.session.MediaSessionService" />
             </intent-filter>
-
         </service>
 
-
-        <activity android:name=".player.PlayerActivity"
-            android:launchMode="singleTask"
+        <activity
+            android:name=".player.PlayerActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden|uiMode"
             android:exported="false"
-            android:supportsPictureInPicture="true"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden|uiMode" />
+            android:launchMode="singleTask"
+            android:supportsPictureInPicture="true" />
+        <activity
+            android:name=".channels.ChannelActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".keyboard.RemotePairingActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".keyboard.RemoteKeyboardActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
-
-
 
 </manifest>

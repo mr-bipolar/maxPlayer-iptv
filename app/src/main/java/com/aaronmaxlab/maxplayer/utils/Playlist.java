@@ -86,7 +86,7 @@ public class Playlist {
 
             String path = remoteUrl.getPath();
 
-            if (path != null && !path.isEmpty()) {
+            if (path != null && !path.isEmpty() && info.fileName.isEmpty()) {
                 String fileName = path.substring(path.lastIndexOf('/') + 1);
 
                 if (!fileName.isEmpty()) {
@@ -125,4 +125,38 @@ public class Playlist {
                 bytes / (1024.0 * 1024 * 1024)
         );
     }
+
+
+    // time
+    public static String getRelativeTime(Long createdAt) {
+        if (createdAt == null || createdAt <= 0) {
+            return "";
+        }
+
+        long now = System.currentTimeMillis();
+        long diff = Math.max(0L, now - createdAt);
+
+        long minutes = diff / (60 * 1000L);
+        long hours = diff / (60 * 60 * 1000L);
+        long days = diff / (24 * 60 * 60 * 1000L);
+
+        if (minutes < 1) {
+            return "Opened just now";
+        }
+
+        if (hours < 1) {
+            return "Opened " + minutes + (minutes == 1 ? " minute ago" : " minutes ago");
+        }
+
+        if (days < 1) {
+            return "Opened " + hours + (hours == 1 ? " hour ago" : " hours ago");
+        }
+
+        if (days == 1) {
+            return "Opened yesterday";
+        }
+
+        return "Opened " + days + " days ago";
+    }
+
 }

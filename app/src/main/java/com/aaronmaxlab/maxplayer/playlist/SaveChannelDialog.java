@@ -75,10 +75,36 @@ public final class SaveChannelDialog {
         dialog.show();
         style(context, dialog);
         if (DeviceUtils.isTv(context)) {
-            b.categoryField.post(() -> b.categoryField.requestFocus());
+            b.categoryField.post(b.categoryField::requestFocus);
         }
         return dialog;
     }
+
+
+    public static void showCategoryPicker(
+            @NonNull Context context,
+            @NonNull List<String> categories,
+            int preselectedIndex,
+            @NonNull OnCategorySelectedListener listener
+    ) {
+        new AlertDialog.Builder(context, R.style.PlayerDialogTheme)
+                .setTitle(R.string.save_channel_choose_category)
+                .setSingleChoiceItems(
+                        categories.toArray(new CharSequence[0]),
+                        preselectedIndex,
+                        (dialog, which) -> {
+                            listener.onSelected(which);
+                            dialog.dismiss();
+                        }
+                )
+                .show();
+    }
+
+    public interface OnCategorySelectedListener {
+        void onSelected(int index);
+    }
+
+
 
     private static void render(Context c, DialogSaveChannelBinding b, @Nullable String category) {
         boolean has = category != null;
