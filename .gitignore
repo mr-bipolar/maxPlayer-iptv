@@ -1,6 +1,5 @@
 # Built application files / outputs
 *.apk
-*.aar
 *.ap_
 *.aab
 
@@ -8,27 +7,35 @@
 *.bin
 
 # Metaprogramming output
-.kotlin
+.kotlin/
 
-# Local configuration file (sdk path, passwords, local keys)
+# Local configuration
 local.properties
 
-# Log Files
+# Signing credentials
+key.properties
+*.jks
+*.keystore
+*.p12
+*.pfx
+
+# Log files
 *.log
 
-# Android Studio & IntelliJ IDEA settings
+# Android Studio & IntelliJ IDEA
 .navigation/
 .gradle/
+.idea/
+*.iml
+
+# Build outputs
 build/
-app/build/
-/build/
-/.idea/
+**/build/
 
 # Android Studio generated files
 captures/
-.externalNativeBuild
+.externalNativeBuild/
 .cxx/
-*.iml
 
 # OS generated files
 .DS_Store
