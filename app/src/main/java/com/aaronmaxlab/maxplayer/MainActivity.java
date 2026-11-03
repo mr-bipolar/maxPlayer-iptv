@@ -16,9 +16,33 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.aaronmaxlab.maxplayer.databinding.ActivityMainBinding;
+import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
+
+    // bottom nav icon and text space
+    private void adjustBottomNavGap(BottomNavigationView bottomNav) {
+        bottomNav.post(() -> {
+            View menuView = bottomNav.getChildAt(0);
+            if (menuView instanceof ViewGroup) {
+                ViewGroup menuViewGroup = (ViewGroup) menuView;
+                for (int i = 0; i < menuViewGroup.getChildCount(); i++) {
+                    View itemView = menuViewGroup.getChildAt(i);
+                    View labelGroup = itemView.findViewById(com.google.android.material.R.id.navigation_bar_item_labels_group);
+                    if (labelGroup != null) {
+                        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) labelGroup.getLayoutParams();
+
+                        // Convert 4dp to pixels dynamically
+                        params.topMargin = (int) (4 * getResources().getDisplayMetrics().density);
+
+                        labelGroup.setLayoutParams(params);
+                    }
+                }
+            }
+        });
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,12 +55,8 @@ public class MainActivity extends AppCompatActivity {
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        //  Control navigation bar icon contrast
-        WindowInsetsControllerCompat controller =
-                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-        controller.setAppearanceLightNavigationBars(false);
-
-
+        // bottom nav set black
+        UIUtils.setLightNavigationBars(this, false);
 
 
         //  Fix WindowInsets padding (prevents double bottom height/extra white space)
@@ -58,25 +78,5 @@ public class MainActivity extends AppCompatActivity {
         adjustBottomNavGap(binding.bottomNavigation);
     }
 
-    private void adjustBottomNavGap(BottomNavigationView bottomNav) {
-        bottomNav.post(() -> {
-            View menuView = bottomNav.getChildAt(0);
-            if (menuView instanceof ViewGroup) {
-                ViewGroup menuViewGroup = (ViewGroup) menuView;
-                for (int i = 0; i < menuViewGroup.getChildCount(); i++) {
-                    View itemView = menuViewGroup.getChildAt(i);
-                    View labelGroup = itemView.findViewById(com.google.android.material.R.id.navigation_bar_item_labels_group);
-                    if (labelGroup != null) {
-                        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) labelGroup.getLayoutParams();
-
-                        // Convert 4dp to pixels dynamically
-                        params.topMargin = (int) (4 * getResources().getDisplayMetrics().density);
-
-                        labelGroup.setLayoutParams(params);
-                    }
-                }
-            }
-        });
-    }
 }
 

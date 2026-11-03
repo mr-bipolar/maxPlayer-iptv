@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.aaronmaxlab.maxplayer.databinding.ActivityPlayAudioStreamBinding;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
+import com.aaronmaxlab.maxplayer.utils.UIUtils;
 
 public class PlayAudioStreamActivity extends AppCompatActivity {
 
@@ -22,10 +23,8 @@ public class PlayAudioStreamActivity extends AppCompatActivity {
 
         ActivityPlayAudioStreamBinding binding = ActivityPlayAudioStreamBinding.inflate(getLayoutInflater());
 
-        //  Control navigation bar icon contrast
-        WindowInsetsControllerCompat controller =
-                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-        controller.setAppearanceLightNavigationBars(false);
+        // bottom nav set black
+        UIUtils.setLightNavigationBars(this, false);
 
         setContentView(binding.getRoot());
 

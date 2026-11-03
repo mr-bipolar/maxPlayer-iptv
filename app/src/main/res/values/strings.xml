@@ -245,4 +245,24 @@
     <string name="recent_jazz_url">https://radio.example.com/jazz/aac</string>
     <string name="recent_rock_url">https://cdn.example.com/rock/index.m3u8</string>
 
+    <!-- File picker -->
+    <string name="iptv_browser">IPTV Browser</string>
+    <string name="select_folder">Select a folder</string>
+    <string name="folder">Folder</string>
+
+    <!-- File details -->
+    <string name="title_playlist_found">Playlist found</string>
+    <string name="details_file_meta">Telegram · 210 KB</string>
+    <string name="details_channels">612</string>
+    <string name="details_categories">18</string>
+    <string name="details_format">M3U</string>
+    <string name="stat_format">Format</string>
+    <string name="details_name_value">live_playlist</string>
+    <string name="section_categories_detected">Categories detected</string>
+    <string name="chip_music">Music</string>
+    <string name="chip_more_12">+12</string>
+    <string name="btn_save_playlist">Save playlist</string>
+
+    <string name="label_playlist_name">Playlist name</string>
+
 </resources>

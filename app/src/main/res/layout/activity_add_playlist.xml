@@ -67,6 +67,7 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/buttonOpenFolder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
@@ -76,6 +77,8 @@
                 android:background="@drawable/bg_card_lg"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="18dp">
 
                 <FrameLayout
@@ -126,6 +129,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/buttonOpenFile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
@@ -135,6 +139,8 @@
                 android:background="@drawable/bg_card_lg"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="18dp">
 
                 <FrameLayout
@@ -185,6 +191,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/buttonOpenPlaylistUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
@@ -194,6 +201,8 @@
                 android:background="@drawable/bg_card_lg"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="18dp">
 
                 <FrameLayout
@@ -244,6 +253,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/buttonOpenVideoUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
@@ -253,6 +263,8 @@
                 android:background="@drawable/bg_card_lg"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="18dp">
 
                 <FrameLayout
@@ -303,6 +315,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/buttonOpenAudioStream"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
@@ -312,6 +325,8 @@
                 android:background="@drawable/bg_card_lg"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="18dp">
 
                 <FrameLayout

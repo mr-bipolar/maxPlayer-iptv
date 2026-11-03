@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.aaronmaxlab.maxplayer.databinding.ActivityAddPlaylistHelperBinding;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
+import com.aaronmaxlab.maxplayer.utils.UIUtils;
 
 
 public class AddPlaylistHelperActivity extends AppCompatActivity {
@@ -26,10 +27,8 @@ public class AddPlaylistHelperActivity extends AppCompatActivity {
 
         setContentView(binding.getRoot());
 
-        //  Control navigation bar icon contrast
-        WindowInsetsControllerCompat controller =
-                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-        controller.setAppearanceLightNavigationBars(false);
+        // bottom nav set black
+        UIUtils.setLightNavigationBars(this, false);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

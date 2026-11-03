@@ -1,6 +1,7 @@
 package com.aaronmaxlab.maxplayer;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.aaronmaxlab.maxplayer.databinding.ActivityPlayVideoUrlBinding;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
+import com.aaronmaxlab.maxplayer.utils.UIUtils;
 
 public class PlayVideoUrlActivity extends AppCompatActivity {
 
@@ -24,10 +26,8 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
 
         setContentView(binding.getRoot());
 
-        //  Control navigation bar icon contrast
-        WindowInsetsControllerCompat controller =
-                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-        controller.setAppearanceLightNavigationBars(false);
+        // bottom nav set black
+        UIUtils.setLightNavigationBars(this, false);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -36,5 +36,16 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
         });
 
         ClickUtils.applyTouchEffect(binding.backPlayVideoUrl, v -> finish());
+        ClickUtils.applyTouchEffect(binding.playVideoUrl, v -> {
+            final String videoUrl = binding.videoUrlForPlay.getText().toString();
+            final String videoName = binding.videoNameForPlay.getText().toString();
+
+            if(videoUrl.trim().isEmpty()){
+                Toast.makeText(this, "Enter a video URL.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // later add this on local db and move to player
+        });
     }
 }
