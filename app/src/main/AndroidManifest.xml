@@ -21,6 +21,7 @@
         android:required="false" />
 
     <application
+        android:name=".MaxPlayerApplication"
         android:allowBackup="true"
         android:banner="@mipmap/ic_launcher"
         android:dataExtractionRules="@xml/data_extraction_rules"

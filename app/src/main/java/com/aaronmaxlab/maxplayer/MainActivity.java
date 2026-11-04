@@ -67,6 +67,11 @@ public class MainActivity extends AppCompatActivity {
 
             assert binding.tvAddPlaylist != null;
             ClickUtils.applyTouchEffect(binding.tvAddPlaylist, v -> {
+                startActivity(new Intent(this, AddPlaylistActivity.class));
+            });
+
+            assert binding.remotePair != null;
+            ClickUtils.applyTouchEffect(binding.remotePair, v -> {
                 startActivity(new Intent(this, RemotePairingActivity.class));
             });
 

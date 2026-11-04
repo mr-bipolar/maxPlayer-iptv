@@ -12,19 +12,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.databinding.ActivityRemotePairingBinding;
-import com.aaronmaxlab.maxplayer.remote.RemoteWebSocketServer;
+import com.aaronmaxlab.maxplayer.remote.RemoteInputController;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
+import com.aaronmaxlab.maxplayer.MaxPlayerApplication;
+import com.aaronmaxlab.maxplayer.remote.RemoteInputManager;
 
 import org.json.JSONObject;
 
 public class RemotePairingActivity extends AppCompatActivity {
 
     private ActivityRemotePairingBinding binding;
-    private RemoteWebSocketServer remoteServer;
-
-    private static final int REMOTE_PORT = 8765;
-
-    private RemotePairingSession pairingSession;
+    private RemoteInputManager remoteInputManager;
+    private RemoteInputController remoteInputController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +34,8 @@ public class RemotePairingActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         UIUtils.applySystemBarPadding(binding.getRoot(), false);
 
+
+
         // Create pairing session before starting the server.
         String ip = NetworkUtils.getLocalIpv4Address(this);
 
@@ -43,93 +44,108 @@ public class RemotePairingActivity extends AppCompatActivity {
             return;
         }
 
-        pairingSession = new RemotePairingSession(ip, REMOTE_PORT);
+        MaxPlayerApplication app =
+                (MaxPlayerApplication) getApplication();
 
-        startRemoteServer();
+        remoteInputManager = app.getRemoteInputManager();
+        remoteInputController = app.getRemoteInputController();
+
+        remoteInputManager.start(ip, remoteListener);
+        remoteInputController.setPhoneConnected(
+                remoteInputManager.isClientConnected()
+        );
+
         setupKeyboardActions();
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
-        RemoteWebSocketServer server = remoteServer;
-        remoteServer = null;
-
-        if (server != null) {
-            new Thread(() -> {
-                try {
-                    server.stop(1000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    Log.e("REMOTE", "Server stop interrupted", e);
-                }
-            }).start();
+        if (remoteInputManager != null) {
+            remoteInputManager.setListener(null);
         }
+
+        binding = null;
+
+        super.onDestroy();
     }
 
 
-    private void startRemoteServer() {
+    private final RemoteInputManager.Listener remoteListener =
+            new RemoteInputManager.Listener() {
 
-        remoteServer = new RemoteWebSocketServer(
-                REMOTE_PORT,
-                pairingSession.getToken(),
-                new RemoteWebSocketServer.Listener() {
+                @Override
+                public void onServerStarted(int port) {
+                    RemotePairingActivity.this.onServerStarted(port);
+                }
 
-                    @Override
-                    public void onServerStarted(int port) {
-                        Log.d("REMOTE", "Server ready on port: " + port);
-                        RemotePairingActivity.this.onServerStarted(port);
-                    }
+                @Override
+                public void onClientConnected() {
+                    Log.d("REMOTE", "Phone authenticated!");
 
-                    @Override
-                    public void onClientConnected() {
-                        Log.d("REMOTE", "Phone authenticated!");
-                    }
-
-                    @Override
-                    public void onClientDisconnected() {
-                        Log.d("REMOTE", "Phone disconnected!");
-                    }
-
-                    @Override
-                    public void onMessageReceived(String message) {
-                        handleRemoteMessage(message);
-                    }
-
-                    @Override
-                    public void onServerError(Exception error) {
-                        Log.e("REMOTE", "Server error", error);
+                    if (remoteInputController != null) {
+                        remoteInputController.setPhoneConnected(true);
                     }
                 }
-        );
 
-        remoteServer.start();
-    }
+                @Override
+                public void onClientDisconnected() {
+                    Log.d("REMOTE", "Phone disconnected!");
+
+                    if (remoteInputController != null) {
+                        remoteInputController.setPhoneConnected(false);
+                    }
+                }
+
+                @Override
+                public void onMessageReceived(String message) {
+                    handleRemoteMessage(message);
+                }
+
+                @Override
+                public void onServerError(Exception error) {
+                    Log.e("REMOTE", "Server error", error);
+                }
+            };
+
 
 
     private void onServerStarted(int port) {
 
+        Log.d("REMOTE", "onServerStarted called");
+
         runOnUiThread(() -> {
 
-            try {
-                String ip = pairingSession.getIpAddress();
+            Log.d("REMOTE", "UI thread reached");
 
-                String payload = pairingSession.toQrPayload();
+            try {
+                String payload = remoteInputManager.getQrPayload();
+
+                Log.d("REMOTE", "QR payload: " +
+                        (payload != null ? "available" : "NULL"));
+
+                if (payload == null || binding == null) {
+                    Log.e("REMOTE", "QR generation skipped");
+                    return;
+                }
 
                 Bitmap qrBitmap = QrCodeManager.generateQrCode(
                         payload,
                         400
                 );
 
+                Log.d("REMOTE", "QR bitmap: " +
+                        (qrBitmap != null ? "generated" : "NULL"));
+
                 binding.ivPairingQr.setImageBitmap(qrBitmap);
 
-                // Display TV IP
-               // binding.txtTvIp.setText(ip);
+                Log.d("REMOTE", "ImageView width: " +
+                        binding.ivPairingQr.getWidth());
 
-                Log.d("REMOTE", "Pairing QR generated");
-                Log.d("REMOTE", "TV IP: " + ip);
-                Log.d("REMOTE", "TV Port: " + port);
+                Log.d("REMOTE", "ImageView height: " +
+                        binding.ivPairingQr.getHeight());
+
+                Log.d("REMOTE", "ImageView drawable: " +
+                        binding.ivPairingQr.getDrawable());
 
             } catch (Exception e) {
                 Log.e("REMOTE", "QR generation failed", e);
@@ -148,9 +164,7 @@ public class RemotePairingActivity extends AppCompatActivity {
             String text = json.optString("text", "");
 
             runOnUiThread(() -> {
-                if (binding != null) {
-                    binding.tvInputText.setText(text);
-                }
+                    updateInputText(text, false);
             });
 
         } catch (Exception e) {
@@ -160,7 +174,6 @@ public class RemotePairingActivity extends AppCompatActivity {
 
     private void setupKeyboardActions() {
 
-        // Handle all character keys automatically
         setupCharacterKeys(binding.tvKeyboardContainer);
 
         // Space
@@ -170,15 +183,17 @@ public class RemotePairingActivity extends AppCompatActivity {
 
         // Clear
         binding.keyClear.setOnClickListener(v -> {
-            binding.tvInputText.setText("");
+            updateInputText("", true);
         });
 
+        // Backspace
         binding.keyBackspace.setOnClickListener(v -> {
             String current = binding.tvInputText.getText().toString();
 
             if (!current.isEmpty()) {
-                binding.tvInputText.setText(
-                        current.substring(0, current.length() - 1)
+                updateInputText(
+                        current.substring(0, current.length() - 1),
+                        true
                 );
             }
         });
@@ -214,6 +229,7 @@ public class RemotePairingActivity extends AppCompatActivity {
                 // Skip special keys
                 if (key.getId() == R.id.keyClear ||
                         key.getId() == R.id.keySpace ||
+                        key.getId() == R.id.keyBackspace ||
                         key.getId() == R.id.keyAddPlaylist) {
                     continue;
                 }
@@ -247,6 +263,20 @@ public class RemotePairingActivity extends AppCompatActivity {
 
         String current = binding.tvInputText.getText().toString();
 
-        binding.tvInputText.setText(current + value);
+        updateInputText(current + value, true);
     }
+
+
+    private void updateInputText(String text, boolean notifyPhone) {
+        if (binding == null) {
+            return;
+        }
+
+        binding.tvInputText.setText(text);
+
+        if (notifyPhone && remoteInputManager != null) {
+            remoteInputManager.sendTextToClient(text);
+        }
+    }
+
 }

@@ -15,6 +15,7 @@ public class RemoteWebSocketServer extends WebSocketServer {
     private static final String TAG = "RemoteWebSocketServer";
     private final String expectedToken;
     private WebSocket authenticatedClient;
+    private volatile boolean serverStarted = false;
 
     public interface Listener {
         void onServerStarted(int port);
@@ -42,11 +43,17 @@ public class RemoteWebSocketServer extends WebSocketServer {
 
     @Override
     public void onStart() {
+        serverStarted = true;
+
         Log.d(TAG, "Server started on port: " + getPort());
 
         if (listener != null) {
             listener.onServerStarted(getPort());
         }
+    }
+
+    public boolean isServerStarted() {
+        return serverStarted;
     }
 
     @Override
@@ -128,10 +135,31 @@ public class RemoteWebSocketServer extends WebSocketServer {
 
     @Override
     public void onError(WebSocket connection, Exception error) {
+        serverStarted = false;
+
         Log.e(TAG, "WebSocket error", error);
 
         if (listener != null) {
             listener.onServerError(error);
+        }
+    }
+
+
+    public synchronized void sendTextToClient(String text) {
+        if (authenticatedClient == null || !authenticatedClient.isOpen()) {
+            Log.w(TAG, "Cannot send text: no authenticated client");
+            return;
+        }
+
+        try {
+            JSONObject json = new JSONObject();
+            json.put("type", "text");
+            json.put("text", text);
+
+            authenticatedClient.send(json.toString());
+
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to send text to client", e);
         }
     }
 

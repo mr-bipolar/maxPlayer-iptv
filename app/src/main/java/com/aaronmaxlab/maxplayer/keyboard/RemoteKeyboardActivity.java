@@ -24,12 +24,15 @@ import android.util.Log;
 
 import com.aaronmaxlab.maxplayer.remote.RemoteWebSocketClient;
 
+import org.json.JSONObject;
+
 public class RemoteKeyboardActivity extends AppCompatActivity {
 
    private ActivityRemoteKeyboardBinding binding;
     private static final String TAG = "RemoteKeyboard";
 
     private RemoteWebSocketClient remoteClient;
+    private boolean updatingFromTv = false;
 
     private enum ConnectionState {
         IDLE,
@@ -54,9 +57,10 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
         updateConnectionUI(ConnectionState.IDLE);
         registerWifiCallback();
 
-        ClickUtils.applyTouchEffect(binding.btnConnect, view -> startQrScanner());
+        ClickUtils.applyTouchEffect(binding.btnScanQr, view -> startQrScanner());
 
         setupRemoteInput();
+        setupDpadControls();
 
         ClickUtils.applyTouchEffect(binding.btnClear, view ->  binding.editRemoteInput.setText(""));
 
@@ -72,29 +76,34 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
 
     private final ActivityResultLauncher<ScanOptions> qrScanner =
             registerForActivityResult(new ScanContract(), result -> {
+                Log.d(TAG, "QR callback received");
 
-                if (result.getContents() == null) {
-                    Toast.makeText(
-                            this,
-                            "QR scanning cancelled",
-                            Toast.LENGTH_SHORT
-                    ).show();
+                String contents = result.getContents();
+
+                Log.d(TAG, "QR contents: " + contents);
+
+                if (contents == null) {
+                    Log.e(TAG, "QR scan returned null");
+                    Toast.makeText(this, "QR scan cancelled", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 try {
-                    RemoteDeviceInfo deviceInfo =
-                            RemoteQrParser.parse(result.getContents());
+                    RemoteDeviceInfo deviceInfo = RemoteQrParser.parse(contents);
+
+                    Log.d(TAG, "QR parsed successfully");
+                    Log.d(TAG, "TV IP: " + deviceInfo.getIp());
+                    Log.d(TAG, "TV Port: " + deviceInfo.getPort());
+
+                    Toast.makeText(this, "QR scanned successfully", Toast.LENGTH_SHORT).show();
 
                     connectToTv(deviceInfo);
 
                 } catch (Exception e) {
-                    Toast.makeText(
-                            this,
-                            "Invalid MaxPlayer QR code",
-                            Toast.LENGTH_LONG
-                    ).show();
+                    Log.e(TAG, "QR parsing failed", e);
+                    Toast.makeText(this, "Invalid QR code", Toast.LENGTH_SHORT).show();
                 }
+
             });
 
     private void startQrScanner() {
@@ -108,7 +117,7 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
     }
 
     private void connectToTv(RemoteDeviceInfo deviceInfo) {
-
+        Log.d(TAG, "connectToTv() called");
         final int generation = ++connectionGeneration;
 
         // Close previous connection safely.
@@ -174,7 +183,7 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
 
                     @Override
                     public void onMessageReceived(String message) {
-                        Log.d(TAG, "TV message received");
+                        handleTvMessage(message);
                     }
 
                     @Override
@@ -191,6 +200,8 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
                 }
         );
 
+        Log.d(TAG, "Calling WebSocket connect()");
+
         remoteClient = client;
         client.connect();
     }
@@ -202,7 +213,7 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (remoteClient != null) {
+                if (!updatingFromTv && remoteClient != null) {
                     remoteClient.sendText(s.toString());
                 }
             }
@@ -212,42 +223,31 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
         });
     }
 
+
     private void updateConnectionUI(ConnectionState state) {
 
+        Log.d(TAG, "updateConnectionUI called: " + state);
+
+        boolean connecting = state == ConnectionState.CONNECTING;
         boolean connected = state == ConnectionState.CONNECTED;
-        boolean idle = state == ConnectionState.IDLE;
+        boolean active = connecting || connected;
+        setDpadEnabled(connected);
 
-        binding.btnScanQr.setVisibility(
-                connected || state == ConnectionState.CONNECTING
-                        ? View.GONE : View.VISIBLE
-        );
+        binding.btnScanQr.setVisibility(active ? View.GONE : View.VISIBLE);
+        binding.layoutConnectionStatus.setVisibility(active ? View.VISIBLE : View.GONE);
+        binding.btnDisconnect.setVisibility(active ? View.VISIBLE : View.GONE);
 
-        binding.layoutConnectionStatus.setVisibility(
-                idle ? View.GONE : View.VISIBLE
-        );
-
-        switch (state) {
-            case CONNECTING:
-                binding.txtConnectionStatus.setText("Connecting...");
-                break;
-
-            case CONNECTED:
-                binding.txtConnectionStatus.setText("Connected");
-                break;
-
-            case DISCONNECTED:
-                binding.txtConnectionStatus.setText("Disconnected");
-                break;
-
-            case IDLE:
-                break;
+        if (connecting) {
+            binding.txtConnectionStatus.setText("Connecting...");
+        } else if (connected) {
+            binding.txtConnectionStatus.setText("Connected");
         }
 
-        binding.btnDisconnect.setVisibility(
-                connected || state == ConnectionState.CONNECTING
-                        ? View.VISIBLE : View.GONE
-        );
+        Log.d(TAG, "Scan visibility: " + binding.btnScanQr.getVisibility());
+        Log.d(TAG, "Status visibility: " + binding.layoutConnectionStatus.getVisibility());
+        Log.d(TAG, "Disconnect visibility: " + binding.btnDisconnect.getVisibility());
     }
+
 
     private void endConnection(
             int generation,
@@ -314,6 +314,88 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
                 wifiNetworkCallback
         );
     }
+
+    private void handleTvMessage(String message) {
+        try {
+            JSONObject json = new JSONObject(message);
+
+            if (!"text".equals(json.optString("type"))) {
+                return;
+            }
+
+            String text = json.optString("text", "");
+
+            runOnUiThread(() -> {
+                if (binding == null) {
+                    return;
+                }
+
+                updatingFromTv = true;
+
+                binding.editRemoteInput.setText(text);
+                binding.editRemoteInput.setSelection(text.length());
+
+                updatingFromTv = false;
+            });
+
+        } catch (Exception e) {
+            Log.e(TAG, "Invalid TV message", e);
+        }
+    }
+
+    private void setDpadEnabled(boolean enabled) {
+
+        binding.btnDpadUp.setEnabled(enabled);
+        binding.btnDpadDown.setEnabled(enabled);
+        binding.btnDpadLeft.setEnabled(enabled);
+        binding.btnDpadRight.setEnabled(enabled);
+        binding.btnDpadCenter.setEnabled(enabled);
+        binding.btnDpadBack.setEnabled(enabled);
+
+        float alpha = enabled ? 1.0f : 0.4f;
+
+        binding.btnDpadUp.setAlpha(alpha);
+        binding.btnDpadDown.setAlpha(alpha);
+        binding.btnDpadLeft.setAlpha(alpha);
+        binding.btnDpadRight.setAlpha(alpha);
+        binding.btnDpadCenter.setAlpha(alpha);
+        binding.btnDpadBack.setAlpha(alpha);
+    }
+
+
+    private void setupDpadControls() {
+
+        ClickUtils.applyTouchEffect(binding.btnDpadUp,
+                v -> sendRemoteKey("up"));
+
+        ClickUtils.applyTouchEffect(binding.btnDpadDown,
+                v -> sendRemoteKey("down"));
+
+        ClickUtils.applyTouchEffect(binding.btnDpadLeft,
+                v -> sendRemoteKey("left"));
+
+        ClickUtils.applyTouchEffect(binding.btnDpadRight,
+                v -> sendRemoteKey("right"));
+
+        ClickUtils.applyTouchEffect(binding.btnDpadCenter,
+                v -> sendRemoteKey("center"));
+
+        ClickUtils.applyTouchEffect(binding.btnDpadBack,
+                v -> sendRemoteKey("back"));
+    }
+
+
+    private void sendRemoteKey(String key) {
+
+        if (remoteClient == null || !remoteClient.isAuthenticated()) {
+            Log.w(TAG, "Cannot send key: TV not connected");
+            return;
+        }
+
+        remoteClient.sendKey(key);
+    }
+
+
 
     @Override
     protected void onDestroy() {

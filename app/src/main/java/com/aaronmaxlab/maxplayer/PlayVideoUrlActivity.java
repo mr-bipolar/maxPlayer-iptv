@@ -25,6 +25,7 @@ import com.aaronmaxlab.maxplayer.player.PlayerActivity;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.AppUtils;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
+import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
 import com.aaronmaxlab.maxplayer.utils.PlaylistType;
 import com.aaronmaxlab.maxplayer.utils.StreamErrorUtils;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
@@ -53,17 +54,25 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
         binding = ActivityPlayVideoUrlBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        recyclerView = binding.recyclerRecentViews;
+        final  boolean isTv = DeviceUtils.isTv(this);
+
+
 
         sqlDbHelper = new SqlDbHelper(this);
 
         UIUtils.setLightNavigationBars(this, false); // black bottom nav
         UIUtils.applySystemBarPadding(binding.getRoot());
 
-        setupRecentViews(sqlDbHelper);
+
+        if(isTv){
+
+        }else {
+            recyclerView = binding.recyclerRecentViews;
+            loader = findViewById(R.id.loaderOverlay);
+            setupRecentViews(sqlDbHelper);
+        }
 
 
-        loader = findViewById(R.id.loaderOverlay);
 
         ClickUtils.applyTouchEffect(binding.backPlayVideoUrl, v -> finish());
         ClickUtils.applyTouchEffect(binding.playVideoUrl, v -> onPlayClicked());
@@ -247,11 +256,14 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
                 }
         );
 
-        recyclerView.setLayoutManager(
-                new LinearLayoutManager(this)
-        );
+        if(recyclerView != null){
+            recyclerView.setLayoutManager(
+                    new LinearLayoutManager(this)
+            );
 
-        recyclerView.setAdapter(adapter);
+            recyclerView.setAdapter(adapter);
+        }
+
 
         refreshRecentViews();
     }

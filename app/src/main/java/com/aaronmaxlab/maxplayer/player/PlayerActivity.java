@@ -244,7 +244,7 @@ public class PlayerActivity extends AppCompatActivity {
     private boolean pipReceiverRegistered = false;
     @Nullable private AlertDialog dialog;
     @Nullable private Dialog saveDialog;
-    private SharedPreferences prefs;
+
 
     // ---- channels bottom sheet state
     @Nullable private PlaylistAdapter adapter;
@@ -288,7 +288,6 @@ public class PlayerActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         isTv = DeviceUtils.isTv(this);
         if (isTv) setupTvPlaylist();
-        prefs = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         sqlDbHelper = new SqlDbHelper(this);
 
         // Never two players at once: mpv is a single native engine ("already initialized") and the Media3

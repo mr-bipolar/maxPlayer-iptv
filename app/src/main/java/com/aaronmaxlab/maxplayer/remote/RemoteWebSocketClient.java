@@ -93,14 +93,14 @@ public class RemoteWebSocketClient extends WebSocketClient {
     }
 
     @Override
-    public void onClose(
-            int code,
-            String reason,
-            boolean remote
-    ) {
+    public void onClose(int code, String reason, boolean remote) {
         authenticated = false;
 
-        Log.d(TAG, "Connection closed: " + reason);
+        Log.e(TAG, "========== WEBSOCKET CLOSED ==========");
+        Log.e(TAG, "Code: " + code);
+        Log.e(TAG, "Reason: " + reason);
+        Log.e(TAG, "Remote: " + remote);
+        Log.e(TAG, "======================================");
 
         if (listener != null) {
             listener.onDisconnected();
@@ -109,7 +109,7 @@ public class RemoteWebSocketClient extends WebSocketClient {
 
     @Override
     public void onError(Exception error) {
-        Log.e(TAG, "WebSocket error", error);
+        Log.e(TAG, "========== WEBSOCKET ERROR ==========", error);
 
         if (listener != null) {
             listener.onError(error);
@@ -136,6 +136,29 @@ public class RemoteWebSocketClient extends WebSocketClient {
         } catch (Exception e) {
             Log.e(TAG, "Failed to send text", e);
             if (listener != null) listener.onError(e);
+        }
+    }
+
+    public void sendKey(String key) {
+
+        if (!authenticated || !isOpen()) {
+            Log.w(TAG, "Cannot send key: not authenticated");
+            return;
+        }
+
+        try {
+            JSONObject json = new JSONObject();
+            json.put("type", "key");
+            json.put("key", key);
+
+            send(json.toString());
+
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to send key", e);
+
+            if (listener != null) {
+                listener.onError(e);
+            }
         }
     }
 }
