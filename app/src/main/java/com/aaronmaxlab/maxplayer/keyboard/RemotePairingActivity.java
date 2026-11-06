@@ -13,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.databinding.ActivityRemotePairingBinding;
 import com.aaronmaxlab.maxplayer.remote.RemoteInputController;
+import com.aaronmaxlab.maxplayer.utils.AppToast;
+import com.aaronmaxlab.maxplayer.utils.ClickUtils;
+import com.aaronmaxlab.maxplayer.utils.ClipboardUtils;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.aaronmaxlab.maxplayer.MaxPlayerApplication;
 import com.aaronmaxlab.maxplayer.remote.RemoteInputManager;
@@ -34,13 +37,21 @@ public class RemotePairingActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         UIUtils.applySystemBarPadding(binding.getRoot(), false);
 
-
+        ClickUtils.applyTouchEffect(binding.backQrBtn, view -> finish());
+        ClickUtils.applyTouchEffect(binding.copyKeyboardOut, view -> {
+            final String copyText = binding.tvInputText.getText().toString().trim();
+            if(copyText.isEmpty()){
+                AppToast.warning(this, "Empty textbox");
+                return;
+            }
+            ClipboardUtils.copyText(this, copyText);
+        });
 
         // Create pairing session before starting the server.
         String ip = NetworkUtils.getLocalIpv4Address(this);
 
         if (ip == null) {
-            Log.e("REMOTE", "Unable to detect TV IP address");
+            AppToast.error(this, "Unable to detect TV IP address");
             return;
         }
 
@@ -80,8 +91,7 @@ public class RemotePairingActivity extends AppCompatActivity {
 
                 @Override
                 public void onClientConnected() {
-                    Log.d("REMOTE", "Phone authenticated!");
-
+                    AppToast.success(RemotePairingActivity.this, "Phone authenticated!");
                     if (remoteInputController != null) {
                         remoteInputController.setPhoneConnected(true);
                     }
@@ -89,8 +99,7 @@ public class RemotePairingActivity extends AppCompatActivity {
 
                 @Override
                 public void onClientDisconnected() {
-                    Log.d("REMOTE", "Phone disconnected!");
-
+                    AppToast.warning(RemotePairingActivity.this, "Phone disconnected!");
                     if (remoteInputController != null) {
                         remoteInputController.setPhoneConnected(false);
                     }
@@ -111,43 +120,15 @@ public class RemotePairingActivity extends AppCompatActivity {
 
     private void onServerStarted(int port) {
 
-        Log.d("REMOTE", "onServerStarted called");
-
         runOnUiThread(() -> {
-
-            Log.d("REMOTE", "UI thread reached");
 
             try {
                 String payload = remoteInputManager.getQrPayload();
-
-                Log.d("REMOTE", "QR payload: " +
-                        (payload != null ? "available" : "NULL"));
-
-                if (payload == null || binding == null) {
-                    Log.e("REMOTE", "QR generation skipped");
-                    return;
-                }
-
-                Bitmap qrBitmap = QrCodeManager.generateQrCode(
-                        payload,
-                        400
-                );
-
-                Log.d("REMOTE", "QR bitmap: " +
-                        (qrBitmap != null ? "generated" : "NULL"));
-
+                if (payload == null || binding == null) {return;}
+                Bitmap qrBitmap = QrCodeManager.generateQrCode(payload, 400);
                 binding.ivPairingQr.setImageBitmap(qrBitmap);
-
-                Log.d("REMOTE", "ImageView width: " +
-                        binding.ivPairingQr.getWidth());
-
-                Log.d("REMOTE", "ImageView height: " +
-                        binding.ivPairingQr.getHeight());
-
-                Log.d("REMOTE", "ImageView drawable: " +
-                        binding.ivPairingQr.getDrawable());
-
             } catch (Exception e) {
+                AppToast.error(this, "QR generation failed");
                 Log.e("REMOTE", "QR generation failed", e);
             }
         });

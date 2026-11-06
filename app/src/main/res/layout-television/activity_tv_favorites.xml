@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_primary_background"
+    android:paddingStart="40dp"
+    android:paddingEnd="40dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="20dp"
+    tools:ignore="MissingDefaultResource">
+
+    <!-- Top Header Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_tv_btn_ghost"
+            android:contentDescription="@string/cd_back"
+            android:focusable="true"
+            android:src="@drawable/ic_back"
+            android:stateListAnimator="@animator/tv_focus_scale_sm"
+            app:tint="@color/ink_dim" />
+
+        <TextView
+            android:id="@+id/tvFavoritesTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:text="@string/nav_favorites"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_text_section_title"
+            android:textStyle="bold" />
+
+        <!-- Filter Chips -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_marginStart="24dp">
+
+            <TextView
+                android:id="@+id/filterAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_pill_accent"
+                android:focusable="true"
+                android:clickable="true"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_marginEnd="8dp"
+                android:text="All"
+                android:textColor="@color/accent_ink"
+                android:textSize="@dimen/tv_text_label"
+                android:textStyle="bold"
+                android:stateListAnimator="@animator/tv_focus_scale_sm" />
+
+            <TextView
+                android:id="@+id/filterLive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_tv_nav_item"
+                android:focusable="true"
+                android:clickable="true"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_marginEnd="8dp"
+                android:text="Live TV"
+                android:textColor="@color/white"
+                android:textSize="@dimen/tv_text_label"
+                android:textStyle="bold"
+                android:stateListAnimator="@animator/tv_focus_scale_sm" />
+
+            <TextView
+                android:id="@+id/filterVod"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_tv_nav_item"
+                android:focusable="true"
+                android:clickable="true"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_marginEnd="8dp"
+                android:text="Movies / VOD"
+                android:textColor="@color/white"
+                android:textSize="@dimen/tv_text_label"
+                android:textStyle="bold"
+                android:stateListAnimator="@animator/tv_focus_scale_sm" />
+
+            <TextView
+                android:id="@+id/filterAudio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_tv_nav_item"
+                android:focusable="true"
+                android:clickable="true"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:text="Audio"
+                android:textColor="@color/white"
+                android:textSize="@dimen/tv_text_label"
+                android:textStyle="bold"
+                android:stateListAnimator="@animator/tv_focus_scale_sm" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvFavoritesCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primary_highlight"
+            android:textSize="@dimen/tv_text_button" />
+    </LinearLayout>
+
+    <!-- Main Content Area -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Grid of Favorites -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tvFavoritesGrid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:scrollbars="none" />
+
+        <!-- Loading Indicator -->
+        <ProgressBar
+            android:id="@+id/tvFavoritesLoading"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <!-- Empty State -->
+        <LinearLayout
+            android:id="@+id/tvFavoritesEmptyView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_card_lg"
+                android:elevation="2dp"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_heart_filled"
+                    android:importantForAccessibility="no"
+                    android:layout_gravity="center"
+                    app:tint="@color/accent" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_favorites_yet"
+                android:textColor="@color/white"
+                android:textSize="@dimen/tv_text_row_title"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/empty_fav"
+                android:textColor="@color/white_alpha_55"
+                android:textSize="@dimen/tv_text_body"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="22dp"
+                android:maxWidth="360dp" />
+
+            <LinearLayout
+                android:id="@+id/tvEmptyBtnBrowseChannels"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/bg_tv_btn_primary"
+                android:focusable="true"
+                android:clickable="true"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:stateListAnimator="@animator/tv_focus_scale">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_tv"
+                    android:importantForAccessibility="no"
+                    android:layout_marginEnd="8dp"
+                    app:tint="@color/accent_ink" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tv_nav_live_tv"
+                    android:textColor="@color/accent_ink"
+                    android:textSize="@dimen/tv_text_button"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Error State -->
+        <TextView
+            android:id="@+id/tvFavoritesErrorView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_text_body"
+            android:text="@string/tv_load_error"
+            android:visibility="gone" />
+
+    </FrameLayout>
+</LinearLayout>

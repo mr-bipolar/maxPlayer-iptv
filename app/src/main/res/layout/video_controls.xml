@@ -367,8 +367,8 @@
         android:layout_marginBottom="@dimen/player_progress_bottom_offset"
         app:bar_height="2dp"
         app:buffered_color="@color/white_alpha_55"
-        app:played_color="@color/accent"
-        app:scrubber_color="@color/accent"
+        app:played_color="@color/primary_highlight"
+        app:scrubber_color="@color/primary_highlight"
         app:unplayed_color="@color/white_alpha_14" />
 
     <LinearLayout
@@ -400,7 +400,7 @@
                 android:alpha="0.50"
                 android:importantForAccessibility="no"
                 android:src="@drawable/ic_play"
-                app:tint="@color/accent" />
+                app:tint="@color/primary_highlight" />
         </FrameLayout>
 
         <include layout="@layout/exo_player_control_ffwd_button"

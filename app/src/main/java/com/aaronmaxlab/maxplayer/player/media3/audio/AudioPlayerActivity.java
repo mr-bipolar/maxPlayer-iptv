@@ -304,7 +304,7 @@ public class AudioPlayerActivity extends AppCompatActivity {
                 favorite ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline);
         ImageViewCompat.setImageTintList(binding.audioFavoriteBtn,
                 ColorStateList.valueOf(ContextCompat.getColor(
-                        this, favorite ? R.color.accent : R.color.accent_dim)));
+                        this, favorite ? R.color.primary_highlight : R.color.favorite_muted)));
     }
 
 

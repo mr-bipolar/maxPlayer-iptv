@@ -166,6 +166,14 @@ public class ChannelActivity extends AppCompatActivity {
         binding.channelsRecyclerView.setHasFixedSize(true);
         binding.channelsRecyclerView.setAdapter(channelAdapter);
 
+        if (channels.isEmpty()) {
+            binding.emptyChannelsView.setVisibility(View.VISIBLE);
+            binding.channelsRecyclerView.setVisibility(View.GONE);
+        } else {
+            binding.emptyChannelsView.setVisibility(View.GONE);
+            binding.channelsRecyclerView.setVisibility(View.VISIBLE);
+        }
+
 
     }
 

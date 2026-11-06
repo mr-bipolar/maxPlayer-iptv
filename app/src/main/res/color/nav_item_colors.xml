@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Active / Selected tab color -->
+    <!-- Active / Selected tab label: Signature orange accent -->
     <item android:state_checked="true" android:color="@color/accent" />
-    <!-- Inactive / Default tab color -->
+    <!-- Inactive / Default tab label -->
     <item android:color="@color/ink_faint" />
 </selector>

@@ -11,7 +11,9 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="120dp"
-        android:background="@drawable/bg_card">
+        android:background="@drawable/bg_card"
+        android:clipToOutline="true"
+        android:elevation="2dp">
 
         <!-- Channel logo -->
         <ImageView
@@ -22,7 +24,7 @@
             android:scaleType="fitCenter"
             android:src="@drawable/ic_tv"
             android:importantForAccessibility="no"
-            app:tint="@color/ink_faint" />
+            app:tint="@color/ink_dim" />
 
         <!-- Top-right menu -->
         <FrameLayout

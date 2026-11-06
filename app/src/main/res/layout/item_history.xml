@@ -26,7 +26,7 @@
             android:layout_height="18dp"
             android:layout_gravity="center"
             android:importantForAccessibility="no"
-            app:tint="@color/ink_faint"
+            app:tint="@color/ink_dim"
             tools:src="@drawable/ic_tv" />
     </FrameLayout>
 

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    tools:context=".ExploreActivity"
+    android:background="@drawable/bg_primary_background">
+
+<View
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_tv_hero_backdrop" />
+
+<View
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_tv_hero_scrim" />
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="120dp"
+    android:scrollbars="none"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:overScrollMode="never">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp">
+
+
+        <LinearLayout
+            android:id="@+id/tvHistorySection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="0dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/tv_margin_h"
+                android:paddingEnd="@dimen/tv_margin_h">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/section_continue_watching"
+                    android:textColor="@color/white" android:textSize="@dimen/tv_text_section_title"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tvHistoryRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingStart="@dimen/tv_margin_h"
+                android:paddingEnd="12dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:scrollbars="none" />
+            <TextView
+                android:id="@+id/tvHistoryRecyclerEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/tv_margin_h"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/tv_no_content"
+                android:textColor="@color/white_alpha_55"
+                android:textSize="@dimen/tv_text_caption"
+                android:visibility="gone" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/tvPlaylistSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="22dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:gravity="center_vertical" android:paddingStart="@dimen/tv_margin_h"
+                android:paddingEnd="@dimen/tv_margin_h">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/section_my_playlists"
+                    android:textColor="@color/white" android:textSize="@dimen/tv_text_section_title"
+                    android:textStyle="bold" />
+            </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tvPlaylistRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingStart="@dimen/tv_margin_h"
+                android:paddingEnd="12dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:scrollbars="none" />
+            <TextView
+                android:id="@+id/tvPlaylistRecyclerEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/tv_margin_h"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/tv_no_content"
+                android:textColor="@color/white_alpha_55"
+                android:textSize="@dimen/tv_text_caption"
+                android:visibility="gone" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/tvCategorySection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="22dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:gravity="center_vertical" android:paddingStart="@dimen/tv_margin_h"
+                android:paddingEnd="@dimen/tv_margin_h">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/tv_row_categories"
+                    android:textColor="@color/white" android:textSize="@dimen/tv_text_section_title"
+                    android:textStyle="bold" />
+            </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tvCategoryRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingStart="@dimen/tv_margin_h"
+                android:paddingEnd="12dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:scrollbars="none" />
+            <TextView
+                android:id="@+id/tvCategoryRecyclerEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/tv_margin_h"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/tv_no_content"
+                android:textColor="@color/white_alpha_55"
+                android:textSize="@dimen/tv_text_caption"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
+
+    <ImageButton
+        android:id="@+id/backExploreBtn"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_gravity="top|start"
+        android:layout_margin="@dimen/tv_margin_v"
+        android:background="@drawable/bg_tv_btn_ghost"
+        android:contentDescription="@string/cd_back"
+        android:focusable="true"
+        android:src="@drawable/ic_back"
+        android:stateListAnimator="@animator/tv_focus_scale_sm"
+        app:tint="@color/ink_dim" />
+
+
+</FrameLayout>

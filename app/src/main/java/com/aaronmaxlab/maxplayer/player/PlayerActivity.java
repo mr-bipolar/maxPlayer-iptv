@@ -1417,7 +1417,7 @@ public class PlayerActivity extends AppCompatActivity {
             if (channel.category != null) {category = channel.category;}
             if(channel.logoUrl != null) {channelIcon = channel.logoUrl;}
         }
-        return new LocalDbFavorites(name, category, currentUrl, channelIcon, PlaylistType.VOD);
+        return new LocalDbFavorites(name, category, currentUrl, channelIcon,  isVod() ? PlaylistType.VOD : PlaylistType.LIVE);
     }
 
     // ---- "more" menu: info, reload, jump to live, copy url, screenshot (mpv), switch engine
@@ -1500,7 +1500,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void styleDialog(AlertDialog d) {
-        int accent = ContextCompat.getColor(this, R.color.accent);
+        int accent = ContextCompat.getColor(this, R.color.primary_highlight);
         if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(R.drawable.bg_dialog_black);
         accentTitle(d);
         for (int w : new int[]{DialogInterface.BUTTON_POSITIVE, DialogInterface.BUTTON_NEGATIVE, DialogInterface.BUTTON_NEUTRAL}) {
@@ -1514,8 +1514,8 @@ public class PlayerActivity extends AppCompatActivity {
     private void accentTitle(Dialog d) {
         TextView title = d.findViewById(androidx.appcompat.R.id.alertTitle);
         if (title != null) {
-            title.setTextColor(ContextCompat.getColor(this, R.color.accent));
-            title.setTypeface(null, Typeface.BOLD);
+            title.setTextColor(ContextCompat.getColor(this, R.color.primary_highlight));
+            title.setTypeface(com.aaronmaxlab.maxplayer.utils.ThemeTypography.bold(this));
         }
     }
 
@@ -1727,7 +1727,7 @@ public class PlayerActivity extends AppCompatActivity {
         label.setText(category);
         label.setTextColor(getColor(R.color.ink_dim));
         label.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.text_body_sm));
-        label.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        label.setTypeface(com.aaronmaxlab.maxplayer.utils.ThemeTypography.medium(this));
         chip.addView(label);
         return chip;
     }
@@ -1742,7 +1742,7 @@ public class PlayerActivity extends AppCompatActivity {
                 for (int j = 0; j < group.getChildCount(); j++) {
                     View inner = group.getChildAt(j);
                     if (inner instanceof TextView) {
-                        ((TextView) inner).setTextColor(getColor(selected ? R.color.accent : R.color.ink_dim));
+                        ((TextView) inner).setTextColor(getColor(selected ? R.color.primary_highlight : R.color.ink_dim));
                     }
                 }
             }

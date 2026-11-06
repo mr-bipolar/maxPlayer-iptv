@@ -134,8 +134,8 @@ public final class SaveChannelDialog {
         }
         TextView title = d.findViewById(androidx.appcompat.R.id.alertTitle);
         if (title != null) {
-            title.setTextColor(ContextCompat.getColor(c, R.color.accent));
-            title.setTypeface(null, Typeface.BOLD);
+            title.setTextColor(ContextCompat.getColor(c, R.color.primary_highlight));
+            title.setTypeface(com.aaronmaxlab.maxplayer.utils.ThemeTypography.bold(c));
         }
     }
 }

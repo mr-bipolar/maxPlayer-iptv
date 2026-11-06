@@ -44,6 +44,15 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".TvSectionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".channels.AllChannelsActivity"
+            android:exported="false" />
+        <activity
             android:name=".AddPlaylistActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
@@ -102,6 +111,14 @@
             android:launchMode="singleTask"
             android:supportsPictureInPicture="true" />
         <activity
+            android:name=".playlists.TvPlaylistsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".favorites.TvFavoritesActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".channels.ChannelActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
@@ -115,8 +132,12 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".keyboard.MaxPlayerCaptureActivity"
-            android:theme="@style/zxing_CaptureTheme"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/zxing_CaptureTheme" />
+        <activity
+            android:name=".ExploreActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

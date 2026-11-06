@@ -23,8 +23,10 @@ public final class UIUtils {
 
     public static void setLightNavigationBars(@NonNull Activity activity, boolean isLight) {
         Window window = activity.getWindow();
-        WindowCompat.getInsetsController(window, window.getDecorView())
-                .setAppearanceLightNavigationBars(isLight);
+        androidx.core.view.WindowInsetsControllerCompat controller =
+                WindowCompat.getInsetsController(window, window.getDecorView());
+        controller.setAppearanceLightNavigationBars(isLight);
+        controller.setAppearanceLightStatusBars(isLight);
     }
 
     /** "https://x/y/list.m3u8?token=1" -> "list"; content://.../primary%3ADownload%2FTelegram%2Fplaylist.m3u -> "playlist". */

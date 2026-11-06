@@ -58,6 +58,19 @@ public class FavoritesFragment extends Fragment {
         recyclerView = binding.favoritesRecyclerView;
 
         setupFavorites();
+
+        if (binding.browsePlaylists != null) {
+            com.aaronmaxlab.maxplayer.utils.ClickUtils.applyTouchEffect(binding.browsePlaylists, v -> {
+                if (getActivity() != null) {
+                    com.google.android.material.bottomnavigation.BottomNavigationView nav =
+                            getActivity().findViewById(R.id.bottomNavigation);
+                    if (nav != null) {
+                        nav.setSelectedItemId(R.id.navPlaylists);
+                    }
+                }
+            });
+        }
+
         return binding.getRoot();
     }
 

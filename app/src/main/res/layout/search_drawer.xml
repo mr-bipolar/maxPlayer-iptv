@@ -38,7 +38,7 @@
         app:boxStrokeColor="@color/channel_search_stroke"
         app:startIconDrawable="@drawable/ic_search"
         app:startIconTint="@color/accent_alpha_35"
-        app:hintTextColor="@color/accent"
+        app:hintTextColor="@color/primary_highlight"
         android:paddingBottom="@dimen/space_10"
         app:cursorColor="@color/white_alpha_45">
 

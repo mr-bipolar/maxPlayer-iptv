@@ -75,7 +75,7 @@
             app:boxStrokeColor="@color/channel_search_stroke"
             app:startIconDrawable="@drawable/ic_search"
             app:startIconTint="@color/accent_alpha_35"
-            app:hintTextColor="@color/accent"
+            app:hintTextColor="@color/primary_highlight"
             android:paddingBottom="@dimen/space_10"
             app:cursorColor="@color/white_alpha_45"
             android:visibility="gone"
@@ -134,7 +134,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/chip_all"
-                        android:textColor="@color/accent"
+                        android:textColor="@color/primary_highlight"
                         android:textSize="@dimen/text_body_sm"
                         android:textStyle="bold" />
                 </LinearLayout>

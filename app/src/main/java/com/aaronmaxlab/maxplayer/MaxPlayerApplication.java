@@ -20,6 +20,8 @@ public class MaxPlayerApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+        ThemePreferences.applySaved(this);
+
         registerActivityLifecycleCallbacks(
                 new ActivityLifecycleCallbacks() {
 

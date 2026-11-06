@@ -46,6 +46,11 @@
         <item name="tint">#F4F7FF</item>
     </style>
 
+    <style name="GlassSurface">
+        <item name="android:background">@drawable/bg_glass_surface</item>
+        <item name="android:elevation">6dp</item>
+    </style>
+
     <style name="zxing_CaptureTheme"
         parent="Theme.AppCompat.NoActionBar">
 

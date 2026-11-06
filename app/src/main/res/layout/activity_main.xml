@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg"
+    android:background="@drawable/bg_primary_background"
     tools:context=".MainActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/space_18"
+        android:paddingEnd="@dimen/space_18"
         android:paddingTop="@dimen/space_12"
         android:paddingBottom="@dimen/space_14"
         android:theme="?attr/actionBarTheme"
@@ -96,21 +97,20 @@
         app:layout_constraintTop_toBottomOf="@+id/materialToolbar"
         app:navGraph="@navigation/nav_graph" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/stroke_hairline"
-        android:background="@color/line_soft"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_16"
+        android:layout_marginEnd="@dimen/space_16"
+        android:layout_marginBottom="@dimen/space_12"
         android:background="@drawable/bg_nav_bar"
-        android:paddingTop="@dimen/space_8"
-        android:paddingBottom="@dimen/space_8"
+        android:elevation="6dp"
+        app:itemBackground="@drawable/bg_bottom_nav_item"
+        android:paddingStart="@dimen/space_6"
+        android:paddingEnd="@dimen/space_6"
+        android:paddingTop="@dimen/space_6"
+        android:paddingBottom="@dimen/space_6"
         app:itemActiveIndicatorStyle="@null"
         app:itemIconSize="@dimen/space_20"
         app:itemIconTint="@color/nav_item_icon_colors"
@@ -122,9 +122,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_nav_menu" >
-
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+        app:menu="@menu/bottom_nav_menu" />
 
 
 

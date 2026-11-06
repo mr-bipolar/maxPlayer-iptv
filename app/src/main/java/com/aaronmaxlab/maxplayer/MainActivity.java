@@ -7,9 +7,12 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -23,35 +26,51 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.aaronmaxlab.maxplayer.channels.AllChannelsActivity;
 import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
+import com.aaronmaxlab.maxplayer.database.TvSectionDataSource;
 import com.aaronmaxlab.maxplayer.database.adapter.LocalDbChannelAdapter;
+import com.aaronmaxlab.maxplayer.database.adapter.TvMainCardAdapter;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbCategory;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbChannel;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbHistory;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbPlaylist;
 import com.aaronmaxlab.maxplayer.databinding.ActivityMainBinding;
+import com.aaronmaxlab.maxplayer.PlayAudioStreamActivity;
+import com.aaronmaxlab.maxplayer.favorites.TvFavoritesActivity;
 import com.aaronmaxlab.maxplayer.keyboard.RemoteKeyboardActivity;
 import com.aaronmaxlab.maxplayer.keyboard.RemotePairingActivity;
+import com.aaronmaxlab.maxplayer.channels.ChannelActivity;
+import com.aaronmaxlab.maxplayer.player.PlayerActivity;
+import com.aaronmaxlab.maxplayer.player.media3.audio.AudioPlayerActivity;
+import com.aaronmaxlab.maxplayer.playlists.TvPlaylistsActivity;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
 import com.aaronmaxlab.maxplayer.utils.StreamLauncher;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
+import com.aaronmaxlab.maxplayer.utils.PlaylistType;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
-
     private SqlDbHelper sqlDbHelper;
     private LocalDbChannelAdapter channelAdapter;
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);                       // before setContentView
 
-        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         UIUtils.setLightNavigationBars(this, false);
@@ -60,25 +79,55 @@ public class MainActivity extends AppCompatActivity {
 
         sqlDbHelper = new SqlDbHelper(this);
 
-        final boolean isTv =DeviceUtils.isTv(this);
+        boolean isTv = DeviceUtils.isTv(this);
 
 
         if(isTv){
 
-            assert binding.tvAddPlaylist != null;
-            ClickUtils.applyTouchEffect(binding.tvAddPlaylist, v -> {
-                startActivity(new Intent(this, AddPlaylistActivity.class));
-            });
+            if(binding.tvSettingsButton != null) {
+                ClickUtils.applyTouchEffect(binding.tvSettingsButton,
+                        v -> startActivity(new Intent(this, SettingsActivity.class)));
+            }
+            if(binding.tvRemoteButton != null) {
+                ClickUtils.applyTouchEffect(binding.tvRemoteButton,
+                        v -> startActivity(new Intent(this, RemotePairingActivity.class)));
+            }
+            if(binding.tvFavoritesButton != null) {
+                ClickUtils.applyTouchEffect(binding.tvFavoritesButton,
+                        v -> startActivity(new Intent(this, TvFavoritesActivity.class)));
+            }
+            if(binding.tvImportButton != null) {
+                ClickUtils.applyTouchEffect(binding.tvImportButton,
+                        v -> startActivity(new Intent(this, AddPlaylistActivity.class)));
+            }
+            if(binding.tvLiveCard != null) {
+                ClickUtils.applyTouchEffect(binding.tvLiveCard,
+                        v -> startActivity(new Intent(this, AllChannelsActivity.class)));
+            }
+            if(binding.tvPlaylistsCard != null) {
+                ClickUtils.applyTouchEffect(binding.tvPlaylistsCard,
+                        v -> startActivity(new Intent(this, TvPlaylistsActivity.class)));
+            }
 
-            assert binding.remotePair != null;
-            ClickUtils.applyTouchEffect(binding.remotePair, v -> {
-                startActivity(new Intent(this, RemotePairingActivity.class));
-            });
+            if(binding.tvExploreCard != null){
+                ClickUtils.applyTouchEffect(binding.tvExploreCard,
+                        v -> startActivity(new Intent(this, ExploreActivity.class)));
+            }
+
 
         }else {
 
             assert binding.bottomNavigation != null;
             UIUtils.adjustBottomNavGap(binding.bottomNavigation);
+            androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.bottomNavigation, (v, insets) -> {
+                androidx.core.graphics.Insets bars = insets.getInsets(
+                        androidx.core.view.WindowInsetsCompat.Type.systemBars());
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+                int defaultMargin = v.getResources().getDimensionPixelSize(R.dimen.space_12);
+                lp.bottomMargin = defaultMargin + bars.bottom;
+                v.setLayoutParams(lp);
+                return insets;
+            });
 
             NavHostFragment navHost = (NavHostFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.nav_host_fragment);
@@ -93,6 +142,20 @@ public class MainActivity extends AppCompatActivity {
             ClickUtils.applyTouchEffect(binding.playerInfo, view -> startActivity(new Intent(this, RemoteKeyboardActivity.class)));
         }
 
+    }
+
+
+
+
+
+    @Override protected void onResume() {
+        super.onResume();
+    }
+
+    @Override protected void onDestroy() {
+        if (sqlDbHelper != null) sqlDbHelper.close();
+        binding = null;
+        super.onDestroy();
     }
 
 
@@ -178,56 +241,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void showPlaybackCredits() {
 
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_playback_credits);
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent
-            );
-
-            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.90f);
-            dialog.getWindow().setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT
-            );
-        }
-
-        TextView linkMpvAndroid = dialog.findViewById(R.id.linkMpvAndroid);
-        TextView linkMpvEngine = dialog.findViewById(R.id.linkMpvEngine);
-        Button btnClose = dialog.findViewById(R.id.btnCloseCredits);
-
-        linkMpvAndroid.setOnClickListener(v ->
-                openCreditUrl(
-                        "https://github.com/mpv-android/mpv-android/releases/tag/2026-09-17"
-                )
-        );
-
-        linkMpvEngine.setOnClickListener(v ->
-                openCreditUrl(
-                        "https://github.com/mr-bipolar/mpv-android-engine"
-                )
-        );
-
-        btnClose.setOnClickListener(v -> dialog.dismiss());
-
-        dialog.show();
-
-        if (dialog.getWindow() != null) {
-            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.90f);
-
-            dialog.getWindow().setLayout(
-                    width, WindowManager.LayoutParams.WRAP_CONTENT
-            );
-        }
-    }
-
-    private void openCreditUrl(String url) {
-        try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            AppToast.warning(this, "Unable to open link");
-        }
-    }
 
 }

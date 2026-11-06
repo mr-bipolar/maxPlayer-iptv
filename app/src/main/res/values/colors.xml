@@ -2,42 +2,70 @@
 <resources>
 
     <!-- Surfaces -->
-    <color name="bg">#0A0A0C</color>
-    <color name="bg_1">#121317</color>
-    <color name="card">#17181D</color>
-    <color name="card_2">#1E2025</color>
+    <color name="bg">#14171F</color> <!-- Deep charcoal TV background -->
+    <color name="bg_1">#1E232F</color> <!-- Surface dark slate -->
+    <color name="card">#272E3D</color> <!-- Elevated card surface (Live TV, Movies, Radios)[cite: 2] -->
+    <color name="card_2">#323B4E</color> <!-- Active / hover card state[cite: 2] -->
 
     <!-- Lines -->
-    <color name="line">#2A2B33</color>
-    <color name="line_soft">#202128</color>
-    <color name="line_dim">#22000000</color>
+    <color name="line">#434E65</color> <!-- Structural borders & separators[cite: 2] -->
+    <color name="line_soft">#353F54</color> <!-- Subtle dividers[cite: 2] -->
+    <color name="line_dim">#22000000</color> <!-- Drop shadows -->
 
     <!-- Text -->
-    <color name="ink">#F3F3F5</color>
-    <color name="ink_dim">#A6A7B2</color>
-    <color name="ink_faint">#63646E</color>
+    <color name="ink">#FFFFFF</color> <!-- Primary white text ("Live TV's", time)[cite: 2] -->
+    <color name="ink_dim">#CBD5E1</color> <!-- Subtitles & descriptions ("+5000 Channels")[cite: 2] -->
+    <color name="ink_faint">#8A99AE</color> <!-- Secondary specs & timestamps[cite: 2] -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 
     <!-- Accent -->
-    <color name="accent">#F5A524</color>
-    <color name="accent_ink">#241701</color>
-    <color name="accent_dim">#7A5713</color>
+    <color name="accent">#FF6700</color> <!-- Signature Mi Orange accent (matching the "NEW" badge)[cite: 2] -->
+    <color name="accent_ink">#FFFFFF</color> <!-- High-contrast text on accent -->
+    <color name="accent_dim">#CC5200</color> <!-- Pressed / muted state -->
+    <color name="primary_highlight">#FF8533</color> <!-- Bright active element glow[cite: 2] -->
+    <color name="favorite_muted">#FFB74D</color> <!-- Amber gold for favorited items -->
+    <color name="primary_violet">#1E293B</color> <!-- Slate secondary fill -->
+    <color name="primary_dark">#0F172A</color>
+    <color name="primary_bg_top">#1E232F</color>
+    <color name="primary_bg_middle">#181D28</color>
+    <color name="primary_bg_bottom">#14171F</color>
+    <color name="primary_surface_top">#272E3D</color>
+    <color name="primary_surface_bottom">#1E232F</color>
+    <color name="primary_button_start">#FF7B1A</color> <!-- Gradient start for action buttons -->
+    <color name="primary_button_middle">#FF6700</color>
+    <color name="primary_button_end">#E65C00</color>
+    <color name="primary_nav_start">#1B202C</color>
+    <color name="primary_nav_end">#14171F</color>
+    <color name="primary_selected_start">#50FF6700</color> <!-- Selected card/row overlay -->
+    <color name="primary_selected_end">#50E65C00</color>
+    <color name="primary_focus_start">#FFFF7B1A</color> <!-- D-Pad Focus Ring start (Mi Orange) -->
+    <color name="primary_focus_end">#FFE65C00</color> <!-- D-Pad Focus Ring end -->
+    <color name="glass_fill_start">#CC272E3D</color> <!-- Frosted glass player overlay[cite: 2] -->
+    <color name="glass_fill_end">#CC1E232F</color>
+    <color name="glass_border">#66FF6700</color> <!-- Glowing orange glass edge -->
+    <color name="glass_lavender_highlight">#33FF8533</color>
+    <color name="glass_reflection_top">#1AFFFFFF</color>
+    <color name="fill_overlay">#D7272E3D</color>
+    <color name="fill_overlay_card">#CC1E232F</color>
 
     <!-- Status -->
-    <color name="live">#FF4D5E</color>
-    <color name="ok">#3DDC97</color>
-    <color name="warn_text">#E3B463</color>
-    <color name="error_text">#FF8A93</color>
+    <color name="live">#FF3B30</color> <!-- Vivid red for LIVE tags -->
+    <color name="ok">#10B981</color> <!-- Connected stream status -->
+    <color name="warn_text">#F59E0B</color> <!-- Buffering / warning indicator -->
+    <color name="error_text">#EF4444</color> <!-- Stream offline error -->
 
     <!-- Folder -->
-    <color name="blue">#4F8FE8</color>
+    <color name="blue">#3B82F6</color> <!-- Media category folders -->
+    <color name="loading_indicator">#FF6700</color>
+    <color name="credits_divider">#353F54</color>
+    <color name="credits_button_text">#FFFFFF</color>
 
     <!-- Alpha overlays (pre-mixed, for use as flat backgrounds) -->
-    <color name="accent_alpha_08">#14F5A524</color>
-    <color name="accent_alpha_14">#24F5A524</color>
-    <color name="accent_alpha_22">#38F5A524</color>
-    <color name="accent_alpha_35">#59F5A524</color>
+    <color name="accent_alpha_08">#143D1A4B</color>
+    <color name="accent_alpha_14">#243D1A4B</color>
+    <color name="accent_alpha_22">#383D1A4B</color>
+    <color name="accent_alpha_35">#593D1A4B</color>
     <color name="live_alpha_08">#14FF4D5E</color>
     <color name="live_alpha_14">#24FF4D5E</color>
     <color name="live_alpha_25">#40FF4D5E</color>

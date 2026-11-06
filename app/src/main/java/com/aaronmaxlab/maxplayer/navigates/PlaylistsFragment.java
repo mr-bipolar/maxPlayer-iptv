@@ -75,6 +75,10 @@ public class PlaylistsFragment extends Fragment {
         ClickUtils.applyTouchEffect(binding.sortBtn, view -> showCategorySort());
         ClickUtils.applyTouchEffect(binding.gridView, view -> spanChange());
         ClickUtils.applyTouchEffect(binding.listView, view -> spanChange());
+        if (binding.btnAddPlaylist != null) {
+            ClickUtils.applyTouchEffect(binding.btnAddPlaylist, view ->
+                    startActivity(new Intent(getContext(), com.aaronmaxlab.maxplayer.AddPlaylistActivity.class)));
+        }
 
         return binding.getRoot();
     }
@@ -93,7 +97,7 @@ public class PlaylistsFragment extends Fragment {
                 isGrid ? R.drawable.bg_chip : R.drawable.bg_chip_active
         );
 
-        int activeColor = ContextCompat.getColor(requireContext(), R.color.accent);
+        int activeColor = ContextCompat.getColor(requireContext(), R.color.primary_highlight);
         int inactiveColor = ContextCompat.getColor(requireContext(), R.color.ink_dim);
 
         binding.gridText.setTextColor(isGrid ? activeColor : inactiveColor);
@@ -122,6 +126,13 @@ public class PlaylistsFragment extends Fragment {
             sqlDbHelper.syncCategoryCounts();
 
             List<LocalDbCategory> categories = sqlDbHelper.getCategories();
+            if (categories == null || categories.isEmpty()) {
+                binding.emptyCategoriesView.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+            } else {
+                binding.emptyCategoriesView.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+            }
 
             categoryAdapter = new LocalDbCategoryAdapter(
                     requireContext(),

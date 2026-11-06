@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/bg">
+    android:background="@drawable/bg_primary_background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,7 +50,7 @@
     </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
             <LinearLayout
                 android:layout_width="match_parent"
@@ -170,11 +170,69 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/channelsRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"
-                android:paddingBottom="12dp"
+                android:paddingBottom="16dp"
                 android:overScrollMode="never"/>
+
+            <ScrollView
+                android:id="@+id/emptyChannelsView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="true"
+                android:scrollbars="none"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingStart="36dp"
+                    android:paddingEnd="36dp"
+                    android:paddingTop="28dp"
+                    android:paddingBottom="28dp">
+
+                    <FrameLayout
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:background="@drawable/bg_card_lg"
+                        android:elevation="2dp"
+                        android:layout_marginBottom="16dp">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_tv"
+                            android:importantForAccessibility="no"
+                            android:layout_gravity="center"
+                            app:tint="@color/accent" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No channels found"
+                        android:textSize="@dimen/text_title"
+                        android:textColor="@color/ink"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="There are no channels in this category."
+                        android:textSize="@dimen/text_body_sm"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="24dp"
+                        android:textColor="@color/ink_dim"
+                        android:gravity="center"
+                        android:maxWidth="280dp"
+                        android:lineSpacingMultiplier="1.15" />
+
+                </LinearLayout>
+            </ScrollView>
         </LinearLayout>
 
 

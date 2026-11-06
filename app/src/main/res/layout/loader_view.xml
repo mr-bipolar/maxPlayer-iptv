@@ -3,7 +3,7 @@
         android:id="@+id/loaderOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/bg"
+        android:background="@drawable/bg_primary_background"
         android:alpha="0.92"
         android:visibility="gone"
         android:clickable="true"

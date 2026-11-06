@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_primary_background"
+    android:paddingStart="40dp"
+    android:paddingEnd="40dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="20dp"
+    tools:ignore="MissingDefaultResource">
+
+    <!-- Top Header Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_tv_btn_ghost"
+            android:contentDescription="@string/cd_back"
+            android:focusable="true"
+            android:src="@drawable/ic_back"
+            android:stateListAnimator="@animator/tv_focus_scale_sm"
+            app:tint="@color/ink_dim" />
+
+        <TextView
+            android:id="@+id/tvPlaylistsTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_weight="1"
+            android:text="@string/section_my_playlists"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_text_section_title"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvPlaylistsCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primary_highlight"
+            android:textSize="@dimen/tv_text_button"
+            android:layout_marginEnd="16dp" />
+
+        <LinearLayout
+            android:id="@+id/tvBtnAddPlaylist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_tv_nav_item"
+            android:focusable="true"
+            android:clickable="true"
+            android:paddingStart="14dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:stateListAnimator="@animator/tv_focus_scale_sm">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_plus"
+                android:importantForAccessibility="no"
+                android:layout_marginEnd="6dp"
+                app:tint="@color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_add_playlist"
+                android:textColor="@color/white"
+                android:textSize="@dimen/tv_text_label"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Main Content Area -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Grid of Playlists -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tvPlaylistsGrid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:scrollbars="none" />
+
+        <!-- Loading Indicator -->
+        <ProgressBar
+            android:id="@+id/tvPlaylistsLoading"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <!-- Empty State -->
+        <LinearLayout
+            android:id="@+id/tvPlaylistsEmptyView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_card_lg"
+                android:elevation="2dp"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_playlist_empty"
+                    android:importantForAccessibility="no"
+                    android:layout_gravity="center"
+                    app:tint="@color/accent" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/empty_no_playlists_title"
+                android:textColor="@color/white"
+                android:textSize="@dimen/tv_text_row_title"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/empty_no_playlists_sub"
+                android:textColor="@color/white_alpha_55"
+                android:textSize="@dimen/tv_text_body"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="22dp"
+                android:maxWidth="360dp" />
+
+            <LinearLayout
+                android:id="@+id/tvEmptyBtnAddPlaylist"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/bg_tv_btn_primary"
+                android:focusable="true"
+                android:clickable="true"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:stateListAnimator="@animator/tv_focus_scale">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_plus"
+                    android:importantForAccessibility="no"
+                    android:layout_marginEnd="8dp"
+                    app:tint="@color/accent_ink" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_add_playlist"
+                    android:textColor="@color/accent_ink"
+                    android:textSize="@dimen/tv_text_button"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Error State -->
+        <TextView
+            android:id="@+id/tvPlaylistsErrorView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_text_body"
+            android:text="@string/tv_load_error"
+            android:visibility="gone" />
+
+    </FrameLayout>
+</LinearLayout>

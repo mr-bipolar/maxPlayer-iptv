@@ -26,7 +26,7 @@
                 android:src="@drawable/ic_tv"
                 android:importantForAccessibility="no"
                 android:layout_gravity="center"
-                app:tint="@color/ink_faint" />
+                app:tint="@color/ink_dim" />
         </FrameLayout>
         <LinearLayout
             android:layout_width="0dp"

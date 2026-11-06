@@ -5,6 +5,7 @@
     android:layout_weight="1"
     android:background="@drawable/bg_card"
     android:clipToOutline="true"
+    android:elevation="2dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <FrameLayout
         android:layout_width="match_parent"
@@ -17,7 +18,7 @@
             android:src="@drawable/ic_tv"
             android:importantForAccessibility="no"
             android:layout_gravity="center"
-            app:tint="@color/ink_faint" />
+            app:tint="@color/ink_dim" />
         <FrameLayout
             android:id="@+id/bookmarkIconView"
             android:layout_width="22dp"
@@ -32,7 +33,7 @@
                 android:src="@drawable/ic_pin"
                 android:importantForAccessibility="no"
                 android:layout_gravity="center"
-                app:tint="@color/accent" />
+                app:tint="@color/primary_highlight" />
         </FrameLayout>
         <FrameLayout
             android:id="@+id/playlistMenuBtn"

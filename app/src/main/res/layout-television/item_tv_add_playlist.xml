@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tvAddPlaylist"
+    android:layout_width="@dimen/tv_card_w"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:focusable="true"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:layout_marginRight="@dimen/space_16"
+    android:stateListAnimator="@animator/tv_focus_scale"
+    tools:ignore="MissingDefaultResource">
+
+    <FrameLayout
+        android:id="@+id/tvSeeMoreCardContainer"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tv_card_h"
+        android:background="@drawable/bg_tv_card_add_art">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_plus"
+            app:tint="@color/primary_highlight" />
+    </FrameLayout>
+</LinearLayout>

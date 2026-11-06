@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".navigates.PlaylistsFragment"
-    android:background="@color/bg">
+    android:background="@drawable/bg_primary_background">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <LinearLayout
@@ -99,7 +99,7 @@
                                 android:text="@string/toggle_list"
                                 android:textColor="@color/ink_dim"
                                 android:textSize="@dimen/text_body_sm"
-                                android:fontFamily="sans-serif-medium"/>
+                                android:fontFamily="?android:attr/fontFamily"/>
                         </LinearLayout>
                         <LinearLayout
                             android:id="@+id/filterBtn"
@@ -126,7 +126,7 @@
                                 android:text="@string/label_filter"
                                 android:textColor="@color/ink_dim"
                                 android:textSize="@dimen/text_body_sm"
-                                android:fontFamily="sans-serif-medium"/>
+                                android:fontFamily="?android:attr/fontFamily"/>
                         </LinearLayout>
                         <LinearLayout
                             android:id="@+id/sortBtn"
@@ -153,7 +153,7 @@
                                 android:text="@string/label_sort"
                                 android:textColor="@color/ink_dim"
                                 android:textSize="@dimen/text_body_sm"
-                                android:fontFamily="sans-serif-medium"/>
+                                android:fontFamily="?android:attr/fontFamily"/>
                         </LinearLayout>
                     </LinearLayout>
                 </HorizontalScrollView>
@@ -179,13 +179,105 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/categoryRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"
                 android:paddingStart="18dp"
                 android:paddingEnd="18dp"
-                android:paddingBottom="12dp"
+                android:paddingBottom="16dp"
                 android:overScrollMode="never"/>
+
+            <ScrollView
+                android:id="@+id/emptyCategoriesView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="true"
+                android:scrollbars="none"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingStart="36dp"
+                    android:paddingEnd="36dp"
+                    android:paddingTop="28dp"
+                    android:paddingBottom="28dp">
+
+                    <FrameLayout
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:background="@drawable/bg_card_lg"
+                        android:elevation="2dp"
+                        android:layout_marginBottom="16dp">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_nav_playlists"
+                            android:importantForAccessibility="no"
+                            android:layout_gravity="center"
+                            app:tint="@color/accent" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/emptyTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No categories found"
+                        android:textSize="@dimen/text_title"
+                        android:textColor="@color/ink"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/emptySubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Categories will appear here once you add a playlist."
+                        android:textSize="@dimen/text_body_sm"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="24dp"
+                        android:textColor="@color/ink_dim"
+                        android:gravity="center"
+                        android:maxWidth="280dp"
+                        android:lineSpacingMultiplier="1.15" />
+
+                    <LinearLayout
+                        android:id="@+id/btnAddPlaylist"
+                        android:layout_width="230dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:background="@drawable/bg_pill_accent"
+                        android:elevation="2dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp"
+                        android:paddingStart="22dp"
+                        android:paddingEnd="22dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:layout_width="17dp"
+                            android:layout_height="17dp"
+                            android:src="@drawable/ic_plus"
+                            android:importantForAccessibility="no"
+                            android:layout_marginEnd="8dp"
+                            app:tint="@color/accent_ink" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/btn_add_playlist"
+                            android:textColor="@color/accent_ink"
+                            android:textSize="@dimen/text_body"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </ScrollView>
             </LinearLayout>
 
 

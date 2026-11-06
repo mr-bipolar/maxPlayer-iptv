@@ -102,7 +102,7 @@ final class PlayerControlsUi {
         if (tv) b.btnFavorite.setSelected(fav);
         androidx.core.widget.ImageViewCompat.setImageTintList(b.btnFavorite,
                 android.content.res.ColorStateList.valueOf(ContextCompat.getColor(activity,
-                        fav ? (tv ? R.color.tv_player_accent : R.color.accent) : R.color.white)));
+                        fav ? R.color.primary_highlight : R.color.white)));
     }
 
     void setNav(boolean hasList, boolean hasPrev, boolean hasNext) {

@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
             android:text="View GitHub project ↗"
-            android:textColor="#C9A96E"
+            android:textColor="@color/tv_player_accent"
             android:textSize="13sp"
             android:clickable="true"
             android:focusable="true" />
@@ -128,7 +128,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
             android:text="View GitHub project ↗"
-            android:textColor="#C9A96E"
+            android:textColor="@color/tv_player_accent"
             android:textSize="13sp"
             android:clickable="true"
             android:focusable="true" />
@@ -137,12 +137,12 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="18dp"
-            android:background="#383838" />
+            android:background="@color/credits_divider" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Special thanks to the developers and contributors behind these projects."
+            android:text="@string/credit_info"
             android:textColor="@color/ink_dim"
             android:textSize="12sp"
             android:gravity="center" />
@@ -153,7 +153,7 @@
             android:layout_height="48dp"
             android:layout_marginTop="20dp"
             android:text="CLOSE"
-            android:textColor="#17191D"
+            android:textColor="@color/credits_button_text"
             android:backgroundTint="@color/tv_player_accent" />
 
     </LinearLayout>
