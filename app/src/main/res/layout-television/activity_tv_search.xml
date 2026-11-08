@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_primary_background"
+    android:paddingStart="40dp"
+    android:paddingEnd="40dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="20dp"
+    tools:ignore="MissingDefaultResource">
+
+    <!-- Top Header Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_tv_btn_ghost"
+            android:contentDescription="@string/cd_back"
+            android:focusable="true"
+            android:src="@drawable/ic_back"
+            android:stateListAnimator="@animator/tv_focus_scale_sm"
+            app:tint="@color/ink_dim" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/cd_search"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_text_section_title"
+            android:textStyle="bold" />
+
+        <!-- Search Input -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1">
+
+            <EditText
+                android:id="@+id/tvSearchInput"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_tv_dialog_field"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:hint="@string/tv_search_hint"
+                android:textColorHint="@color/ink_faint"
+                android:textColor="@color/white"
+                android:textSize="@dimen/tv_text_body"
+                android:paddingStart="16dp"
+                android:paddingEnd="52dp"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+            <ImageButton
+                android:id="@+id/tvSearchClear"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="4dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/cd_clear"
+                android:focusable="true"
+                android:src="@drawable/ic_close"
+                android:padding="12dp"
+                android:visibility="gone"
+                app:tint="@color/ink_faint" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tvSearchResultCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textColor="@color/ink_faint"
+            android:textSize="@dimen/tv_text_label"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Main Content Area -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Results Grid -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tvSearchGrid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:scrollbars="none"
+            android:visibility="gone" />
+
+        <!-- Loading -->
+        <ProgressBar
+            android:id="@+id/tvSearchLoading"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <!-- Default Prompt State -->
+        <LinearLayout
+            android:id="@+id/tvSearchPromptView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="visible">
+
+            <FrameLayout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_card_lg"
+                android:elevation="2dp"
+                android:layout_marginBottom="16dp">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_search"
+                    android:importantForAccessibility="no"
+                    android:layout_gravity="center"
+                    app:tint="@color/accent" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tv_search_prompt_title"
+                android:textColor="@color/white"
+                android:textSize="@dimen/tv_text_row_title"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tv_search_prompt_body"
+                android:textColor="@color/white_alpha_55"
+                android:textSize="@dimen/tv_text_body"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:maxWidth="380dp" />
+        </LinearLayout>
+
+        <!-- Empty / No Results State -->
+        <LinearLayout
+            android:id="@+id/tvSearchEmptyView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_card_lg"
+                android:elevation="2dp"
+                android:layout_marginBottom="16dp">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_search"
+                    android:importantForAccessibility="no"
+                    android:layout_gravity="center"
+                    app:tint="@color/ink_faint" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/search_no_results_title"
+                android:textColor="@color/white"
+                android:textSize="@dimen/tv_text_row_title"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSearchEmptyBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white_alpha_55"
+                android:textSize="@dimen/tv_text_body"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:maxWidth="380dp" />
+        </LinearLayout>
+
+        <!-- Error State -->
+        <TextView
+            android:id="@+id/tvSearchErrorView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_text_body"
+            android:text="@string/tv_load_error"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+</LinearLayout>

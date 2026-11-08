@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="480dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_tv_dialog_panel"
+    android:padding="28dp"
+    tools:ignore="MissingDefaultResource">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Edit Playlist"
+        android:textColor="@color/white"
+        android:textSize="@dimen/tv_text_row_title"
+        android:textStyle="bold"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Playlist Name"
+        android:textColor="@color/ink_dim"
+        android:textSize="@dimen/tv_text_label"
+        android:layout_marginBottom="6dp" />
+
+    <EditText
+        android:id="@+id/playlistNameInput"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Enter playlist name"
+        android:singleLine="true"
+        android:inputType="textCapSentences"
+        android:textColor="@color/white"
+        android:textColorHint="@color/ink_faint"
+        android:paddingHorizontal="16dp"
+        android:background="@drawable/bg_tv_dialog_field"
+        android:textSize="@dimen/tv_text_body"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Playlist URL"
+        android:textColor="@color/ink_dim"
+        android:textSize="@dimen/tv_text_label"
+        android:layout_marginBottom="6dp" />
+
+    <EditText
+        android:id="@+id/playlistUrlInput"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Enter playlist URL"
+        android:singleLine="true"
+        android:inputType="textUri"
+        android:imeOptions="actionDone"
+        android:textColor="@color/white"
+        android:textColorHint="@color/ink_faint"
+        android:paddingHorizontal="16dp"
+        android:textSize="@dimen/tv_text_body"
+        android:background="@drawable/bg_tv_dialog_field"
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="24dp">
+
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:text="@android:string/cancel"
+            android:textColor="@color/ink_dim"
+            android:textSize="@dimen/tv_text_body"
+            android:background="@drawable/bg_tv_btn_ghost"
+            android:focusable="true"
+            android:stateListAnimator="@animator/tv_focus_scale_sm"
+            android:paddingHorizontal="20dp" />
+
+        <Button
+            android:id="@+id/updateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:text="@string/update_channel_submit"
+            android:textColor="@color/accent_ink"
+            android:textStyle="bold"
+            android:background="@drawable/bg_tv_btn_primary"
+            android:textSize="@dimen/tv_text_body"
+            android:focusable="true"
+            android:stateListAnimator="@animator/tv_focus_scale_sm"
+            android:paddingHorizontal="24dp"
+            android:layout_marginStart="12dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

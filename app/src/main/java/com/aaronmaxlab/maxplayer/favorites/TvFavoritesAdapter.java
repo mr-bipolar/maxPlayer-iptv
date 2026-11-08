@@ -113,12 +113,32 @@ public class TvFavoritesAdapter extends RecyclerView.Adapter<TvFavoritesAdapter.
             holder.image.setImageDrawable(null);
         }
 
-        ClickUtils.applyTouchEffect(holder.itemView, v -> {
+        // Ensure focused item scrolls into view
+        // Ensure focused item scrolls into view
+        holder.itemView.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                v.post(() -> {
+                    if (v.getParent() instanceof RecyclerView) {
+                        RecyclerView rv = (RecyclerView) v.getParent();
+
+                        android.graphics.Rect rect = new android.graphics.Rect();
+                        v.getDrawingRect(rect);
+
+                        rv.requestChildRectangleOnScreen(v, rect, false);
+                    }
+                });
+            }
+        });
+
+        // Handle favorite selection only when clicked
+        holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onFavoriteClick(favorite);
             }
         });
     }
+
+
 
     @Override
     public int getItemCount() {

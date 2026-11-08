@@ -392,4 +392,17 @@
     <string name="tv_channels_load_error">Channels could not be loaded. Please try again later.</string>
     <string name="credit_info">Special thanks to the developers and contributors behind these projects.</string>
 
+    <!-- Search Activity -->
+    <string name="search_hint_channels">Search all channels…</string>
+    <string name="search_prompt_title">Search channels</string>
+    <string name="search_prompt_body">Search across all your playlists and categories.</string>
+    <string name="search_no_results_title">No results</string>
+    <string name="search_no_results_body">No matches for &#8220;%1$s&#8221;. Try a different keyword.</string>
+    <string name="search_error">Could not search. Please try again.</string>
+    <string name="cd_clear">Clear</string>
+
+    <!-- Explore empty state -->
+    <string name="explore_empty_title">Nothing here yet</string>
+    <string name="explore_empty_body">Add a playlist to start watching. Your history, playlists and categories will appear here.</string>
+
 </resources>

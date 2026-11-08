@@ -87,97 +87,76 @@ public class HomeFragment extends Fragment {
             audioMiniPlayer.attach();
         }
 
-         sqlDbHelper = new SqlDbHelper(requireContext());
+        sqlDbHelper = new SqlDbHelper(requireContext());
 
-        try {
-            List<LocalDbPlaylist> playlists = sqlDbHelper.getAllPlaylists();
+        int spacing = (int) (12 * getResources().getDisplayMetrics().density);
+        recyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 2));
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(spacing));
 
-            if (!playlists.isEmpty()) {
+        adapter = new LocalDbPlaylistAdapter(
+                requireContext(),
+                playlist -> {
+                    // Open the selected playlist.
+                    startActivity(PlayerActivity.forPlaylist(requireContext(), playlist.getPlaylistUrl()));
+                    sqlDbHelper.lastOpenUpdate(playlist.getId());
+                    updateList();
+                },
+                (anchor, playlist) -> {
+                    Context themedContext = new ContextThemeWrapper(
+                            anchor.getContext(),
+                            R.style.PlayerPopupMenuTheme
+                    );
 
-            hideEmptyHome();
+                    android.util.Log.d("MaxPlayer", "Opening playlist menu for: " + playlist.getPlaylistName());
+                    PopupMenu popupMenu = new PopupMenu(themedContext, anchor);
+                    popupMenu.setGravity(android.view.Gravity.END);
+                    popupMenu.getMenu().add(0, 1, 0, "Edit");
+                    popupMenu.getMenu().add(0, 2, 1, "Delete");
 
-            adapter = new LocalDbPlaylistAdapter(
-                    requireContext(),
-                    playlist -> {
-                        // Open the selected playlist.
-                        startActivity(PlayerActivity.forPlaylist(requireContext(), playlist.getPlaylistUrl()));
-                        sqlDbHelper.lastOpenUpdate(playlist.getId());
-                        updateList(sqlDbHelper);
+                    popupMenu.setOnMenuItemClickListener(item -> {
+                        switch (item.getItemId()) {
+                            case 1:
+                                showEditPlaylistDialog(playlist, (selectedPlaylist, newName, newUrl) -> {
+                                    LocalDbPlaylist updatePlaylist = new LocalDbPlaylist(
+                                            selectedPlaylist.getId(),
+                                            newName,
+                                            newUrl,
+                                            selectedPlaylist.getPlaylistCount(),
+                                            null
+                                    );
+                                    boolean result = sqlDbHelper.updatePlaylist(updatePlaylist);
+                                    if (result) {
+                                        updateList();
+                                        AppToast.success(getActivity(), "Successfully Updated...");
+                                    } else {
+                                        AppToast.error(getActivity(), "Update Failed...");
+                                    }
+                                });
+                                return true;
 
-                    },
-                    (anchor, playlist) -> {
+                            case 2:
+                                AppUtils.showDeleteConfirmation(getContext(), playlist.getPlaylistName(), () -> {
+                                    boolean result = sqlDbHelper.deletePlaylist(playlist.getId());
+                                    if (result) {
+                                        updateList();
+                                        AppToast.success(getActivity(), "Playlist deleted.");
+                                    } else {
+                                        AppToast.error(getActivity(), "Delete failed.");
+                                    }
+                                });
+                                return true;
 
-                        Context themedContext = new ContextThemeWrapper(
-                                anchor.getContext(),
-                                R.style.PlayerPopupMenuTheme
-                        );
+                            default:
+                                return false;
+                        }
+                    });
 
-                        PopupMenu popupMenu = new PopupMenu(themedContext, anchor);
+                    popupMenu.show();
+                }
+        );
+        recyclerView.setAdapter(adapter);
 
-                        popupMenu.getMenu().add(0, 1, 0, "Edit");
-                        popupMenu.getMenu().add(0, 2, 1, "Delete");
-
-                        popupMenu.setOnMenuItemClickListener(item -> {
-
-                            switch (item.getItemId()) {
-                                case 1:
-                                    showEditPlaylistDialog(playlist, (selectedPlaylist, newName, newUrl) -> {
-                                        LocalDbPlaylist updatePlaylist = new LocalDbPlaylist(selectedPlaylist.getId(), newName, newUrl, selectedPlaylist.getPlaylistCount(), null);
-                                        final boolean result = sqlDbHelper.updatePlaylist(updatePlaylist);
-                                        if (result) {
-                                            updateList(sqlDbHelper);
-                                            AppToast.success(getActivity(), "Successfully Updated...");
-                                        } else {
-                                            AppToast.error(getActivity(), "Update Failed...");
-                                        }
-                                    });
-                                    return true;
-
-                                case 2:
-                                    AppUtils.showDeleteConfirmation(getContext(), playlist.getPlaylistName(), () -> {
-                                        boolean result = sqlDbHelper.deletePlaylist(playlist.getId());
-
-                                        if (result) {
-                                            adapter.submitList(sqlDbHelper.getAllPlaylists());
-                                            updateList(sqlDbHelper);
-                                            AppToast.success(getActivity(), "Playlist deleted.");
-                                        } else {
-                                            AppToast.error(getActivity(), "Delete failed.");
-                                        }
-                                    });
-                                    return true;
-
-                                default:
-                                    return false;
-                            }
-                        });
-
-                        popupMenu.show();
-                    }
-            );
-
-
-            int spacing = (int) (12 * getResources()
-                    .getDisplayMetrics().density);
-
-            recyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 2));
-
-            recyclerView.addItemDecoration(
-                    new GridSpacingItemDecoration(spacing)
-            );
-
-            recyclerView.setAdapter(adapter);
-            adapter.submitList(playlists);
-
-        }else {
-               showEmptyHome();
-            }
-
-        } catch (Exception e) {
-            AppToast.error(getActivity(), "Failed to load playlists.");
-            android.util.Log.e("PlaylistView", "Failed to load playlists", e);
-        }
-
+        updateList();
     }
 
     @Override
@@ -196,33 +175,37 @@ public class HomeFragment extends Fragment {
             audioMiniPlayer = null;
         }
 
+        if (sqlDbHelper != null) {
+            sqlDbHelper.close();
+            sqlDbHelper = null;
+        }
+
         binding = null;
         super.onDestroyView();
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        updateList(sqlDbHelper);
+        if (sqlDbHelper == null && getContext() != null) {
+            sqlDbHelper = new SqlDbHelper(requireContext());
+        }
+        updateList();
     }
 
-
-    private void updateList(SqlDbHelper sqlDbHelper){
-        try (sqlDbHelper) {
+    private void updateList() {
+        if (sqlDbHelper == null || adapter == null) return;
+        try {
             List<LocalDbPlaylist> updateList = sqlDbHelper.getAllPlaylists();
             adapter.submitList(updateList);
 
-            if(updateList.isEmpty()){
+            if (updateList == null || updateList.isEmpty()) {
                 showEmptyHome();
-            }else {
+            } else {
                 hideEmptyHome();
             }
-
         } catch (Exception e) {
             android.util.Log.e("PlaylistView", "Failed to update playlists", e);
-        }finally {
-            sqlDbHelper.close();
         }
     }
 
@@ -269,6 +252,12 @@ public class HomeFragment extends Fragment {
 
             if (url.isEmpty()) {
                 urlInput.setError("Enter playlist URL");
+                urlInput.requestFocus();
+                return;
+            }
+
+            if (!com.aaronmaxlab.maxplayer.utils.UrlUtils.isValidPlaylistUrl(url)) {
+                urlInput.setError("Enter a valid HTTP or HTTPS URL");
                 urlInput.requestFocus();
                 return;
             }

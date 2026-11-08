@@ -32,8 +32,20 @@ public class AppUtils {
                 "Series", "Kids", "Documentary",
                 "Entertainment", "Music", "Radio", "Talk",
                 "Lifestyle", "Education", "Religious",
-                "Regional", "International", "Other"
+                "Regional", "International", "18+",
+                "Podcast" , "MP3" , "Other"
         ));
+    }
+
+    public static int getCategoryIndex(String category) {
+        if (category == null) {return -1;}
+        List<String> categories = showCategories();
+        for (int i = 0; i < categories.size(); i++) {
+            if (categories.get(i).equalsIgnoreCase(category.trim())) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     // Icons for category
@@ -73,6 +85,10 @@ public class AppUtils {
                 return R.drawable.ic_international;
             case "ic_18_plus":
                 return R.drawable.ic_18_plus;
+            case "ic_podcasts":
+                return R.drawable.ic_podcasts;
+            case "ic_audio":
+                return R.drawable.ic_audio;
             default:
                 return R.drawable.ic_other;
         }

@@ -58,13 +58,15 @@
         <FrameLayout
             android:id="@+id/channelMenu"
             android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="top|end"
-            android:layout_margin="8dp"
-            android:background="@drawable/bg_badge_overlay">
+            android:layout_height="26dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="4dp"
+            android:clickable="true"
+            android:focusable="false"
+            android:background="@drawable/bg_btn_overflow">
             <ImageView
-                android:layout_width="15dp"
-                android:layout_height="15dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:src="@drawable/ic_more_vert"
                 android:importantForAccessibility="no"
                 android:layout_gravity="center"

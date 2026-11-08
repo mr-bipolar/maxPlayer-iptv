@@ -117,7 +117,11 @@ public class ExploreActivity extends AppCompatActivity {
     }
 
     private void openTvFullList(TvMainCardAdapter.Kind kind) {
-        startActivity(new Intent(this, TvSectionActivity.class).putExtra(TvSectionActivity.EXTRA_KIND, kind.name()));
+        if (kind == TvMainCardAdapter.Kind.CATEGORY) {
+            startActivity(new Intent(this, com.aaronmaxlab.maxplayer.categories.TvCategoriesActivity.class));
+        } else {
+            startActivity(new Intent(this, TvSectionActivity.class).putExtra(TvSectionActivity.EXTRA_KIND, kind.name()));
+        }
     }
 
     private void setupHorizontalRow(RecyclerView recyclerView) {
@@ -152,6 +156,10 @@ public class ExploreActivity extends AppCompatActivity {
                 binding.tvHistoryRecyclerEmpty.setVisibility(View.GONE);
                 binding.tvPlaylistRecyclerEmpty.setVisibility(View.GONE);
                 binding.tvCategoryRecyclerEmpty.setVisibility(View.GONE);
+                boolean allEmpty = history.isEmpty() && playlists.isEmpty() && categories.isEmpty();
+                if (binding.exploreEmptyView != null) {
+                    binding.exploreEmptyView.setVisibility(allEmpty ? View.VISIBLE : View.GONE);
+                }
                 if (focusedRow != null && focusedPosition != RecyclerView.NO_POSITION) {
                     RecyclerView restoreRow = focusedRow;
                     int restorePosition = focusedPosition;

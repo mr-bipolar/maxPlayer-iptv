@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_primary_background"
+    android:paddingStart="40dp"
+    android:paddingEnd="40dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="20dp"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    tools:ignore="MissingDefaultResource">
+
+    <!-- Top Header Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <ImageButton
+            android:id="@+id/backChannelList"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_tv_btn_ghost"
+            android:contentDescription="@string/cd_back"
+            android:focusable="true"
+            android:src="@drawable/ic_back"
+            android:stateListAnimator="@animator/tv_focus_scale_sm"
+            app:tint="@color/ink_dim" />
+
+        <TextView
+            android:id="@+id/categoryTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_text_section_title"
+            android:textStyle="bold"
+            tools:text="Sports" />
+
+        <TextView
+            android:id="@+id/channelsCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primary_highlight"
+            android:textSize="@dimen/tv_text_button"
+            tools:text="42 Channels" />
+    </LinearLayout>
+
+    <!-- Main Content Area -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <!-- Grid of Channels -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/channelsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:scrollbars="none" />
+
+        <!-- Empty State -->
+        <LinearLayout
+            android:id="@+id/emptyChannelsView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_card_lg"
+                android:elevation="2dp"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_tv"
+                    android:importantForAccessibility="no"
+                    android:layout_gravity="center"
+                    app:tint="@color/accent" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tv_no_channels"
+                android:textColor="@color/white"
+                android:textSize="@dimen/tv_text_row_title"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="There are no channels in this category."
+                android:textColor="@color/white_alpha_55"
+                android:textSize="@dimen/tv_text_body"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:maxWidth="360dp" />
+        </LinearLayout>
+
+        <!-- Error State -->
+        <TextView
+            android:id="@+id/tvChannelsErrorView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_text_body"
+            android:text="@string/tv_channels_load_error"
+            android:visibility="gone" />
+
+    </FrameLayout>
+</LinearLayout>

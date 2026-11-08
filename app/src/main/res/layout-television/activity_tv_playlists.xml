@@ -27,6 +27,7 @@
             android:background="@drawable/bg_tv_btn_ghost"
             android:contentDescription="@string/cd_back"
             android:focusable="true"
+            android:nextFocusDown="@id/tvPlaylistsGrid"
             android:src="@drawable/ic_back"
             android:stateListAnimator="@animator/tv_focus_scale_sm"
             app:tint="@color/ink_dim" />
@@ -59,6 +60,7 @@
             android:background="@drawable/bg_tv_nav_item"
             android:focusable="true"
             android:clickable="true"
+            android:nextFocusDown="@id/tvPlaylistsGrid"
             android:paddingStart="14dp"
             android:paddingEnd="16dp"
             android:paddingTop="8dp"

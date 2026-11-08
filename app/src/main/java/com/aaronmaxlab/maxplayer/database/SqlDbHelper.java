@@ -74,6 +74,30 @@ public class SqlDbHelper extends SQLiteOpenHelper {
     private static final String COL_HISTORY_TYPE = "historyType";
     public static final  String COL_HISTORY_ICON = "historyIcon";
 
+    private static final String[][] DEFAULT_CATEGORIES = {
+
+            {"Live TV", "ic_tv"},
+            {"Sports", "ic_cat_sport"},
+            {"News", "ic_cat_news"},
+            {"Movies", "ic_cat_movies"},
+            {"Series", "ic_series"},
+            {"Kids", "ic_cat_kids"},
+            {"Documentary", "ic_documentary"},
+            {"Entertainment", "ic_entertainment"},
+            {"Music", "ic_music"},
+            {"Radio", "ic_radio"},
+            {"Talk", "ic_talk"},
+            {"Lifestyle", "ic_life_style"},
+            {"Education", "ic_education"},
+            {"Religious", "ic_religious"},
+            {"Regional", "ic_regional"},
+            {"International", "ic_international"},
+            {"18+", "ic_18_plus"},
+            {"Podcast", "ic_podcasts"},
+            {"MP3", "ic_audio"},
+            {"Other", "ic_other"}
+    };
+
 
 
     private final Context context;
@@ -86,8 +110,6 @@ public class SqlDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         createCategoriesTable(db);
-        seedCategories(db);
-
         createChannelsTable(db, TABLE_CHANNELS);
         createPlaylistsTable(db, TABLE_PLAYLISTS);
         createFavoritesTable(db);
@@ -175,6 +197,13 @@ public class SqlDbHelper extends SQLiteOpenHelper {
         if (tableExists(db, TABLE_OLD_PLAYLIST)) {
             db.execSQL("DROP TABLE " + TABLE_OLD_PLAYLIST);
         }
+    }
+
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        seedCategories(db);
     }
 
     private void logRecentViewsColumns(SQLiteDatabase db) {
@@ -295,29 +324,11 @@ public class SqlDbHelper extends SQLiteOpenHelper {
 
     // SEED CATEGORIES
     private void seedCategories(SQLiteDatabase db) {
-        String[][] categories = {
-                {"Live TV", "ic_tv"},
-                {"Sports", "ic_cat_sport"},
-                {"News", "ic_cat_news"},
-                {"Movies", "ic_cat_movies"},
-                {"Series", "ic_series"},
-                {"Kids", "ic_cat_kids"},
-                {"Documentary", "ic_documentary"},
-                {"Entertainment", "ic_entertainment"},
-                {"Music", "ic_music"},
-                {"Radio", "ic_radio"},
-                {"Talk", "ic_talk"},
-                {"Lifestyle", "ic_life_style"},
-                {"Education", "ic_education"},
-                {"Religious", "ic_religious"},
-                {"Regional", "ic_regional"},
-                {"International", "ic_international"},
-                {"18+", "ic_18_plus"},
-                {"Other", "ic_other"}
-        };
 
-        for (String[] item : categories) {
+        for (String[] item : DEFAULT_CATEGORIES) {
+
             ContentValues values = new ContentValues();
+
             values.put(COL_CATEGORY, item[0]);
             values.put(COL_COUNT, 0);
             values.put(COL_ICON, item[1]);
@@ -331,15 +342,36 @@ public class SqlDbHelper extends SQLiteOpenHelper {
         }
     }
 
+    private String getCategoryIcon(String category) {
+        if (category == null || category.trim().isEmpty()) {
+            return "ic_other";
+        }
+        for (String[] item : DEFAULT_CATEGORIES) {
+            if (item[0].equalsIgnoreCase(category.trim())) {
+                return item[1];
+            }
+        }
+        return "ic_other";
+    }
+
+
     // INSERT MISSING CATEGORY
     private void insertCategoryIfMissing(
             SQLiteDatabase db,
             String category
     ) {
+
+        if (category == null || category.trim().isEmpty()) {
+            return;
+        }
+
+        String categoryName = category.trim();
+
         ContentValues values = new ContentValues();
-        values.put(COL_CATEGORY, category);
+
+        values.put(COL_CATEGORY, categoryName);
         values.put(COL_COUNT, 0);
-        values.put(COL_ICON, "ic_other");
+        values.put(COL_ICON, getCategoryIcon(categoryName));
 
         db.insertWithOnConflict(
                 TABLE_CATEGORIES,
@@ -580,13 +612,27 @@ public class SqlDbHelper extends SQLiteOpenHelper {
     }
 
     public boolean updatePlaylist(LocalDbPlaylist playlist) {
-        if (playlist.getId() == null) {
+        if (playlist == null || playlist.getId() == null) {
             return false;
         }
 
-        try (SQLiteDatabase database = this.getWritableDatabase()) {
-            ContentValues cv = new ContentValues();
+        SQLiteDatabase database = this.getWritableDatabase();
+        try {
+            database.beginTransaction();
 
+            String oldUrl = null;
+            try (Cursor cursor = database.query(
+                    TABLE_PLAYLISTS,
+                    new String[]{COL_PLAYLIST_URL},
+                    COL_ID + "=?",
+                    new String[]{String.valueOf(playlist.getId())},
+                    null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    oldUrl = cursor.getString(0);
+                }
+            }
+
+            ContentValues cv = new ContentValues();
             cv.put(COL_PLAYLIST_NAME, playlist.getPlaylistName());
             cv.put(COL_PLAYLIST_URL, playlist.getPlaylistUrl());
             cv.put(COL_PLAYLIST_COUNT, playlist.getPlaylistCount());
@@ -598,7 +644,38 @@ public class SqlDbHelper extends SQLiteOpenHelper {
                     new String[]{String.valueOf(playlist.getId())}
             );
 
-            return result > 0;
+            if (result == 0) {
+                return false;
+            }
+
+            if (oldUrl != null && !oldUrl.trim().isEmpty()) {
+                String newUrl = playlist.getPlaylistUrl();
+                String newName = playlist.getPlaylistName();
+
+                ContentValues favCv = new ContentValues();
+                if (newName != null) favCv.put(COL_FAVORITE_NAME, newName);
+                if (newUrl != null && !newUrl.trim().isEmpty()) {
+                    favCv.put(COL_FAVORITE_URL, newUrl.trim());
+                }
+                database.update(TABLE_FAVORITES, favCv, COL_FAVORITE_URL + "=?", new String[]{oldUrl.trim()});
+
+                ContentValues histCv = new ContentValues();
+                if (newName != null) histCv.put(COL_HISTORY_NAME, newName);
+                if (newUrl != null && !newUrl.trim().isEmpty()) {
+                    histCv.put(COL_HISTORY_URL, newUrl.trim());
+                }
+                database.update(TABLE_HISTORY, histCv, COL_HISTORY_URL + "=?", new String[]{oldUrl.trim()});
+            }
+
+            database.setTransactionSuccessful();
+            return true;
+        } catch (Exception e) {
+            Log.e("PLAYER_DB", "Playlist update failed", e);
+            return false;
+        } finally {
+            if (database.inTransaction()) {
+                database.endTransaction();
+            }
         }
     }
 
@@ -607,7 +684,7 @@ public class SqlDbHelper extends SQLiteOpenHelper {
             ContentValues cv = new ContentValues();
             cv.put(COL_CREATED_AT, System.currentTimeMillis());
 
-            int result = database.update(
+            database.update(
                     TABLE_PLAYLISTS,
                     cv,
                     COL_ID + "=?",
@@ -618,14 +695,46 @@ public class SqlDbHelper extends SQLiteOpenHelper {
     }
 
     public boolean deletePlaylist(int playlistId) {
-        try (SQLiteDatabase database = this.getWritableDatabase()) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        try {
+            database.beginTransaction();
+
+            String oldUrl = null;
+            try (Cursor cursor = database.query(
+                    TABLE_PLAYLISTS,
+                    new String[]{COL_PLAYLIST_URL},
+                    COL_ID + "=?",
+                    new String[]{String.valueOf(playlistId)},
+                    null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    oldUrl = cursor.getString(0);
+                }
+            }
+
             int result = database.delete(
                     TABLE_PLAYLISTS,
                     COL_ID + "=?",
                     new String[]{String.valueOf(playlistId)}
             );
 
-            return result > 0;
+            if (result == 0) {
+                return false;
+            }
+
+            if (oldUrl != null && !oldUrl.trim().isEmpty()) {
+                database.delete(TABLE_FAVORITES, COL_FAVORITE_URL + "=?", new String[]{oldUrl.trim()});
+                database.delete(TABLE_HISTORY, COL_HISTORY_URL + "=?", new String[]{oldUrl.trim()});
+            }
+
+            database.setTransactionSuccessful();
+            return true;
+        } catch (Exception e) {
+            Log.e("PLAYER_DB", "Playlist delete failed", e);
+            return false;
+        } finally {
+            if (database.inTransaction()) {
+                database.endTransaction();
+            }
         }
     }
 
@@ -1100,18 +1209,32 @@ public class SqlDbHelper extends SQLiteOpenHelper {
 
 
     public boolean updateChannel(LocalDbChannel dbChannel, int changeIndex) {
+        if (dbChannel == null || dbChannel.getId() == null) {
+            return false;
+        }
 
         SQLiteDatabase database = this.getWritableDatabase();
 
         try {
-            ContentValues values = new ContentValues();
+            database.beginTransaction();
 
+            String oldUrl = null;
+            try (Cursor cursor = database.query(
+                    TABLE_CHANNELS,
+                    new String[]{COL_CHANNEL_URL},
+                    COL_ID + " = ?",
+                    new String[]{String.valueOf(dbChannel.getId())},
+                    null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    oldUrl = cursor.getString(0);
+                }
+            }
+
+            ContentValues values = new ContentValues();
             values.put(COL_CHANNEL_NAME, dbChannel.getChannelName());
             values.put(COL_CHANNEL_IMAGE, dbChannel.getChannelImage());
             values.put(COL_CHANNEL_URL, dbChannel.getChannelUrl());
             values.put(COL_CATEGORY, dbChannel.getChannelCategory());
-
-            database.beginTransaction();
 
             int result = database.update(
                     TABLE_CHANNELS,
@@ -1127,6 +1250,24 @@ public class SqlDbHelper extends SQLiteOpenHelper {
             if (changeIndex != dbChannel.getChannelCategory()) {
                 decrementCategoryCount(database, changeIndex);
                 incrementCategoryCount(database, dbChannel.getChannelCategory());
+            }
+
+            if (oldUrl != null && !oldUrl.trim().isEmpty()) {
+                String newUrl = dbChannel.getChannelUrl() != null ? dbChannel.getChannelUrl().trim() : null;
+                String newName = dbChannel.getChannelName();
+                String newImg = dbChannel.getChannelImage();
+
+                ContentValues favCv = new ContentValues();
+                if (newName != null) favCv.put(COL_FAVORITE_NAME, newName);
+                if (newUrl != null && !newUrl.isEmpty()) favCv.put(COL_FAVORITE_URL, newUrl);
+                if (newImg != null) favCv.put(COL_FAVORITE_ICON, newImg);
+                database.update(TABLE_FAVORITES, favCv, COL_FAVORITE_URL + " = ?", new String[]{oldUrl.trim()});
+
+                ContentValues histCv = new ContentValues();
+                if (newName != null) histCv.put(COL_HISTORY_NAME, newName);
+                if (newUrl != null && !newUrl.isEmpty()) histCv.put(COL_HISTORY_URL, newUrl);
+                if (newImg != null) histCv.put(COL_HISTORY_ICON, newImg);
+                database.update(TABLE_HISTORY, histCv, COL_HISTORY_URL + " = ?", new String[]{oldUrl.trim()});
             }
 
             database.setTransactionSuccessful();
@@ -1165,6 +1306,9 @@ public class SqlDbHelper extends SQLiteOpenHelper {
             }
 
             decrementCategoryCount(database, changeIndex);
+
+            database.delete(TABLE_FAVORITES, COL_FAVORITE_URL + " = ?", new String[]{url.trim()});
+            database.delete(TABLE_HISTORY, COL_HISTORY_URL + " = ?", new String[]{url.trim()});
 
             database.setTransactionSuccessful();
 
@@ -1375,7 +1519,8 @@ public class SqlDbHelper extends SQLiteOpenHelper {
         String lowerCat = categoryName != null ? categoryName.toLowerCase(Locale.ROOT) : "";
         String lowerUrl = url != null ? url.toLowerCase(Locale.ROOT) : "";
 
-        if (lowerCat.contains("radio") || lowerCat.contains("music") || lowerCat.contains("audio")) {
+        if (lowerCat.contains("radio") || lowerCat.contains("music") || lowerCat.contains("audio") || lowerCat.contains("mp3")
+                || lowerCat.contains("podcasts")) {
             return PlaylistType.AUDIO;
         }
         for (String ext : MediaTypes.AUDIO_EXT) {

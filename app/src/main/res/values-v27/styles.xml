@@ -7,4 +7,5 @@
                 <item name="android:navigationBarColor">#000000</item>
                 <item name="android:statusBarColor">#000000</item>
         </style>
+
 </resources>

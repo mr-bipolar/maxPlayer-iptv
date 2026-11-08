@@ -44,6 +44,11 @@ public class TvSectionActivity extends AppCompatActivity {
         TvMainCardAdapter.Kind kind;
         try { kind = TvMainCardAdapter.Kind.valueOf(kindName); }
         catch (Exception e) { finish(); return; }
+        if (kind == TvMainCardAdapter.Kind.CATEGORY) {
+            startActivity(new android.content.Intent(this, com.aaronmaxlab.maxplayer.categories.TvCategoriesActivity.class));
+            finish();
+            return;
+        }
         ((TextView)findViewById(R.id.tvSectionTitle)).setText(TvSectionDataSource.titleRes(kind));
         list.setLayoutManager(new GridLayoutManager(this, 5));
         list.setFocusable(true);

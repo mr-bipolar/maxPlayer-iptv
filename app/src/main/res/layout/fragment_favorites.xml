@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:overScrollMode="never"
-        android:paddingBottom="16dp"
+        android:paddingBottom="@dimen/space_64"
         tools:listitem="@layout/item_favorite" />
 
     <ScrollView
@@ -96,5 +96,13 @@
 
         </LinearLayout>
     </ScrollView>
+
+
+    <include
+        android:id="@+id/audioPlayerOverlay"
+        layout="@layout/audio_bg_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
 </FrameLayout>

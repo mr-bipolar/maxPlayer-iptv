@@ -91,13 +91,20 @@ public class LocalDbPlaylistAdapter
 
         holder.playlistSubText.setText(subtitle);
 
-        ClickUtils.applyTouchEffect(holder.itemView, v ->{
+        ClickUtils.applyTouchEffect(holder.itemView, v -> {
             if (clickListener != null) {
                 clickListener.onPlaylistClick(playlist);
             }
         });
 
-        ClickUtils.applyTouchEffect(holder.playlistMenuBtn,  v -> {
+        holder.playlistMenuBtn.setOnTouchListener((v, event) -> {
+            if (v.getParent() != null) {
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+            }
+            return false;
+        });
+
+        holder.playlistMenuBtn.setOnClickListener(v -> {
             if (menuClickListener != null) {
                 menuClickListener.onMenuClick(v, playlist);
             }

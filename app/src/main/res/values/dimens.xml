@@ -17,6 +17,7 @@
     <dimen name="space_28">28dp</dimen>
     <dimen name="space_32">32dp</dimen>
     <dimen name="space_40">40dp</dimen>
+    <dimen name="space_64">64dp</dimen>
 
     <!-- Corner radius -->
     <dimen name="radius_sm">8dp</dimen>
@@ -76,9 +77,9 @@
     <dimen name="tv_text_label">12sp</dimen>
     <dimen name="tv_text_caption">11sp</dimen>
     <dimen name="tv_card_wide_w">160dp</dimen>
-    <dimen name="tv_card_wide_h">90dp</dimen>
+    <dimen name="tv_card_wide_h">120dp</dimen>
     <dimen name="tv_card_w">120dp</dimen>
-    <dimen name="tv_card_h">68dp</dimen>
+    <dimen name="tv_card_h">90dp</dimen>
     <dimen name="tv_key_h">40dp</dimen>
 
 </resources>

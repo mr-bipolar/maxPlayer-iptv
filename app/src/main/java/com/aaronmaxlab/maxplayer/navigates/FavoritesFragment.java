@@ -25,6 +25,7 @@ import com.aaronmaxlab.maxplayer.database.adapter.LocalDbFavoritesAdapter;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbFavorites;
 import com.aaronmaxlab.maxplayer.databinding.FragmentFavoritesBinding;
 import com.aaronmaxlab.maxplayer.player.PlayerActivity;
+import com.aaronmaxlab.maxplayer.player.media3.audio.AudioMiniPlayer;
 import com.aaronmaxlab.maxplayer.player.media3.audio.AudioPlayerActivity;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.PlaylistType;
@@ -32,6 +33,7 @@ import com.aaronmaxlab.maxplayer.utils.StreamLauncher;
 import com.aaronmaxlab.maxplayer.utils.UrlUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 
 public class FavoritesFragment extends Fragment {
@@ -40,6 +42,7 @@ public class FavoritesFragment extends Fragment {
     private SqlDbHelper sqlDbHelper;
     private LocalDbFavoritesAdapter favoritesAdapter;
     private RecyclerView recyclerView;
+    private AudioMiniPlayer audioMiniPlayer;
 
     public FavoritesFragment() {
         // Required empty public constructor
@@ -59,17 +62,21 @@ public class FavoritesFragment extends Fragment {
 
         setupFavorites();
 
-        if (binding.browsePlaylists != null) {
-            com.aaronmaxlab.maxplayer.utils.ClickUtils.applyTouchEffect(binding.browsePlaylists, v -> {
-                if (getActivity() != null) {
-                    com.google.android.material.bottomnavigation.BottomNavigationView nav =
-                            getActivity().findViewById(R.id.bottomNavigation);
-                    if (nav != null) {
-                        nav.setSelectedItemId(R.id.navPlaylists);
-                    }
+        audioMiniPlayer = new AudioMiniPlayer(
+                requireActivity(),
+                binding.getRoot().findViewById(R.id.audioPlayerOverlay)
+        );
+        audioMiniPlayer.attach();
+
+        com.aaronmaxlab.maxplayer.utils.ClickUtils.applyTouchEffect(binding.browsePlaylists, v -> {
+            if (getActivity() != null) {
+                com.google.android.material.bottomnavigation.BottomNavigationView nav =
+                        getActivity().findViewById(R.id.customBottomBar);
+                if (nav != null) {
+                    nav.setSelectedItemId(R.id.navPlaylists);
                 }
-            });
-        }
+            }
+        });
 
         return binding.getRoot();
     }
@@ -82,6 +89,10 @@ public class FavoritesFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        if (audioMiniPlayer != null) {
+            audioMiniPlayer.release();
+            audioMiniPlayer = null;
+        }
         binding = null;
         super.onDestroy();
     }
@@ -141,8 +152,8 @@ public class FavoritesFragment extends Fragment {
 
     private void loadFavorites() {
         List<LocalDbFavorites> favoritesList = sqlDbHelper.getAllFavorites();
-        recyclerView.setVisibility(favoritesList.isEmpty() ? View.GONE : View.VISIBLE);
-        binding.emptyFav.setVisibility(favoritesList.isEmpty() ? View.VISIBLE : View.GONE);
+       recyclerView.setVisibility(favoritesList.isEmpty() ? View.GONE : View.VISIBLE);
+       binding.emptyFav.setVisibility(favoritesList.isEmpty() ? View.VISIBLE : View.GONE);
         favoritesAdapter.submitList(favoritesList);
     }
 }

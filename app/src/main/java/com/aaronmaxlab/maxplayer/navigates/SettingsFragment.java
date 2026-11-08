@@ -12,6 +12,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -54,51 +55,178 @@ public class SettingsFragment extends Fragment {
 
     public SettingsFragment() { }
 
+
+    private View tvRoot;
+    private boolean isTV;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state) {
-        View root = inflater.inflate(R.layout.fragment_settings, container, false);
+        isTV = DeviceUtils.isTv(requireContext());
 
-        boolean isTV = DeviceUtils.isTv(requireContext());
+        View root = inflater.inflate( R.layout.fragment_settings, container, false);
 
-        if (isTV) {
-            root.findViewById(R.id.settings_page_title).setVisibility(View.GONE);
-        }
         LinearLayout appearance = root.findViewById(R.id.settings_appearance_card);
         LinearLayout player = root.findViewById(R.id.settings_player_card);
         LinearLayout library = root.findViewById(R.id.settings_library_card);
         LinearLayout about = root.findViewById(R.id.settings_about_card);
 
-        View themeRow = addRow(appearance, R.drawable.ic_theme, R.string.settings_theme,
-                R.string.settings_theme_summary, true, v -> showThemePicker());
-        themeSummary = themeRow.findViewById(R.id.settings_row_summary);
+        populateAppearance(appearance);
+        populatePlayer(player);
+        populateLibrary(library, isTV);
+        populateAbout(about);
 
-        View engineRow = addRow(player, R.drawable.ic_decoder, R.string.settings_engine,
-                R.string.settings_engine_summary, true,
-                v -> showEnginePicker());
-        engineSummary = engineRow.findViewById(R.id.settings_row_summary);
-
-        View subtitleRow = addRow(player, R.drawable.ic_subtitles, R.string.settings_subtitle_size,
-                R.string.settings_subtitle_summary, true, v -> showSubtitleSizePicker());
-        subtitleSummary = subtitleRow.findViewById(R.id.settings_row_summary);
-
-        addRow(library, R.drawable.ic_clock, R.string.settings_clear_history,
-                R.string.settings_clear_history_summary, true, v -> confirmClearHistory());
-        View remoteRow = addRow(library, R.drawable.ic_remote, R.string.settings_remote,
-                R.string.settings_remote_summary, true,
-                v -> startActivity(new Intent(requireContext(), isTV ? RemotePairingActivity.class : RemoteKeyboardActivity.class)));
-        remoteSummary = remoteRow.findViewById(R.id.settings_row_summary);
-
-        View versionRow = addRow(about, R.drawable.ic_info, R.string.app_name,
-                R.string.settings_version_summary, false, null);
-        ((TextView) versionRow.findViewById(R.id.settings_row_summary)).setText(getVersionSummary());
-        addRow(about, R.drawable.ic_info, R.string.settings_credits,
-                R.string.settings_credits_summary, true, v -> showPlaybackCredits());
+        if (isTV) {
+            tvRoot = root;
+            setupTvTabs(root);
+        }
 
         updateThemeSummary();
         updatePlayerSummaries();
         updateRemoteSummary();
+
         return root;
     }
+
+    private void populateAppearance(LinearLayout appearance) {
+        View themeRow = addRow(
+                appearance,
+                R.drawable.ic_theme,
+                R.string.settings_theme,
+                R.string.settings_theme_summary,
+                true,
+                v -> showThemePicker()
+        );
+
+        themeSummary = themeRow.findViewById(R.id.settings_row_summary);
+    }
+
+    private void populatePlayer(LinearLayout player) {
+        View engineRow = addRow(
+                player,
+                R.drawable.ic_decoder,
+                R.string.settings_engine,
+                R.string.settings_engine_summary,
+                true,
+                v -> showEnginePicker()
+        );
+        engineSummary = engineRow.findViewById(R.id.settings_row_summary);
+
+        View subtitleRow = addRow(
+                player,
+                R.drawable.ic_subtitles,
+                R.string.settings_subtitle_size,
+                R.string.settings_subtitle_summary,
+                true,
+                v -> showSubtitleSizePicker()
+        );
+        subtitleSummary = subtitleRow.findViewById(R.id.settings_row_summary);
+    }
+
+    private void populateLibrary(LinearLayout library, boolean isTV) {
+        addRow(
+                library,
+                R.drawable.ic_clock,
+                R.string.settings_clear_history,
+                R.string.settings_clear_history_summary,
+                true,
+                v -> confirmClearHistory()
+        );
+
+        View remoteRow = addRow(
+                library,
+                R.drawable.ic_remote,
+                R.string.settings_remote,
+                R.string.settings_remote_summary,
+                true,
+                v -> startActivity(new Intent(
+                        requireContext(),
+                        isTV ? RemotePairingActivity.class : RemoteKeyboardActivity.class
+                ))
+        );
+
+        remoteSummary = remoteRow.findViewById(R.id.settings_row_summary);
+    }
+
+    private void populateAbout(LinearLayout about) {
+        View versionRow = addRow(
+                about,
+                R.drawable.ic_info,
+                R.string.app_name,
+                R.string.settings_version_summary,
+                false,
+                null
+        );
+
+        ((TextView) versionRow.findViewById(R.id.settings_row_summary))
+                .setText(getVersionSummary());
+
+        addRow(
+                about,
+                R.drawable.ic_info,
+                R.string.settings_credits,
+                R.string.settings_credits_summary,
+                true,
+                v -> showPlaybackCredits()
+        );
+    }
+
+    private void setupTvTabs(View root) {
+
+        root.findViewById(R.id.tabAppearance).setOnClickListener(v ->
+                showSettingsTab(root, 0));
+
+        root.findViewById(R.id.tabPlayer).setOnClickListener(v ->
+                showSettingsTab(root, 1));
+
+        root.findViewById(R.id.tabLibrary).setOnClickListener(v ->
+                showSettingsTab(root, 2));
+
+        root.findViewById(R.id.tabAbout).setOnClickListener(v ->
+                showSettingsTab(root, 3));
+
+        showSettingsTab(root, 0);
+
+    }
+
+
+    private void showSettingsTab(View root, int selectedTab) {
+
+        int[] tabIds = {
+                R.id.tabAppearance,
+                R.id.tabPlayer,
+                R.id.tabLibrary,
+                R.id.tabAbout
+        };
+
+        int[] contentIds = {
+                R.id.contentAppearance,
+                R.id.contentPlayer,
+                R.id.contentLibrary,
+                R.id.contentAbout
+        };
+
+        for (int i = 0; i < tabIds.length; i++) {
+
+            View tab = root.findViewById(tabIds[i]);
+
+            tab.setSelected(i == selectedTab);
+
+            if (tab instanceof TextView) {
+                ((TextView) tab).setTextColor(
+                        requireContext().getColor(
+                                i == selectedTab
+                                        ? R.color.accent
+                                        : R.color.ink_dim
+                        )
+                );
+            }
+
+            root.findViewById(contentIds[i]).setVisibility(
+                    i == selectedTab ? View.VISIBLE : View.GONE
+            );
+        }
+    }
+
 
     @Override
     public void onResume() {
@@ -107,6 +235,8 @@ public class SettingsFragment extends Fragment {
         updatePlayerSummaries();
         updateRemoteSummary();
     }
+
+
 
     private View addRow(LinearLayout parent, @DrawableRes int icon, @StringRes int title,
                         @StringRes int summary, boolean interactive, View.OnClickListener listener) {
@@ -142,7 +272,7 @@ public class SettingsFragment extends Fragment {
                 R.string.theme_primary_summary, new int[]{0xFF272E3D, 0xFF323B4E, 0xFFCC5200}, current);
         addThemeOption(options, ThemePreferences.DARK, R.string.theme_dark_choice,
                 R.string.theme_dark_summary, new int[]{0xFF0A0A0C, 0xFF17181D, 0xFFF5A524}, current);
-        themeDialog = new AlertDialog.Builder(requireContext())
+        themeDialog = new AlertDialog.Builder(requireContext(), R.style.PlayerDialogTheme)
                 .setTitle(R.string.settings_theme)
                 .setView(options)
                 .setNegativeButton(android.R.string.cancel, null)
@@ -216,7 +346,7 @@ public class SettingsFragment extends Fragment {
     private void showSubtitleSizePicker() {
         String[] labels = getResources().getStringArray(R.array.settings_subtitle_sizes);
         int selected = PlayerSettings.getSubtitleSizeIndex(requireContext());
-        new AlertDialog.Builder(requireContext())
+        new AlertDialog.Builder(requireContext(), R.style.PlayerDialogTheme)
                 .setTitle(R.string.settings_subtitle_size)
                 .setSingleChoiceItems(labels, selected, (dialog, which) -> {
                     PlayerSettings.setSubtitleSizeIndex(requireContext(), which);
@@ -233,7 +363,7 @@ public class SettingsFragment extends Fragment {
                 getString(R.string.player_engine_media3),
                 getString(R.string.player_engine_mpv)
         };
-        new AlertDialog.Builder(requireContext())
+        new AlertDialog.Builder(requireContext(), R.style.PlayerDialogTheme)
                 .setTitle(R.string.settings_engine)
                 .setSingleChoiceItems(labels, current.ordinal(), (dialog, which) -> {
                     PlayerSettings.setEngine(requireContext(), PlayerEngineType.values()[which]);
@@ -255,7 +385,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void confirmClearHistory() {
-        new AlertDialog.Builder(requireContext())
+        new AlertDialog.Builder(requireContext(), R.style.PlayerDialogTheme)
                 .setTitle(R.string.settings_clear_history)
                 .setMessage(R.string.settings_clear_history_confirm)
                 .setNegativeButton(android.R.string.cancel, null)
@@ -290,15 +420,6 @@ public class SettingsFragment extends Fragment {
         Dialog dialog = new Dialog(requireContext());
         dialog.setContentView(R.layout.dialog_playback_credits);
 
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent
-            );
-
-            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.90f);
-            dialog.getWindow().setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT
-            );
-        }
-
         TextView linkMpvAndroid = dialog.findViewById(R.id.linkMpvAndroid);
         TextView linkMpvEngine = dialog.findViewById(R.id.linkMpvEngine);
         Button btnClose = dialog.findViewById(R.id.btnCloseCredits);
@@ -317,13 +438,26 @@ public class SettingsFragment extends Fragment {
 
         btnClose.setOnClickListener(v -> dialog.dismiss());
 
+        // Show dialog once
         dialog.show();
 
-        if (dialog.getWindow() != null) {
-            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.90f);
+        Window window = dialog.getWindow();
 
-            dialog.getWindow().setLayout(
-                    width, WindowManager.LayoutParams.WRAP_CONTENT
+        if (window != null) {
+            window.setBackgroundDrawableResource(android.R.color.transparent);
+
+            boolean isTV = DeviceUtils.isTv(requireContext());
+
+            float density = getResources().getDisplayMetrics().density;
+            int screenWidth = getResources().getDisplayMetrics().widthPixels;
+
+            int width = isTV
+                    ? (int) (480 * density)
+                    : (int) (screenWidth * 0.90f);
+
+            window.setLayout(
+                    Math.min(width, screenWidth - (int) (48 * density)),
+                    WindowManager.LayoutParams.WRAP_CONTENT
             );
         }
     }

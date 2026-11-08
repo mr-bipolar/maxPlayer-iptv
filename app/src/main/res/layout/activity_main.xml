@@ -5,6 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:background="@drawable/bg_primary_background"
     tools:context=".MainActivity">
 
@@ -91,39 +93,20 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
+        app:layout_constraintBottom_toBottomOf="@id/customBottomBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/materialToolbar"
         app:navGraph="@navigation/nav_graph" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
+    <include
+        android:id="@+id/customBottomBar"
+        layout="@layout/view_custom_bottom_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/space_16"
-        android:layout_marginEnd="@dimen/space_16"
-        android:layout_marginBottom="@dimen/space_12"
-        android:background="@drawable/bg_nav_bar"
-        android:elevation="6dp"
-        app:itemBackground="@drawable/bg_bottom_nav_item"
-        android:paddingStart="@dimen/space_6"
-        android:paddingEnd="@dimen/space_6"
-        android:paddingTop="@dimen/space_6"
-        android:paddingBottom="@dimen/space_6"
-        app:itemActiveIndicatorStyle="@null"
-        app:itemIconSize="@dimen/space_20"
-        app:itemIconTint="@color/nav_item_icon_colors"
-        app:itemRippleColor="@null"
-        app:itemTextColor="@color/nav_item_colors"
-        app:labelVisibilityMode="labeled"
-        app:paddingBottomSystemWindowInsets="false"
-        app:paddingTopSystemWindowInsets="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
-
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

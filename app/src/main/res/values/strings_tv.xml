@@ -55,6 +55,11 @@
     <string name="tv_voice_search">Voice search</string>
     <string name="tv_search_channels">Channels</string>
 
+    <!-- TV: search screen -->
+    <string name="tv_search_hint">Search channels, playlists…</string>
+    <string name="tv_search_prompt_title">Search everything</string>
+    <string name="tv_search_prompt_body">Type to search across all your channels and playlists.</string>
+
     <!-- TV: settings -->
     <string name="tv_cat_playback">Playback</string>
     <string name="tv_cat_subtitles">Subtitles</string>

@@ -174,5 +174,49 @@
         android:stateListAnimator="@animator/tv_focus_scale_sm"
         app:tint="@color/ink_dim" />
 
+    <!-- Full-screen empty state shown when ALL sections are empty -->
+    <LinearLayout
+        android:id="@+id/exploreEmptyView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="48dp"
+        android:paddingEnd="48dp"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@drawable/bg_card_lg"
+            android:elevation="2dp"
+            android:layout_marginBottom="16dp">
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_playlist_empty"
+                app:tint="@color/accent" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/explore_empty_title"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_text_row_title"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/explore_empty_body"
+            android:textColor="@color/white_alpha_55"
+            android:textSize="@dimen/tv_text_body"
+            android:gravity="center"
+            android:layout_marginTop="8dp"
+            android:maxWidth="400dp" />
+    </LinearLayout>
 
 </FrameLayout>

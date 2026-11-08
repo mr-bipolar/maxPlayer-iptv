@@ -22,6 +22,7 @@ import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
 import com.aaronmaxlab.maxplayer.database.adapter.LocalDbCategoryAdapter;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbCategory;
 import com.aaronmaxlab.maxplayer.databinding.FragmentPlaylistsBinding;
+import com.aaronmaxlab.maxplayer.player.media3.audio.AudioMiniPlayer;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 
@@ -36,6 +37,7 @@ public class PlaylistsFragment extends Fragment {
     private SqlDbHelper sqlDbHelper;
     private Integer spanCount = 1;
     private RecyclerView recyclerView;
+    private AudioMiniPlayer audioMiniPlayer;
 
     public PlaylistsFragment() {
         // Required empty public constructor
@@ -54,6 +56,12 @@ public class PlaylistsFragment extends Fragment {
         binding = FragmentPlaylistsBinding.inflate(inflater, container, false);
         recyclerView = binding.categoryRecyclerView;
         sqlDbHelper = new SqlDbHelper(getContext());
+
+        audioMiniPlayer = new AudioMiniPlayer(
+                requireActivity(),
+                binding.getRoot().findViewById(R.id.audioPlayerOverlay)
+        );
+        audioMiniPlayer.attach();
 
         spanChange();
         setupCategories();
@@ -75,10 +83,8 @@ public class PlaylistsFragment extends Fragment {
         ClickUtils.applyTouchEffect(binding.sortBtn, view -> showCategorySort());
         ClickUtils.applyTouchEffect(binding.gridView, view -> spanChange());
         ClickUtils.applyTouchEffect(binding.listView, view -> spanChange());
-        if (binding.btnAddPlaylist != null) {
-            ClickUtils.applyTouchEffect(binding.btnAddPlaylist, view ->
-                    startActivity(new Intent(getContext(), com.aaronmaxlab.maxplayer.AddPlaylistActivity.class)));
-        }
+        ClickUtils.applyTouchEffect(binding.btnAddPlaylist, view ->
+                startActivity(new Intent(getContext(), com.aaronmaxlab.maxplayer.AddPlaylistActivity.class)));
 
         return binding.getRoot();
     }
@@ -214,6 +220,10 @@ public class PlaylistsFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        if (audioMiniPlayer != null) {
+            audioMiniPlayer.release();
+            audioMiniPlayer = null;
+        }
         sqlDbHelper.close();
         super.onDestroy();
     }

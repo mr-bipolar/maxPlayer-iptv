@@ -284,7 +284,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/line_soft" />
 
         <LinearLayout
             android:layout_width="match_parent"

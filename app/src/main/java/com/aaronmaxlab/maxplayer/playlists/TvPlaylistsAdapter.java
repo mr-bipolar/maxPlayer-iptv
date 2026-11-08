@@ -1,3 +1,4 @@
+
 package com.aaronmaxlab.maxplayer.playlists;
 
 import android.view.LayoutInflater;
@@ -37,13 +38,16 @@ public class TvPlaylistsAdapter extends RecyclerView.Adapter<TvPlaylistsAdapter.
 
     public void submitList(List<LocalDbPlaylist> list) {
         items.clear();
+
         if (list != null) {
             for (LocalDbPlaylist p : list) {
-                if (p != null && p.getPlaylistUrl() != null && !p.getPlaylistUrl().trim().isEmpty()) {
+                if (p != null && p.getPlaylistUrl() != null
+                        && !p.getPlaylistUrl().trim().isEmpty()) {
                     items.add(p);
                 }
             }
         }
+
         notifyDataSetChanged();
     }
 
@@ -72,35 +76,67 @@ public class TvPlaylistsAdapter extends RecyclerView.Adapter<TvPlaylistsAdapter.
         holder.title.setText(UIUtils.toCapitalize(name));
 
         int count = Math.max(0, playlist.getPlaylistCount());
-        String channelCount = holder.itemView.getContext().getResources().getQuantityString(
-                R.plurals.playlist_channel_count, count, count);
-        String relativeTime = playlist.getCreatedAt() != null ? Playlist.getRelativeTime(playlist.getCreatedAt()) : "";
-        String subtitle = relativeTime.isEmpty() ? channelCount : channelCount + " • " + relativeTime;
+
+        String channelCount = holder.itemView.getContext().getResources()
+                .getQuantityString(R.plurals.playlist_channel_count, count, count);
+
+        String relativeTime = playlist.getCreatedAt() != null
+                ? Playlist.getRelativeTime(playlist.getCreatedAt())
+                : "";
+
+        String subtitle = relativeTime.isEmpty()
+                ? channelCount
+                : channelCount + " • " + relativeTime;
+
         holder.subtitle.setText(subtitle);
 
         PlaylistType type = detectType(playlist);
+
         switch (type) {
             case AUDIO:
                 holder.badge.setText("AUDIO");
-                holder.badge.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.blue));
+                holder.badge.setTextColor(ContextCompat.getColor(
+                        holder.itemView.getContext(), R.color.blue));
                 holder.icon.setImageResource(R.drawable.ic_radio);
                 break;
+
             case VOD:
                 holder.badge.setText("VOD");
-                holder.badge.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.primary_highlight));
+                holder.badge.setTextColor(ContextCompat.getColor(
+                        holder.itemView.getContext(), R.color.primary_highlight));
                 holder.icon.setImageResource(R.drawable.ic_play);
                 break;
+
             case LIVE:
             default:
                 holder.badge.setText("LIVE");
-                holder.badge.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.accent));
+                holder.badge.setTextColor(ContextCompat.getColor(
+                        holder.itemView.getContext(), R.color.accent));
                 holder.icon.setImageResource(R.drawable.ic_tv);
                 break;
         }
 
+        // Click listener
         ClickUtils.applyTouchEffect(holder.itemView, v -> {
             if (listener != null) {
                 listener.onPlaylistClick(playlist);
+            }
+        });
+
+        // Scroll focused item into view
+        holder.itemView.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                v.post(() -> {
+                    if (v.getParent() instanceof RecyclerView) {
+                        RecyclerView rv = (RecyclerView) v.getParent();
+
+                        android.graphics.Rect rect =
+                                new android.graphics.Rect();
+
+                        v.getDrawingRect(rect);
+                        rv.requestChildRectangleOnScreen(v, rect, false);
+                    }
+                });
             }
         });
     }
@@ -111,27 +147,38 @@ public class TvPlaylistsAdapter extends RecyclerView.Adapter<TvPlaylistsAdapter.
     }
 
     public static PlaylistType detectType(LocalDbPlaylist item) {
-        String name = item.getPlaylistName() != null ? item.getPlaylistName().toLowerCase(Locale.ROOT) : "";
-        String url = item.getPlaylistUrl() != null ? item.getPlaylistUrl().toLowerCase(Locale.ROOT) : "";
+        String name = item.getPlaylistName() != null
+                ? item.getPlaylistName().toLowerCase(Locale.ROOT)
+                : "";
 
-        if (name.contains("radio") || name.contains("music") || name.contains("audio")
-                || url.contains(".mp3") || url.contains(".aac") || url.contains(".ogg")) {
+        String url = item.getPlaylistUrl() != null
+                ? item.getPlaylistUrl().toLowerCase(Locale.ROOT)
+                : "";
+
+        if (name.contains("radio") || name.contains("music")
+                || name.contains("audio") || url.contains(".mp3")
+                || url.contains(".aac") || url.contains(".ogg")) {
             return PlaylistType.AUDIO;
         }
-        if (name.contains("vod") || name.contains("movie") || name.contains("series")
-                || name.contains("cinema") || name.contains("film")
-                || url.contains(".mp4") || url.contains(".mkv")) {
+
+        if (name.contains("vod") || name.contains("movie")
+                || name.contains("series") || name.contains("cinema")
+                || name.contains("film") || url.contains(".mp4")
+                || url.contains(".mkv")) {
             return PlaylistType.VOD;
         }
+
         return PlaylistType.LIVE;
     }
 
     static class Holder extends RecyclerView.ViewHolder {
+
         final ImageView icon;
         final TextView badge, title, subtitle;
 
         Holder(@NonNull View itemView) {
             super(itemView);
+
             icon = itemView.findViewById(R.id.cardIcon);
             badge = itemView.findViewById(R.id.cardTypeBadge);
             title = itemView.findViewById(R.id.cardTitle);

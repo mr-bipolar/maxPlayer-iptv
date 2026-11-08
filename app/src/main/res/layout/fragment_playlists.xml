@@ -184,7 +184,7 @@
                 android:clipToPadding="false"
                 android:paddingStart="18dp"
                 android:paddingEnd="18dp"
-                android:paddingBottom="16dp"
+                android:paddingBottom="@dimen/space_64"
                 android:overScrollMode="never"/>
 
             <ScrollView
@@ -280,7 +280,12 @@
             </ScrollView>
             </LinearLayout>
 
-
+    <include
+        android:id="@+id/audioPlayerOverlay"
+        layout="@layout/audio_bg_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
 
 </FrameLayout>

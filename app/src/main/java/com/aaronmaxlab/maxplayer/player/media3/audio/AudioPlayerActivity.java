@@ -43,11 +43,14 @@ import androidx.media3.session.SessionToken;
 import com.aaronmaxlab.maxplayer.PlayAudioStreamActivity;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbCategory;
+import com.aaronmaxlab.maxplayer.database.models.LocalDbChannel;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbHistory;
 import com.aaronmaxlab.maxplayer.databinding.ActivityAudioPlayerBinding;
 import com.aaronmaxlab.maxplayer.playlist.SaveChannelDialog;
 import com.aaronmaxlab.maxplayer.service.PlaybackService;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
+import com.aaronmaxlab.maxplayer.utils.AppUtils;
 import com.aaronmaxlab.maxplayer.utils.AudioUtils;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.PlaylistType;
@@ -88,9 +91,7 @@ public class AudioPlayerActivity extends AppCompatActivity {
     // ---- static categories
 
     private static final List<String> AUDIO_CATEGORIES =
-            new ArrayList<>(Arrays.asList(
-                    "Podcast",  "Radio", "Mp3"
-            ));
+            new ArrayList<>(Arrays.asList("Podcast", "Radio", "MP3"));
 
     private SqlDbHelper sqlDbHelper;
 
@@ -225,8 +226,22 @@ public class AudioPlayerActivity extends AppCompatActivity {
                 AUDIO_CATEGORIES, //  categories
                 null,
                 category -> {
-                    Toast.makeText(this, category, Toast.LENGTH_SHORT).show();
-                    // save streamUri + streamChannelName + category here
+                   try {
+                       int categoryId =  AppUtils.getCategoryIndex(category);
+
+                       if (categoryId == -1) return;
+
+                       LocalDbChannel dbChannel = new LocalDbChannel(streamChannelName, null, streamUri, categoryId);
+                       boolean result = sqlDbHelper.addChannel(dbChannel);
+
+                       if (result) {
+                           AppToast.success(this, "Channel added successfully");
+                       } else {
+                           AppToast.error(this, "Unable to add channel. Please try again.");
+                       }
+                   } catch (Exception e) {
+                       AppToast.error(this, e.toString());
+                   }
                 });
     }
 
