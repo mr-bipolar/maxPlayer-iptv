@@ -17,6 +17,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,22 +25,21 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.aaronmaxlab.maxplayer.MaxPlayerApplication;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.ThemePreferences;
-import com.aaronmaxlab.maxplayer.TvSectionActivity;
 import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
 import com.aaronmaxlab.maxplayer.keyboard.RemoteKeyboardActivity;
 import com.aaronmaxlab.maxplayer.keyboard.RemotePairingActivity;
 import com.aaronmaxlab.maxplayer.player.PlayerEngineType;
 import com.aaronmaxlab.maxplayer.player.PlayerSettings;
+import com.aaronmaxlab.maxplayer.remote.RemoteKeyController;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
+import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
 import com.aaronmaxlab.maxplayer.utils.ThemeTypography;
 
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -47,6 +47,7 @@ import java.util.concurrent.Executors;
 public class SettingsFragment extends Fragment {
     private final ExecutorService ioExecutor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private RemoteKeyController remoteKeys;
     private TextView themeSummary;
     private TextView engineSummary;
     private TextView subtitleSummary;
@@ -70,6 +71,11 @@ public class SettingsFragment extends Fragment {
         LinearLayout library = root.findViewById(R.id.settings_library_card);
         LinearLayout about = root.findViewById(R.id.settings_about_card);
 
+        backPress(root.findViewById(R.id.settings_back));
+        remoteKeys =
+                ((MaxPlayerApplication) requireContext().getApplicationContext())
+                        .getRemoteKeyController();
+
         populateAppearance(appearance);
         populatePlayer(player);
         populateLibrary(library, isTV);
@@ -85,6 +91,10 @@ public class SettingsFragment extends Fragment {
         updateRemoteSummary();
 
         return root;
+    }
+
+    private  void backPress(View view){
+        ClickUtils.applyTouchEffect(view, v -> requireActivity().finish());
     }
 
     private void populateAppearance(LinearLayout appearance) {
@@ -278,6 +288,10 @@ public class SettingsFragment extends Fragment {
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
         themeDialog.show();
+
+        remoteKeys.registerDialog(themeDialog);
+        themeDialog.setOnDismissListener(d -> remoteKeys.unregisterDialog(themeDialog));
+
     }
 
     private void addThemeOption(LinearLayout parent, String key, @StringRes int title,
@@ -346,32 +360,75 @@ public class SettingsFragment extends Fragment {
     private void showSubtitleSizePicker() {
         String[] labels = getResources().getStringArray(R.array.settings_subtitle_sizes);
         int selected = PlayerSettings.getSubtitleSizeIndex(requireContext());
-        new AlertDialog.Builder(requireContext(), R.style.PlayerDialogTheme)
+        AlertDialog dialog = new AlertDialog.Builder(
+                requireContext(),
+                R.style.PlayerDialogTheme
+        )
                 .setTitle(R.string.settings_subtitle_size)
-                .setSingleChoiceItems(labels, selected, (dialog, which) -> {
+                .setSingleChoiceItems(labels, selected, (d, which) -> {
                     PlayerSettings.setSubtitleSizeIndex(requireContext(), which);
                     updatePlayerSummaries();
-                    dialog.dismiss();
+                    d.dismiss();
                 })
                 .setNegativeButton(android.R.string.cancel, null)
-                .show();
+                .create();
+
+        dialog.show();
+
+        remoteKeys.registerDialog(dialog);
+        dialog.setOnDismissListener(d -> remoteKeys.unregisterDialog(dialog));
+
     }
 
     private void showEnginePicker() {
         PlayerEngineType current = PlayerSettings.getEngine(requireContext());
+
         CharSequence[] labels = {
                 getString(R.string.player_engine_media3),
                 getString(R.string.player_engine_mpv)
         };
-        new AlertDialog.Builder(requireContext(), R.style.PlayerDialogTheme)
+
+        AlertDialog dialog = new AlertDialog.Builder(
+                requireContext(),
+                R.style.PlayerDialogTheme)
                 .setTitle(R.string.settings_engine)
-                .setSingleChoiceItems(labels, current.ordinal(), (dialog, which) -> {
-                    PlayerSettings.setEngine(requireContext(), PlayerEngineType.values()[which]);
+                .setSingleChoiceItems(labels, current.ordinal(), (d, which) -> {
+                    PlayerSettings.setEngine(
+                            requireContext(),
+                            PlayerEngineType.values()[which]
+                    );
                     updatePlayerSummaries();
-                    dialog.dismiss();
+                    d.dismiss();
                 })
                 .setNegativeButton(android.R.string.cancel, null)
-                .show();
+                .create();
+
+        dialog.show();
+
+        ListView listView = dialog.getListView();
+        Button cancelButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+        if (listView != null && cancelButton != null) {
+            cancelButton.setFocusable(true);
+            cancelButton.setFocusableInTouchMode(true);
+
+            listView.setSelection(current.ordinal());
+
+            // Connect the last choice row to the Cancel button.
+            listView.post(() -> {
+                int lastPosition = listView.getCount() - 1;
+                int lastChildPosition = lastPosition - listView.getFirstVisiblePosition();
+
+                View lastRow = listView.getChildAt(lastChildPosition);
+
+                if (lastRow != null) {
+                    lastRow.setNextFocusDownId(cancelButton.getId());
+                }
+            });
+        }
+
+        remoteKeys.registerDialog(dialog);
+        dialog.setOnDismissListener(d -> remoteKeys.unregisterDialog(dialog));
     }
 
 
@@ -385,12 +442,26 @@ public class SettingsFragment extends Fragment {
     }
 
     private void confirmClearHistory() {
-        new AlertDialog.Builder(requireContext(), R.style.PlayerDialogTheme)
+        AlertDialog dialog = new AlertDialog.Builder(
+                requireContext(),
+                R.style.PlayerDialogTheme)
                 .setTitle(R.string.settings_clear_history)
                 .setMessage(R.string.settings_clear_history_confirm)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(R.string.settings_clear, (dialog, which) -> clearHistory())
-                .show();
+                .setPositiveButton(R.string.settings_clear, (d, which) -> clearHistory())
+                .create();
+
+        dialog.show();
+
+        Button cancelButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        if (cancelButton != null) {
+            cancelButton.setFocusable(true);
+            cancelButton.setFocusableInTouchMode(true);
+            cancelButton.requestFocus();
+        }
+
+        remoteKeys.registerDialog(dialog);
+        dialog.setOnDismissListener(d -> remoteKeys.unregisterDialog(dialog));
     }
 
     private void clearHistory() {
@@ -460,6 +531,9 @@ public class SettingsFragment extends Fragment {
                     WindowManager.LayoutParams.WRAP_CONTENT
             );
         }
+
+        remoteKeys.registerDialog(dialog);
+        dialog.setOnDismissListener(d -> remoteKeys.unregisterDialog(dialog));
     }
 
     private void openCreditUrl(String url) {

@@ -224,7 +224,10 @@ public class PlaylistsFragment extends Fragment {
             audioMiniPlayer.release();
             audioMiniPlayer = null;
         }
-        sqlDbHelper.close();
+        if (sqlDbHelper != null) {
+            sqlDbHelper.close();
+            sqlDbHelper = null;
+        }
         super.onDestroy();
     }
 }

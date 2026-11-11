@@ -174,6 +174,10 @@ public class HistoryFragment extends Fragment {
             audioMiniPlayer.release();
             audioMiniPlayer = null;
         }
+        if (dbHelper != null) {
+            dbHelper.close();
+            dbHelper = null;
+        }
         networkExecutor.shutdownNow();
         super.onDestroy();
     }
@@ -189,7 +193,6 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         if (binding != null && dbHelper != null && historyAdapter != null) {
             loadHistory();
         }
@@ -197,14 +200,11 @@ public class HistoryFragment extends Fragment {
 
     private void loadHistory() {
         if (binding == null || dbHelper == null || historyAdapter == null) {
-
             return;
         }
 
         List<LocalDbHistory> history = dbHelper.getAllHistory();
-
         historyAdapter.submitList(history);
-
         boolean isEmpty = history.isEmpty();
         binding.layoutHistoryEmpty.getRoot()
                 .setVisibility(isEmpty ? View.VISIBLE : View.GONE);

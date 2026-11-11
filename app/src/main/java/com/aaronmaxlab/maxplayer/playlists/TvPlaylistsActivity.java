@@ -20,10 +20,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aaronmaxlab.maxplayer.AddPlaylistActivity;
+import com.aaronmaxlab.maxplayer.MaxPlayerApplication;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbPlaylist;
 import com.aaronmaxlab.maxplayer.player.PlayerActivity;
+import com.aaronmaxlab.maxplayer.remote.RemoteKeyController;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.AppUtils;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
@@ -45,16 +47,15 @@ public class TvPlaylistsActivity extends AppCompatActivity {
     private View emptyView;
     private TextView errorView;
     private TextView countView;
-    private View btnAddPlaylist;
-    private ImageButton backBtn;
 
     private volatile boolean destroyed;
+    private RemoteKeyController remoteKeys;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tv_playlists);
-
+        remoteKeys = ((MaxPlayerApplication) getApplication()).getRemoteKeyController();
         db = new SqlDbHelper(getApplicationContext());
 
         grid = findViewById(R.id.tvPlaylistsGrid);
@@ -62,8 +63,8 @@ public class TvPlaylistsActivity extends AppCompatActivity {
         emptyView = findViewById(R.id.tvPlaylistsEmptyView);
         errorView = findViewById(R.id.tvPlaylistsErrorView);
         countView = findViewById(R.id.tvPlaylistsCount);
-        btnAddPlaylist = findViewById(R.id.tvBtnAddPlaylist);
-        backBtn = findViewById(R.id.backButton);
+        View btnAddPlaylist = findViewById(R.id.tvBtnAddPlaylist);
+        ImageButton backBtn = findViewById(R.id.backButton);
 
         ClickUtils.applyTouchEffect(backBtn, v -> finish());
 
@@ -163,12 +164,15 @@ public class TvPlaylistsActivity extends AppCompatActivity {
 
         dialog.show();
 
+        remoteKeys.registerDialog(dialog);
+        dialog.setOnDismissListener(d -> remoteKeys.unregisterDialog(dialog));
+
         Window window = dialog.getWindow();
         if (window != null) {
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        actionPrimary.post(() -> actionPrimary.requestFocus());
+        actionPrimary.post(actionPrimary::requestFocus);
     }
 
     private void showEditTvPlaylistDialog(LocalDbPlaylist playlist) {
@@ -238,12 +242,15 @@ public class TvPlaylistsActivity extends AppCompatActivity {
 
         dialog.show();
 
+        remoteKeys.registerDialog(dialog);
+        dialog.setOnDismissListener(d -> remoteKeys.unregisterDialog(dialog));
+
         Window window = dialog.getWindow();
         if (window != null) {
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        nameInput.post(() -> nameInput.requestFocus());
+        nameInput.post(nameInput::requestFocus);
     }
 
     @Override

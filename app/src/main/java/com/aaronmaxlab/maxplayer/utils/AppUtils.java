@@ -3,7 +3,9 @@ package com.aaronmaxlab.maxplayer.utils;
 import androidx.appcompat.app.AlertDialog;
 import android.content.Context;
 
+import com.aaronmaxlab.maxplayer.MaxPlayerApplication;
 import com.aaronmaxlab.maxplayer.R;
+import com.aaronmaxlab.maxplayer.remote.RemoteKeyController;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,12 +20,36 @@ public class AppUtils {
     ) {
         if (context == null) return;
 
-        new AlertDialog.Builder(context, R.style.PlayerDialogTheme)
+        AlertDialog dialog = new AlertDialog.Builder(
+                context,
+                R.style.PlayerDialogTheme
+        )
                 .setTitle("Delete item?")
                 .setMessage("Are you sure you want to delete \"" + itemName + "\"?")
-                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                .setPositiveButton("Delete", (dialog, which) -> onConfirm.run())
-                .show();
+                .setNegativeButton("Cancel", (d, which) -> d.dismiss())
+                .setPositiveButton("Delete", (d, which) -> {
+                    if (onConfirm != null) {
+                        onConfirm.run();
+                    }
+                })
+                .create();
+
+        RemoteKeyController remoteKeys =
+                ((MaxPlayerApplication) context.getApplicationContext())
+                        .getRemoteKeyController();
+
+        dialog.setOnDismissListener(d ->
+                remoteKeys.unregisterDialog(dialog)
+        );
+
+        dialog.show();
+
+        if (DeviceUtils.isTv(context)) {
+            remoteKeys.registerDialog(dialog);
+
+            // Default focus on Cancel to avoid accidental deletion.
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).requestFocus();
+        }
     }
 
     public static List<String> showCategories(){

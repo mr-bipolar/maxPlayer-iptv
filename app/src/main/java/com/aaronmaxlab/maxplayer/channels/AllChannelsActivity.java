@@ -18,12 +18,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aaronmaxlab.maxplayer.MaxPlayerApplication;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
 import com.aaronmaxlab.maxplayer.database.adapter.ChannelGridAdapter;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbChannel;
 import com.aaronmaxlab.maxplayer.player.PlayerActivity;
 import com.aaronmaxlab.maxplayer.playlist.SaveChannelDialog;
+import com.aaronmaxlab.maxplayer.remote.RemoteKeyController;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.AppUtils;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
@@ -45,11 +47,12 @@ public class AllChannelsActivity extends AppCompatActivity {
     private volatile boolean destroyed;
 
     private static final List<String> IPTV_CATEGORIES = AppUtils.showCategories();
+    private RemoteKeyController remoteKeys;
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_all_channels);
-
+        remoteKeys = ((MaxPlayerApplication) getApplication()).getRemoteKeyController();
         db = new SqlDbHelper(getApplicationContext());
 
         grid = findViewById(R.id.channelGrid);
@@ -72,7 +75,6 @@ public class AllChannelsActivity extends AppCompatActivity {
     }
 
     private void showTvChannelActions(LocalDbChannel channel) {
-        android.util.Log.d("MaxPlayerTest", "showTvChannelActions called for: " + (channel != null ? channel.getChannelName() : "null"));
         if (channel == null || isFinishing() || isDestroyed()) return;
 
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_tv_actions, null);
@@ -105,7 +107,6 @@ public class AllChannelsActivity extends AppCompatActivity {
         actionDeleteText.setText("Delete Channel");
 
         ClickUtils.applyTouchEffect(actionPrimary, v -> {
-            android.util.Log.d("MaxPlayerTest", "actionPrimary clicked (Play Stream)");
             dialog.dismiss();
             String url = channel.getChannelUrl();
             if (url != null && !url.trim().isEmpty()) {
@@ -140,12 +141,15 @@ public class AllChannelsActivity extends AppCompatActivity {
 
         dialog.show();
 
+        remoteKeys.registerDialog(dialog);
+        dialog.setOnDismissListener(d -> remoteKeys.unregisterDialog(dialog));
+
         Window window = dialog.getWindow();
         if (window != null) {
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        actionPrimary.post(() -> actionPrimary.requestFocus());
+        actionPrimary.post(actionPrimary::requestFocus);
     }
 
     private void showTvEditChannelDialog(LocalDbChannel channel) {
@@ -235,12 +239,15 @@ public class AllChannelsActivity extends AppCompatActivity {
 
         dialog.show();
 
+        remoteKeys.registerDialog(dialog);
+        dialog.setOnDismissListener(d -> remoteKeys.unregisterDialog(dialog));
+
         Window window = dialog.getWindow();
         if (window != null) {
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        channelName.post(() -> channelName.requestFocus());
+        channelName.post(channelName::requestFocus);
     }
 
     private void loadChannels() {

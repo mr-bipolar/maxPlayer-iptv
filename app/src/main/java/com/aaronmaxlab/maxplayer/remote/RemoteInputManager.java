@@ -216,13 +216,8 @@ public class RemoteInputManager {
     }
 
     private void notifyListener(java.util.function.Consumer<Listener> action) {
-
         Listener currentListener;
-
-        synchronized (this) {
-            currentListener = listener;
-        }
-
+        synchronized (this) {currentListener = listener;}
         if (currentListener != null) {
             action.accept(currentListener);
         }

@@ -60,7 +60,30 @@
                     android:importantForAccessibility="no"
                     android:layout_gravity="center"
                     />
+
+
+                <ImageView
+                    android:id="@+id/btnRestartQr"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_restart"
+                    android:background="@drawable/bg_pill_accent"
+                    android:padding="12dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:contentDescription="Restart QR code"
+                    android:elevation="4dp"
+                    android:visibility="gone"
+                    android:nextFocusUp="@id/backQrBtn"
+                    android:nextFocusDown="@id/copyKeyboardOut"
+                    android:stateListAnimator="@animator/tv_focus_scale_sm"
+                    app:tint="@color/ink" />
+
+
             </FrameLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

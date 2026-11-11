@@ -9,6 +9,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +30,7 @@ import com.aaronmaxlab.maxplayer.player.PlayerActivity;
 import com.aaronmaxlab.maxplayer.player.media3.audio.AudioMiniPlayer;
 import com.aaronmaxlab.maxplayer.player.media3.audio.AudioPlayerActivity;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
+import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.PlaylistType;
 import com.aaronmaxlab.maxplayer.utils.StreamLauncher;
 import com.aaronmaxlab.maxplayer.utils.UrlUtils;
@@ -68,13 +71,12 @@ public class FavoritesFragment extends Fragment {
         );
         audioMiniPlayer.attach();
 
-        com.aaronmaxlab.maxplayer.utils.ClickUtils.applyTouchEffect(binding.browsePlaylists, v -> {
+        ClickUtils.applyTouchEffect(binding.browsePlaylists, v -> {
             if (getActivity() != null) {
-                com.google.android.material.bottomnavigation.BottomNavigationView nav =
-                        getActivity().findViewById(R.id.customBottomBar);
-                if (nav != null) {
-                    nav.setSelectedItemId(R.id.navPlaylists);
-                }
+                NavController navController =
+                        NavHostFragment.findNavController(this);
+
+                navController.navigate(R.id.navPlaylists);
             }
         });
 
@@ -92,6 +94,10 @@ public class FavoritesFragment extends Fragment {
         if (audioMiniPlayer != null) {
             audioMiniPlayer.release();
             audioMiniPlayer = null;
+        }
+        if (sqlDbHelper != null) {
+            sqlDbHelper.close();
+            sqlDbHelper = null;
         }
         binding = null;
         super.onDestroy();
@@ -129,6 +135,8 @@ public class FavoritesFragment extends Fragment {
                                     .putExtra(EXTRA_STREAM_NAME, item.getFavName()));
 
                         } else if (type.contains(PlaylistType.VOD.name())) {
+                            StreamLauncher.launch(requireContext(), item.getFavUrl(), item.getFavName());
+                        }else{
                             StreamLauncher.launch(requireContext(), item.getFavUrl(), item.getFavName());
                         }
                     }

@@ -33,6 +33,7 @@ import com.aaronmaxlab.maxplayer.utils.StreamLauncher;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -52,18 +53,12 @@ public class ExploreActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-
         binding = ActivityExploreBinding.inflate(getLayoutInflater());
-
         setContentView(binding.getRoot());
         UIUtils.applySystemBarPadding(binding.getRoot(), false);
-
         sqlDbHelper = new SqlDbHelper(this);
-
         isTv = DeviceUtils.isTv(this);
-
         setupTvRows();
-
         ClickUtils.applyTouchEffect(binding.backExploreBtn, view -> finish());
     }
 
@@ -75,7 +70,10 @@ public class ExploreActivity extends AppCompatActivity {
 
     @Override protected void onDestroy() {
         tvDataExecutor.shutdownNow();
-        if (sqlDbHelper != null) sqlDbHelper.close();
+        if (sqlDbHelper != null) {
+            sqlDbHelper.close();
+            sqlDbHelper = null;
+        }
         binding = null;
         super.onDestroy();
     }
@@ -157,17 +155,17 @@ public class ExploreActivity extends AppCompatActivity {
                 binding.tvPlaylistRecyclerEmpty.setVisibility(View.GONE);
                 binding.tvCategoryRecyclerEmpty.setVisibility(View.GONE);
                 boolean allEmpty = history.isEmpty() && playlists.isEmpty() && categories.isEmpty();
-                if (binding.exploreEmptyView != null) {
-                    binding.exploreEmptyView.setVisibility(allEmpty ? View.VISIBLE : View.GONE);
-                }
+                binding.exploreEmptyView.setVisibility(allEmpty ? View.VISIBLE : View.GONE);
                 if (focusedRow != null && focusedPosition != RecyclerView.NO_POSITION) {
                     RecyclerView restoreRow = focusedRow;
                     int restorePosition = focusedPosition;
                     restoreRow.post(() -> {
-                        if (binding != null && !binding.getRoot().hasFocus()
-                                && restorePosition < restoreRow.getAdapter().getItemCount()
-                                && restoreRow.findViewHolderForAdapterPosition(restorePosition) != null) {
-                            restoreRow.findViewHolderForAdapterPosition(restorePosition).itemView.requestFocus();
+                        if (binding != null && !binding.getRoot().hasFocus()) {
+                            assert restoreRow.getAdapter() != null;
+                            if (restorePosition < restoreRow.getAdapter().getItemCount()
+                                    && restoreRow.findViewHolderForAdapterPosition(restorePosition) != null) {
+                                Objects.requireNonNull(restoreRow.findViewHolderForAdapterPosition(restorePosition)).itemView.requestFocus();
+                            }
                         }
                     });
                 }

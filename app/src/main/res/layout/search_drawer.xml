@@ -66,7 +66,8 @@
         android:layout_height="wrap_content"
         android:clipToPadding="false"
         android:overScrollMode="never"
-        android:paddingBottom="12dp"
+        android:paddingHorizontal="@dimen/space_12"
+        android:paddingBottom="@dimen/space_12"
         android:scrollbars="vertical"
         />
 

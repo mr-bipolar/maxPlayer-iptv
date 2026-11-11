@@ -106,8 +106,6 @@ public class HomeFragment extends Fragment {
                             anchor.getContext(),
                             R.style.PlayerPopupMenuTheme
                     );
-
-                    android.util.Log.d("MaxPlayer", "Opening playlist menu for: " + playlist.getPlaylistName());
                     PopupMenu popupMenu = new PopupMenu(themedContext, anchor);
                     popupMenu.setGravity(android.view.Gravity.END);
                     popupMenu.getMenu().add(0, 1, 0, "Edit");

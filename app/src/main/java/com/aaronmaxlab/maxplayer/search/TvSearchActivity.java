@@ -221,8 +221,8 @@ public class TvSearchActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         executor.shutdownNow();
         if (db != null) db.close();
+        super.onDestroy();
     }
 }

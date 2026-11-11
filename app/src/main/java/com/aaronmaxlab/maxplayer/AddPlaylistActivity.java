@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResult;
@@ -44,7 +42,7 @@ public class AddPlaylistActivity extends AppCompatActivity {
     private static final String EXTRA_PLAYLIST_FILE_NAME = "playlist_file_name";
 
 
-    /** Launchers must be registered before the Activity is STARTED; field initialisers guarantee that. */
+    /** Launchers must be registered before the Activity is STARTED; */
     private final ActivityResultLauncher<Intent> mediaBrowserLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::onMediaBrowserResult);
 
@@ -61,26 +59,21 @@ public class AddPlaylistActivity extends AppCompatActivity {
         ActivityAddPlaylistBinding binding = ActivityAddPlaylistBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        final boolean isTv = DeviceUtils.isTv(this);
+
         UIUtils.setLightNavigationBars(this, false);
         UIUtils.applySystemBarPadding(binding.getRoot());
 
-        final boolean isTv = DeviceUtils.isTv(this);
-
-        // Back (the system back button already finishes the Activity, no extra callback needed)
+        // Back press
         ClickUtils.applyTouchEffect(binding.backAddPlaylist, v -> finish());
-
-
         ClickUtils.applyTouchEffect(binding.buttonOpenFile,
                 v -> playlistPickerLauncher.launch(PLAYLIST_MIME_TYPES));
-
         // URL screens
         openOnClick(binding.buttonOpenPlaylistUrl, AddPlaylistUrlActivity.class);
         openOnClick(binding.buttonOpenVideoUrl, PlayVideoUrlActivity.class);
-
         // File / folder pickers
         ClickUtils.applyTouchEffect(binding.buttonOpenFolder,
                 v -> mediaBrowserLauncher.launch(new Intent(this, MediaBrowserActivity.class)));
-
 
         if(!isTv){
             assert binding.buttonOpenAudioStream != null;

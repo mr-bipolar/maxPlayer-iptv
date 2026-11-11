@@ -5,8 +5,10 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -60,7 +62,6 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
         UIUtils.applySystemBarPadding(binding.getRoot());
 
         sqlDbHelper = new SqlDbHelper(this);
-
         final boolean isTv = DeviceUtils.isTv(this);
 
         binding.errorCard.setVisibility(INVISIBLE);
@@ -69,17 +70,9 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
         ClickUtils.applyTouchEffect(binding.openPlaylistStream, v -> onOpenStreamClicked());
 
         if(isTv){
-
-            MaxPlayerApplication app =
-                    (MaxPlayerApplication) getApplication();
-
+            MaxPlayerApplication app = (MaxPlayerApplication) getApplication();
             remoteInputController = app.getRemoteInputController();
-
-            remoteInputController.registerInputs(
-                    binding.inputPlaylistUrl,
-                    binding.inputPlaylistName
-            );
-
+            remoteInputController.registerInputs(binding.inputPlaylistUrl, binding.inputPlaylistName);
         }else{
             assert binding.btnFavorite != null;
             ClickUtils.applyTouchEffect(binding.btnFavorite, v -> onAddFavorite());
@@ -96,6 +89,11 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
                     binding.inputPlaylistUrl,
                     binding.inputPlaylistName
             );
+        }
+
+        if (sqlDbHelper != null) {
+            sqlDbHelper.close();
+            sqlDbHelper = null;
         }
 
         super.onDestroy();
@@ -135,6 +133,7 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void onOpenStreamClicked() {
         if (loadedPlaylistUrl == null) {

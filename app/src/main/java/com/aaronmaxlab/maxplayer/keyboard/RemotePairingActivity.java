@@ -51,6 +51,7 @@ public class RemotePairingActivity extends AppCompatActivity {
         String ip = NetworkUtils.getLocalIpv4Address(this);
 
         if (ip == null) {
+            binding.btnRestartQr.setVisibility(View.VISIBLE);
             AppToast.error(this, "Unable to detect TV IP address");
             return;
         }
@@ -66,7 +67,9 @@ public class RemotePairingActivity extends AppCompatActivity {
                 remoteInputManager.isClientConnected()
         );
 
-        setupKeyboardActions();
+        ClickUtils.applyTouchEffect(binding.btnRestartQr, v -> regenerateQr());
+
+       setupKeyboardActions();
     }
 
     @Override
@@ -78,6 +81,32 @@ public class RemotePairingActivity extends AppCompatActivity {
         binding = null;
 
         super.onDestroy();
+    }
+
+
+    private void regenerateQr() {
+        if (binding == null || remoteInputManager == null) {
+            return;
+        }
+
+        try {
+            String payload = remoteInputManager.getQrPayload();
+
+            if (payload == null || payload.trim().isEmpty()) {
+                AppToast.warning(this, "Pairing session is not ready");
+                return;
+            }
+
+            Bitmap qrBitmap = QrCodeManager.generateQrCode(payload, 400);
+            binding.ivPairingQr.setImageBitmap(qrBitmap);
+            binding.btnRestartQr.setVisibility(View.GONE);
+
+            Log.d("REMOTE", "QR code generated successfully");
+
+        } catch (Exception e) {
+            AppToast.error(this, "QR generation failed");
+            Log.e("REMOTE", "QR generation failed", e);
+        }
     }
 
 
@@ -119,17 +148,32 @@ public class RemotePairingActivity extends AppCompatActivity {
 
 
     private void onServerStarted(int port) {
-
         runOnUiThread(() -> {
+            if (binding == null || remoteInputManager == null) {
+                return;
+            }
 
             try {
                 String payload = remoteInputManager.getQrPayload();
-                if (payload == null || binding == null) {return;}
+
+                if (payload == null || payload.trim().isEmpty()) {
+                    throw new IllegalStateException("QR payload is empty");
+                }
+
                 Bitmap qrBitmap = QrCodeManager.generateQrCode(payload, 400);
+
                 binding.ivPairingQr.setImageBitmap(qrBitmap);
+                binding.btnRestartQr.setVisibility(View.GONE);
+                Log.d("QR_DEBUG", "QR generated successfully");
+
             } catch (Exception e) {
+                binding.btnRestartQr.setVisibility(View.VISIBLE);
+                binding.btnRestartQr.setFocusable(true);
+                binding.btnRestartQr.setFocusableInTouchMode(true);
+                binding.btnRestartQr.post(() -> binding.btnRestartQr.requestFocus());
+
+                Log.e("QR_DEBUG", "QR generation failed", e);
                 AppToast.error(this, "QR generation failed");
-                Log.e("REMOTE", "QR generation failed", e);
             }
         });
     }

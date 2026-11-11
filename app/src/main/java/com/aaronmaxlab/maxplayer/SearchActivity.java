@@ -15,12 +15,12 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
 import com.aaronmaxlab.maxplayer.database.adapter.LocalDbChannelAdapter;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbChannel;
+import com.aaronmaxlab.maxplayer.databinding.ActivitySearchBinding;
 import com.aaronmaxlab.maxplayer.player.media3.audio.AudioPlayerActivity;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.StreamLauncher;
@@ -36,6 +36,7 @@ public class SearchActivity extends AppCompatActivity {
 
     private static final int DEBOUNCE_MS = 300;
 
+    private ActivitySearchBinding binding;
     private SqlDbHelper db;
     private LocalDbChannelAdapter adapter;
 
@@ -57,20 +58,21 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
-
-        UIUtils.applySystemBarPadding(findViewById(R.id.searchBackBtn).getRootView(), false);
+        binding = ActivitySearchBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        UIUtils.setLightNavigationBars(this, false);
+        UIUtils.applySystemBarPadding(binding.getRoot(), false);
 
         db = new SqlDbHelper(this);
 
-        searchInput = findViewById(R.id.searchInput);
-        clearBtn = findViewById(R.id.searchClearBtn);
-        recyclerView = findViewById(R.id.searchRecyclerView);
-        loading = findViewById(R.id.searchLoading);
-        promptView = findViewById(R.id.searchPromptView);
-        emptyView = findViewById(R.id.searchEmptyView);
-        emptyBody = findViewById(R.id.searchEmptyBody);
-        errorView = findViewById(R.id.searchErrorView);
+        searchInput = binding.searchInput;
+        clearBtn = binding.searchClearBtn;
+        recyclerView = binding.searchRecyclerView;
+        loading = binding.searchLoading;
+        promptView = binding.searchPromptView;
+        emptyView = binding.searchEmptyView;
+        emptyBody = binding.searchEmptyBody;
+        errorView = binding.searchErrorView;
 
         // Back button
         ClickUtils.applyTouchEffect(findViewById(R.id.searchBackBtn), v -> finish());
@@ -250,8 +252,9 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         executor.shutdownNow();
         if (db != null) db.close();
+        binding = null;
+        super.onDestroy();
     }
 }

@@ -1,210 +1,252 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg">
+    android:orientation="vertical"
+    android:background="@drawable/bg_primary_background"
+    android:paddingStart="@dimen/space_24"
+    android:paddingEnd="@dimen/space_24"
+    android:paddingBottom="@dimen/space_24">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/bg_tv_plain" />
-
+    <!-- HEADER -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="100dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <!-- LEFT TAB NAVIGATION -->
-        <LinearLayout
-            android:layout_width="230dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:background="@drawable/bg_tv_settings_nav"
-            android:paddingTop="16dp">
+        <ImageButton
+            android:id="@+id/settings_back"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_tv_btn_ghost"
+            android:contentDescription="@string/cd_back"
+            android:focusable="true"
+            android:src="@drawable/ic_back"
+            android:stateListAnimator="@animator/tv_focus_scale_sm" />
 
-            <!-- Appearance tab -->
-            <TextView
-                android:id="@+id/tabAppearance"
-                style="@style/TvSettingsTab"
-                android:text="@string/settings_section_appearance"
-                android:drawableStart="@drawable/ic_theme"
-                android:focusable="true"
-                android:clickable="true"
-                android:background="@drawable/bg_tv_settings_cat_selector" />
-
-            <!-- Player tab -->
-            <TextView
-                android:id="@+id/tabPlayer"
-                style="@style/TvSettingsTab"
-                android:text="@string/settings_section_player"
-                android:focusable="true"
-                android:clickable="true"
-                android:background="@drawable/bg_tv_settings_cat_selector"
-                android:drawableStart="@drawable/ic_play" />
-
-            <!-- Library tab -->
-            <TextView
-                android:id="@+id/tabLibrary"
-                style="@style/TvSettingsTab"
-                android:text="@string/settings_section_library_remote"
-                android:focusable="true"
-                android:clickable="true"
-                android:background="@drawable/bg_tv_settings_cat_selector"
-                android:drawableStart="@drawable/ic_retry" />
-
-            <!-- About tab -->
-            <TextView
-                android:id="@+id/tabAbout"
-                style="@style/TvSettingsTab"
-                android:text="@string/settings_section_about"
-                android:focusable="true"
-                android:clickable="true"
-                android:background="@drawable/bg_tv_settings_cat_selector"
-                android:drawableStart="@drawable/ic_info" />
-
-        </LinearLayout>
-
-        <!-- RIGHT CONTENT -->
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:paddingStart="36dp"
-            android:paddingEnd="48dp"
-            android:paddingTop="36dp"
-            android:paddingBottom="28dp">
-
-            <!-- APPEARANCE CONTENT -->
-            <ScrollView
-                android:id="@+id/contentAppearance"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fillViewport="true"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_section_appearance"
-                        android:textColor="@color/ink"
-                        android:textSize="26sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:layout_marginBottom="24dp"
-                        android:text="Customize your app appearance"
-                        android:textColor="@color/ink_dim"
-                        android:textSize="@dimen/tv_text_body" />
-
-                    <LinearLayout
-                        android:id="@+id/settings_appearance_card"
-                        style="@style/SettingsGlassCard"
-                        android:orientation="vertical" />
-
-                </LinearLayout>
-            </ScrollView>
-
-            <!-- PLAYER CONTENT -->
-            <ScrollView
-                android:id="@+id/contentPlayer"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                android:fillViewport="true"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_section_player"
-                        android:textColor="@color/ink"
-                        android:textSize="26sp"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:id="@+id/settings_player_card"
-                        style="@style/SettingsGlassCard"
-                        android:orientation="vertical" />
-
-                </LinearLayout>
-            </ScrollView>
-
-            <!-- LIBRARY CONTENT -->
-            <ScrollView
-                android:id="@+id/contentLibrary"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                android:fillViewport="true"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_section_library_remote"
-                        android:textColor="@color/ink"
-                        android:textSize="26sp"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:id="@+id/settings_library_card"
-                        style="@style/SettingsGlassCard"
-                        android:orientation="vertical" />
-
-                </LinearLayout>
-            </ScrollView>
-
-            <!-- ABOUT CONTENT -->
-            <ScrollView
-                android:id="@+id/contentAbout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                android:fillViewport="true"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_section_about"
-                        android:textColor="@color/ink"
-                        android:textSize="26sp"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:id="@+id/settings_about_card"
-                        style="@style/SettingsGlassCard"
-                        android:orientation="vertical" />
-
-                </LinearLayout>
-            </ScrollView>
-
-        </FrameLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:text="@string/settings_title"
+            android:textColor="@color/ink"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
-</FrameLayout>
+    <!-- MAIN SETTINGS CONTENT -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/bg">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_tv_plain" />
+
+        <!-- LEFT NAVIGATION + RIGHT CONTENT -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <!-- LEFT TAB NAVIGATION -->
+            <LinearLayout
+                android:layout_width="230dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="@drawable/bg_tv_settings_nav"
+                android:paddingTop="16dp">
+
+                <!-- APPEARANCE TAB -->
+                <TextView
+                    android:id="@+id/tabAppearance"
+                    style="@style/TvSettingsTab"
+                    android:text="@string/settings_section_appearance"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="@drawable/bg_tv_settings_cat_selector"
+                    app:drawableStartCompat="@drawable/ic_theme" />
+
+                <!-- PLAYER TAB -->
+                <TextView
+                    android:id="@+id/tabPlayer"
+                    style="@style/TvSettingsTab"
+                    android:text="@string/settings_section_player"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="@drawable/bg_tv_settings_cat_selector"
+                    app:drawableStartCompat="@drawable/ic_play" />
+
+                <!-- LIBRARY TAB -->
+                <TextView
+                    android:id="@+id/tabLibrary"
+                    style="@style/TvSettingsTab"
+                    android:text="@string/settings_section_library_remote"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="@drawable/bg_tv_settings_cat_selector"
+                    app:drawableStartCompat="@drawable/ic_retry" />
+
+                <!-- ABOUT TAB -->
+                <TextView
+                    android:id="@+id/tabAbout"
+                    style="@style/TvSettingsTab"
+                    android:text="@string/settings_section_about"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="@drawable/bg_tv_settings_cat_selector"
+                    app:drawableStartCompat="@drawable/ic_info" />
+
+            </LinearLayout>
+
+            <!-- RIGHT CONTENT -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingStart="36dp"
+                android:paddingEnd="48dp"
+                android:paddingTop="36dp"
+                android:paddingBottom="28dp">
+
+                <!-- APPEARANCE CONTENT -->
+                <ScrollView
+                    android:id="@+id/contentAppearance"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fillViewport="true"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_section_appearance"
+                            android:textColor="@color/ink"
+                            android:textSize="26sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:layout_marginBottom="24dp"
+                            android:text="Customize your app appearance"
+                            android:textColor="@color/ink_dim"
+                            android:textSize="@dimen/tv_text_body" />
+
+                        <LinearLayout
+                            android:id="@+id/settings_appearance_card"
+                            style="@style/SettingsGlassCard"
+                            android:orientation="vertical" />
+
+                    </LinearLayout>
+                </ScrollView>
+
+                <!-- PLAYER CONTENT -->
+                <ScrollView
+                    android:id="@+id/contentPlayer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    android:fillViewport="true"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_section_player"
+                            android:textColor="@color/ink"
+                            android:textSize="26sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:id="@+id/settings_player_card"
+                            style="@style/SettingsGlassCard"
+                            android:orientation="vertical" />
+
+                    </LinearLayout>
+                </ScrollView>
+
+                <!-- LIBRARY CONTENT -->
+                <ScrollView
+                    android:id="@+id/contentLibrary"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    android:fillViewport="true"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_section_library_remote"
+                            android:textColor="@color/ink"
+                            android:textSize="26sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:id="@+id/settings_library_card"
+                            style="@style/SettingsGlassCard"
+                            android:orientation="vertical" />
+
+                    </LinearLayout>
+                </ScrollView>
+
+                <!-- ABOUT CONTENT -->
+                <ScrollView
+                    android:id="@+id/contentAbout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    android:fillViewport="true"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_section_about"
+                            android:textColor="@color/ink"
+                            android:textSize="26sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:id="@+id/settings_about_card"
+                            style="@style/SettingsGlassCard"
+                            android:orientation="vertical" />
+
+                    </LinearLayout>
+                </ScrollView>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

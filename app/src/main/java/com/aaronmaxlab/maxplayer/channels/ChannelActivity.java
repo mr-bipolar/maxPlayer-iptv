@@ -27,6 +27,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.widget.ImageViewCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.aaronmaxlab.maxplayer.MaxPlayerApplication;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
 import com.aaronmaxlab.maxplayer.database.adapter.LocalDbChannelAdapter;
@@ -36,6 +37,7 @@ import com.aaronmaxlab.maxplayer.databinding.ActivityChannelBinding;
 import com.aaronmaxlab.maxplayer.player.PlayerActivity;
 import com.aaronmaxlab.maxplayer.player.media3.audio.AudioPlayerActivity;
 import com.aaronmaxlab.maxplayer.playlist.SaveChannelDialog;
+import com.aaronmaxlab.maxplayer.remote.RemoteKeyController;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.AppUtils;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
@@ -72,6 +74,9 @@ public class ChannelActivity extends AppCompatActivity {
                 .putExtra(EXTRA_CATEGORY_ID, categoryId)
                 .putExtra(EXTRA_CATEGORY_NAME, categoryName);
     }
+
+   private RemoteKeyController remoteKeys;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +91,8 @@ public class ChannelActivity extends AppCompatActivity {
             UIUtils.applySystemBarPadding(binding.getRoot());
         }
 
+        remoteKeys = ((MaxPlayerApplication) getApplication()).getRemoteKeyController();
+
         sqlDbHelper = new SqlDbHelper(this);
 
         currentCategoryId = getIntent().getIntExtra(EXTRA_CATEGORY_ID, -1);
@@ -97,6 +104,7 @@ public class ChannelActivity extends AppCompatActivity {
             if (binding.channelSort != null) {
                 binding.channelSort.setOnClickListener(v -> {
                     channelAdapter.sortUpDown();
+                    assert binding.channelSort != null;
                     binding.channelSort.setRotation(
                             channelAdapter.isAscending() ? 0f : 180f
                     );
@@ -116,9 +124,7 @@ public class ChannelActivity extends AppCompatActivity {
             }
         }
 
-        if (binding.backChannelList != null) {
-            ClickUtils.applyTouchEffect(binding.backChannelList, v -> finish());
-        }
+        ClickUtils.applyTouchEffect(binding.backChannelList, v -> finish());
     }
 
     private void setupTvChannels(int catId, String catName) {
@@ -314,14 +320,16 @@ public class ChannelActivity extends AppCompatActivity {
         });
 
         ClickUtils.applyTouchEffect(actionCancel, v -> dialog.dismiss());
-
         dialog.show();
+
+        remoteKeys.registerDialog(dialog);
+        dialog.setOnDismissListener(d -> remoteKeys.unregisterDialog(dialog));
 
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
 
-        actionPrimary.post(() -> actionPrimary.requestFocus());
+        actionPrimary.post(actionPrimary::requestFocus);
     }
 
     private void deleteChannel(LocalDbChannel channel) {
@@ -345,6 +353,7 @@ public class ChannelActivity extends AppCompatActivity {
 
     private void setupChannelSearch() {
 
+        assert binding.channelSearch != null;
         binding.channelSearch.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -444,6 +453,7 @@ public class ChannelActivity extends AppCompatActivity {
         TextView btnSubmit = view.findViewById(R.id.btnSubmit);
         LinearLayout category = view.findViewById(R.id.categoryField);
 
+
         // Populate existing channel details
         urlInput.setText(channel.getChannelUrl());
         channelName.setText(channel.getChannelName());
@@ -455,15 +465,19 @@ public class ChannelActivity extends AppCompatActivity {
                 IPTV_CATEGORIES.get(selectedCategoryIndex[0])
         );
 
-        category.setOnClickListener(v -> SaveChannelDialog.showCategoryPicker(
-                this,
-                IPTV_CATEGORIES,
-                selectedCategoryIndex[0],
-                index -> {
-                    selectedCategoryIndex[0] = index;
-                    txtCategory.setText(IPTV_CATEGORIES.get(index));
-                }
-        ));
+        View.OnClickListener openCategoryPicker = v ->
+                SaveChannelDialog.showCategoryPicker(
+                        this,
+                        IPTV_CATEGORIES,
+                        selectedCategoryIndex[0],
+                        index -> {
+                            selectedCategoryIndex[0] = index;
+                            txtCategory.setText(IPTV_CATEGORIES.get(index));
+                        }
+                );
+
+        category.setOnClickListener(openCategoryPicker);
+        txtCategory.setOnClickListener(openCategoryPicker);
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
@@ -505,6 +519,8 @@ public class ChannelActivity extends AppCompatActivity {
         });
 
         dialog.show();
+        remoteKeys.registerDialog(dialog);
+        dialog.setOnDismissListener(d -> remoteKeys.unregisterDialog(dialog));
 
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawableResource(
@@ -512,7 +528,7 @@ public class ChannelActivity extends AppCompatActivity {
             );
         }
 
-        channelName.post(() -> channelName.requestFocus());
+        channelName.post(channelName::requestFocus);
     }
 
     private void refreshChannelList() {

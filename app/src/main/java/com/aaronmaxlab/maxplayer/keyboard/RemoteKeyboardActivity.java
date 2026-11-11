@@ -8,13 +8,13 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 
 import com.aaronmaxlab.maxplayer.databinding.ActivityRemoteKeyboardBinding;
+import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.journeyapps.barcodescanner.ScanContract;
@@ -76,32 +76,18 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
 
     private final ActivityResultLauncher<ScanOptions> qrScanner =
             registerForActivityResult(new ScanContract(), result -> {
-                Log.d(TAG, "QR callback received");
-
                 String contents = result.getContents();
-
-                Log.d(TAG, "QR contents: " + contents);
-
                 if (contents == null) {
-                    Log.e(TAG, "QR scan returned null");
-                    Toast.makeText(this, "QR scan cancelled", Toast.LENGTH_SHORT).show();
+                    AppToast.warning(this, "QR scan cancelled");
                     return;
                 }
 
                 try {
                     RemoteDeviceInfo deviceInfo = RemoteQrParser.parse(contents);
-
-                    Log.d(TAG, "QR parsed successfully");
-                    Log.d(TAG, "TV IP: " + deviceInfo.getIp());
-                    Log.d(TAG, "TV Port: " + deviceInfo.getPort());
-
-                    Toast.makeText(this, "QR scanned successfully", Toast.LENGTH_SHORT).show();
-
+                   AppToast.success(this, "QR scanned successfully");
                     connectToTv(deviceInfo);
-
                 } catch (Exception e) {
-                    Log.e(TAG, "QR parsing failed", e);
-                    Toast.makeText(this, "Invalid QR code", Toast.LENGTH_SHORT).show();
+                    AppToast.error(this, "Invalid QR code");
                 }
 
             });
@@ -130,12 +116,16 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
 
         updateConnectionUI(ConnectionState.CONNECTING);
 
+        Log.d("RemoteKeyController",
+                "Remote focus: " + deviceInfo.getIp()
+                        + " | type: " + deviceInfo.getType()
+                        + " | port: " + deviceInfo.getPort());
+
         RemoteWebSocketClient client = new RemoteWebSocketClient(
                 // Temporary emulator testing address.
                 "192.168.1.5",
-                8766,
+                8766, // 8766 local loop
                 deviceInfo.getToken(),
-
                 new RemoteWebSocketClient.Listener() {
 
                     @Override
@@ -145,11 +135,10 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
 
                             updateConnectionUI(ConnectionState.CONNECTED);
 
-                            Toast.makeText(
+                            AppToast.success(
                                     RemoteKeyboardActivity.this,
-                                    "Connected to TV!",
-                                    Toast.LENGTH_SHORT
-                            ).show();
+                                    "Connected to TV!"
+                            );
                         });
                     }
 
@@ -173,11 +162,10 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
                                     ConnectionState.DISCONNECTED
                             );
 
-                            Toast.makeText(
+                            AppToast.error(
                                     RemoteKeyboardActivity.this,
-                                    "TV authentication failed. Please scan again.",
-                                    Toast.LENGTH_LONG
-                            ).show();
+                                    "TV authentication failed. Please scan again."
+                            );
                         });
                     }
 
@@ -189,7 +177,6 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
                     @Override
                     public void onError(Exception error) {
                         Log.e(TAG, "Connection error", error);
-
                         runOnUiThread(() -> {
                             endConnection(
                                     generation,
@@ -199,9 +186,7 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
                     }
                 }
         );
-
         Log.d(TAG, "Calling WebSocket connect()");
-
         remoteClient = client;
         client.connect();
     }
@@ -225,9 +210,6 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
 
 
     private void updateConnectionUI(ConnectionState state) {
-
-        Log.d(TAG, "updateConnectionUI called: " + state);
-
         boolean connecting = state == ConnectionState.CONNECTING;
         boolean connected = state == ConnectionState.CONNECTED;
         boolean active = connecting || connected;
@@ -243,9 +225,6 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
             binding.txtConnectionStatus.setText("Connected");
         }
 
-        Log.d(TAG, "Scan visibility: " + binding.btnScanQr.getVisibility());
-        Log.d(TAG, "Status visibility: " + binding.layoutConnectionStatus.getVisibility());
-        Log.d(TAG, "Disconnect visibility: " + binding.btnDisconnect.getVisibility());
     }
 
 

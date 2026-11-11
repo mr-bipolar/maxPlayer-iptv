@@ -157,9 +157,6 @@ public class AudioMiniPlayer implements DefaultLifecycleObserver {
         MediaItem item = c.getCurrentMediaItem();
         if (item == null) return;
 
-        /** localConfiguration can be stripped over IPC;
-          * the full player sets mediaId = stream URI
-         */
         String uri = item.localConfiguration != null
                 ? item.localConfiguration.uri.toString()
                 : item.mediaId;

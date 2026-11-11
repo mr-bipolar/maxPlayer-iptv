@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
@@ -55,15 +55,11 @@ public class PlayAudioStreamActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-
         binding = ActivityPlayAudioStreamBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         loader = findViewById(R.id.loaderOverlay);
         recyclerView = binding.recyclerViewStream;
-
         sqlDbHelper = new SqlDbHelper(this);
-
         setupRecentViews(sqlDbHelper);
 
         UIUtils.setLightNavigationBars(this, false); // black bottom nav
@@ -74,6 +70,14 @@ public class PlayAudioStreamActivity extends AppCompatActivity {
                 binding.getRoot().findViewById(R.id.audioPlayerOverlay)
         );
         audioMiniPlayer.attach();
+
+        // audio player bottom margin
+        View view = binding.audioPlayerOverlay.miniPlayerContainer;
+        ViewGroup.MarginLayoutParams params =
+                (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        int margin16dp = (int) (16 * getResources().getDisplayMetrics().density + 0.5f);
+        params.setMargins(margin16dp, margin16dp, margin16dp, margin16dp);
+        view.setLayoutParams(params);
 
         ClickUtils.applyTouchEffect(binding.backPlayAudioStream, v -> finish());
         ClickUtils.applyTouchEffect(binding.playAudioPlayerStream, v -> onPlayClicked());
@@ -129,8 +133,6 @@ public class PlayAudioStreamActivity extends AppCompatActivity {
             return;
         }
 
-
-
         startActivity(new Intent(this, AudioPlayerActivity.class)
                 .putExtra(EXTRA_STREAM_URI, url)
                 .putExtra(EXTRA_STREAM_NAME, name));
@@ -139,7 +141,6 @@ public class PlayAudioStreamActivity extends AppCompatActivity {
         if (saveRecentView) {
             LocalDbRecentView recentView =
                     new LocalDbRecentView(name, url, PlaylistType.AUDIO, null);
-
             addRecentView(recentView);
         }
     }
@@ -159,23 +160,13 @@ public class PlayAudioStreamActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(LocalDbRecentView item) {
                         if (isChecking) return;
-
                         String url = item.getChannelUrl();
                         String name = item.getChannelName();
-
                         LoaderAnimator.startLoader(loader);
                         setChecking(true);
-
                         ioExecutor.execute(() -> {
                             boolean reachable = UrlUtils.isStreamReachable(url);
-;
-                            runOnUiThread(() ->
-                                    onReachabilityResult(
-                                            reachable,
-                                            url,
-                                            name,
-                                            false
-                                    )
+                            runOnUiThread(() -> onReachabilityResult(reachable, url, name, false)
                             );
                         });
 
@@ -186,18 +177,10 @@ public class PlayAudioStreamActivity extends AppCompatActivity {
                         // Toggle favorite in your database.
                         LocalDbFavorites favorites = new LocalDbFavorites(item.getChannelName(), "Internet radio", item.getChannelUrl(), null, PlaylistType.AUDIO );
                         boolean result =  sqlDbHelper.setFavorite(favorites);
-
                           if(result){
                               boolean isFav = sqlDbHelper.isFavorite(item.getChannelUrl());
-
-                              if (isFav) {
-                                  AppToast.success(PlayAudioStreamActivity.this, "Added to favorites.");
-                              } else {
-                                  AppToast.success(PlayAudioStreamActivity.this, "Removed from favorites.");
-                              }
-
+                              AppToast.success(PlayAudioStreamActivity.this, isFav ? "Added to favorites." : "Removed from favorites.");
                               ImageView favButton = findViewById(R.id.mediaFav);
-
                               if (favButton != null) {
                                   favButton.setImageResource(
                                           isFav
@@ -205,9 +188,7 @@ public class PlayAudioStreamActivity extends AppCompatActivity {
                                                   : R.drawable.ic_heart_outline
                                   );
                               }
-
                           }
-
                         adapter.notifyDataSetChanged();
                     }
 
@@ -237,7 +218,6 @@ public class PlayAudioStreamActivity extends AppCompatActivity {
 
                                     } catch (Exception e) {
                                         Log.e("RECENT_VIEW", "Delete failed", e);
-
                                         AppToast.error(
                                                 PlayAudioStreamActivity.this,
                                                 "Delete failed."
@@ -249,12 +229,8 @@ public class PlayAudioStreamActivity extends AppCompatActivity {
                 }
         );
 
-        recyclerView.setLayoutManager(
-                new LinearLayoutManager(this)
-        );
-
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-
         refreshRecentViews();
     }
 
@@ -276,10 +252,8 @@ public class PlayAudioStreamActivity extends AppCompatActivity {
     private void addRecentView(LocalDbRecentView recentView) {
         try {
             sqlDbHelper.setRecentViews(recentView);
-
             // Reload the RecyclerView after inserting.
             refreshRecentViews();
-
         } catch (Exception e) {
             Log.e("RECENT_VIEW", "Failed to add recent view", e);
         }
@@ -292,6 +266,10 @@ public class PlayAudioStreamActivity extends AppCompatActivity {
         if (audioMiniPlayer != null) {
             audioMiniPlayer.release();
             audioMiniPlayer = null;
+        }
+        if (sqlDbHelper != null) {
+            sqlDbHelper.close();
+            sqlDbHelper = null;
         }
         binding = null;
         super.onDestroy();

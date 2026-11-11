@@ -13,9 +13,6 @@ import java.util.Objects;
 
 
 final class AudioFavorites {
-
-
-
     private AudioFavorites() {}
 
     static boolean isFavorite(@NonNull Context c,  @NonNull String uri) {

@@ -14,8 +14,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
+import com.aaronmaxlab.maxplayer.MaxPlayerApplication;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.databinding.DialogSaveChannelBinding;
+import com.aaronmaxlab.maxplayer.remote.RemoteKeyController;
 import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
 
 import java.util.List;
@@ -76,6 +78,15 @@ public final class SaveChannelDialog {
         style(context, dialog);
         if (DeviceUtils.isTv(context)) {
             b.categoryField.post(b.categoryField::requestFocus);
+
+            RemoteKeyController remoteKeys =
+                    ((MaxPlayerApplication) context.getApplicationContext())
+                            .getRemoteKeyController();
+
+            remoteKeys.registerDialog(dialog);
+            dialog.setOnDismissListener(d ->
+                    remoteKeys.unregisterDialog(dialog)
+            );
         }
         return dialog;
     }
@@ -87,17 +98,41 @@ public final class SaveChannelDialog {
             int preselectedIndex,
             @NonNull OnCategorySelectedListener listener
     ) {
-        new AlertDialog.Builder(context, R.style.PlayerDialogTheme)
+        AlertDialog dialog = new AlertDialog.Builder(
+                context,
+                R.style.PlayerDialogTheme
+        )
                 .setTitle(R.string.save_channel_choose_category)
                 .setSingleChoiceItems(
                         categories.toArray(new CharSequence[0]),
                         preselectedIndex,
-                        (dialog, which) -> {
+                        (dialogInterface, which) -> {
                             listener.onSelected(which);
-                            dialog.dismiss();
+                            dialogInterface.dismiss();
                         }
                 )
-                .show();
+                .create();
+
+        RemoteKeyController remoteKeys =
+                ((MaxPlayerApplication) context.getApplicationContext())
+                        .getRemoteKeyController();
+
+        dialog.setOnDismissListener(d ->
+                remoteKeys.unregisterDialog(dialog)
+        );
+
+        dialog.show();
+
+        remoteKeys.registerDialog(dialog);
+
+        // Focus the selected category in the TV picker.
+        dialog.getListView().post(() -> {
+            dialog.getListView().requestFocus();
+
+            if (preselectedIndex >= 0) {
+                dialog.getListView().setSelection(preselectedIndex);
+            }
+        });
     }
 
     public interface OnCategorySelectedListener {

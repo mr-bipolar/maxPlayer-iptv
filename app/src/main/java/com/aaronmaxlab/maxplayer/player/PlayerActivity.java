@@ -79,6 +79,7 @@ import androidx.media3.ui.TrackSelectionDialogBuilder;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aaronmaxlab.maxplayer.MaxPlayerApplication;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.animations.LoaderAnimator;
 import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
@@ -92,6 +93,7 @@ import com.aaronmaxlab.maxplayer.playlist.SaveChannelDialog;
 import com.aaronmaxlab.maxplayer.playlist.adapter.PlaylistAdapter;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistChannel;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
+import com.aaronmaxlab.maxplayer.remote.RemoteKeyController;
 import com.aaronmaxlab.maxplayer.service.VideoPlaybackService;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.AppUtils;
@@ -242,6 +244,7 @@ public class PlayerActivity extends AppCompatActivity {
     private int aspectMode = 0;
     private boolean wasInPipMode = false;
     private boolean pipReceiverRegistered = false;
+    private RemoteKeyController remoteKeys;
     @Nullable private AlertDialog dialog;
     @Nullable private Dialog saveDialog;
 
@@ -289,7 +292,7 @@ public class PlayerActivity extends AppCompatActivity {
         isTv = DeviceUtils.isTv(this);
         if (isTv) setupTvPlaylist();
         sqlDbHelper = new SqlDbHelper(this);
-
+        remoteKeys = ((MaxPlayerApplication) getApplication()).getRemoteKeyController();
         // Never two players at once: mpv is a single native engine ("already initialized") and the Media3
         // service player is shared. Free the old screen's player/surface BEFORE this one creates its own.
         PlayerActivity previous = active;
@@ -1496,7 +1499,12 @@ public class PlayerActivity extends AppCompatActivity {
         ui.setAutoHideBlocked(true);
         builder.setOnDismissListener(d -> { dialog = null; if (ui != null) ui.setAutoHideBlocked(false); });
         dialog = builder.show();
-        styleDialog(dialog);
+
+        if(dialog != null) {
+            remoteKeys.registerDialog(dialog);
+            dialog.setOnDismissListener(d -> remoteKeys.unregisterDialog(dialog));
+            styleDialog(dialog);
+        }
     }
 
     private void styleDialog(AlertDialog d) {

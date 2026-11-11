@@ -9,6 +9,9 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +25,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aaronmaxlab.maxplayer.categories.TvCategoriesActivity;
 import com.aaronmaxlab.maxplayer.channels.AllChannelsActivity;
 import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
 import com.aaronmaxlab.maxplayer.database.adapter.LocalDbChannelAdapter;
@@ -55,114 +59,58 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);                       // before setContentView
-
+        EdgeToEdge.enable(this);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         UIUtils.setLightNavigationBars(this, false);
         UIUtils.applySystemBarPadding(binding.getRoot(), false);
-
-
         sqlDbHelper = new SqlDbHelper(this);
-
         boolean isTv = DeviceUtils.isTv(this);
 
-
         if(isTv){
+            ImageButton settingsBtn = binding.tvSettingsButton;
+            ImageButton favoritesBtn = binding.tvFavoritesButton;
+            ImageButton remoteBtn  = binding.tvRemoteButton;
+            ImageButton searchBtn  = binding.tvSearchCard;
 
-            if(binding.tvSettingsButton != null) {
-                ClickUtils.applyTouchEffect(binding.tvSettingsButton,
-                        v -> startActivity(new Intent(this, SettingsActivity.class)));
-            }
-            if(binding.tvRemoteButton != null) {
-                ClickUtils.applyTouchEffect(binding.tvRemoteButton,
-                        v -> startActivity(new Intent(this, RemotePairingActivity.class)));
-            }
-            if(binding.tvFavoritesButton != null) {
-                ClickUtils.applyTouchEffect(binding.tvFavoritesButton,
-                        v -> startActivity(new Intent(this, TvFavoritesActivity.class)));
-            }
-            if(binding.tvImportButton != null) {
-                ClickUtils.applyTouchEffect(binding.tvImportButton,
-                        v -> startActivity(new Intent(this, AddPlaylistActivity.class)));
-            }
-            if(binding.tvLiveCard != null) {
-                ClickUtils.applyTouchEffect(binding.tvLiveCard,
-                        v -> startActivity(new Intent(this, AllChannelsActivity.class)));
-            }
-            if(binding.tvPlaylistsCard != null) {
-                ClickUtils.applyTouchEffect(binding.tvPlaylistsCard,
-                        v -> startActivity(new Intent(this, TvPlaylistsActivity.class)));
-            }
+            LinearLayout importPlaylist = binding.tvImportButton;
+            LinearLayout liveChannels = binding.tvLiveCard;
+            LinearLayout playlists = binding.tvPlaylistsCard;
+            LinearLayout exploreItems = binding.tvExploreCard;
+            LinearLayout categories = binding.tvCategoriesCard;
 
-            if(binding.tvExploreCard != null){
-                ClickUtils.applyTouchEffect(binding.tvExploreCard,
-                        v -> startActivity(new Intent(this, ExploreActivity.class)));
-            }
-
-            if(binding.tvCategoriesCard != null){
-                ClickUtils.applyTouchEffect(binding.tvCategoriesCard,
-                        v -> startActivity(new Intent(this, com.aaronmaxlab.maxplayer.categories.TvCategoriesActivity.class)));
-            }
-
-            if(binding.tvSearchCard != null){
-                ClickUtils.applyTouchEffect(binding.tvSearchCard,
-                        v -> startActivity(new Intent(this, TvSearchActivity.class)));
-            }
-
-
+            buttonCall(settingsBtn, SettingsActivity.class);
+            buttonCall(favoritesBtn, TvFavoritesActivity.class);
+            buttonCall(remoteBtn, RemotePairingActivity.class);
+            buttonCall(searchBtn, TvSearchActivity.class);
+            buttonCall(importPlaylist, AddPlaylistActivity.class);
+            buttonCall(liveChannels, AllChannelsActivity.class);
+            buttonCall(playlists, TvPlaylistsActivity.class);
+            buttonCall(exploreItems, ExploreActivity.class);
+            buttonCall(categories, TvCategoriesActivity.class);
         }else {
-
             View bottomBar = findViewById(R.id.customBottomBar);
-
             ViewCompat.setOnApplyWindowInsetsListener(bottomBar, (v, insets) -> {
-                Insets bars = insets.getInsets(
-                        WindowInsetsCompat.Type.systemBars()
-                );
-
-                ViewGroup.MarginLayoutParams lp =
-                        (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-
+                Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
                 lp.bottomMargin = bars.bottom;
                 v.setLayoutParams(lp);
-
                 return insets;
             });
-
-            if(binding.searchChannel != null) {
-                ClickUtils.applyTouchEffect(binding.searchChannel,
-                        view -> startActivity(new Intent(this, SearchActivity.class)));
-            }
-
-            if(binding.playerInfo != null) {
-                ClickUtils.applyTouchEffect(binding.playerInfo,
-                        view -> startActivity(new Intent(this, RemoteKeyboardActivity.class)));
-            }
 
             NavHostFragment navHost =
                     (NavHostFragment) getSupportFragmentManager()
                             .findFragmentById(R.id.nav_host_fragment);
-
             if (navHost == null) return;
-
             NavController navController = navHost.getNavController();
-
-            if(bottomBar.findViewById(R.id.navHome) != null){
-                ClickUtils.applyTouchEffect(bottomBar.findViewById(R.id.navHome), v -> navController.navigate(R.id.navHome));
-            }
-
-            if(bottomBar.findViewById(R.id.navPlaylists) != null){
-                ClickUtils.applyTouchEffect(bottomBar.findViewById(R.id.navPlaylists), v -> navController.navigate(R.id.navPlaylists));
-            }
-
-            if(bottomBar.findViewById(R.id.navFavorites) != null){
-                ClickUtils.applyTouchEffect(bottomBar.findViewById(R.id.navFavorites), v -> navController.navigate(R.id.navFavorites));
-            }
-
-            if(bottomBar.findViewById(R.id.navHistory) != null){
-                ClickUtils.applyTouchEffect(bottomBar.findViewById(R.id.navHistory), v -> navController.navigate(R.id.navHistory));
-            }
+            ImageView searchBtn = binding.searchChannel;
+            ImageView settingsBtn = binding.settings;
+            buttonCall(searchBtn, SearchActivity.class);
+            buttonCall(settingsBtn, SettingsActivity.class);
+            setupNavItem(bottomBar, R.id.navHome, navController, R.id.navHome);
+            setupNavItem(bottomBar, R.id.navPlaylists, navController, R.id.navPlaylists);
+            setupNavItem(bottomBar, R.id.navFavorites, navController, R.id.navFavorites);
+            setupNavItem(bottomBar, R.id.navHistory, navController, R.id.navHistory);
 
             if(bottomBar.findViewById(R.id.btnChannels) != null){
                 ClickUtils.applyTouchEffect(bottomBar.findViewById(R.id.btnChannels), v -> showChannelsBottomSheet());
@@ -185,8 +133,30 @@ public class MainActivity extends AppCompatActivity {
                         bottomBar.findViewById(R.id.navHistory).setSelected(
                                 destinationId == R.id.navHistory);
                     });
+
+
         }
 
+
+    }
+
+    // Helper function
+    private void buttonCall(View view, Class<?> callback) {
+        if (view != null) {
+            ClickUtils.applyTouchEffect(view,
+                    v -> startActivity(new Intent(this, callback)));
+        }
+    }
+
+    private void setupNavItem(View bottomBar, int viewId,
+                              NavController navController, int destinationId) {
+        View view = bottomBar.findViewById(viewId);
+        if (view != null) {
+            ClickUtils.applyTouchEffect(
+                    view,
+                    v -> navController.navigate(destinationId)
+            );
+        }
     }
 
 
@@ -195,7 +165,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override protected void onDestroy() {
-        if (sqlDbHelper != null) sqlDbHelper.close();
+        if (sqlDbHelper != null) {
+            sqlDbHelper.close();
+            sqlDbHelper = null;
+        }
         binding = null;
         super.onDestroy();
     }
