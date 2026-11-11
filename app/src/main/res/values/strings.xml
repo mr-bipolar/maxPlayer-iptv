@@ -404,5 +404,8 @@
     <!-- Explore empty state -->
     <string name="explore_empty_title">Nothing here yet</string>
     <string name="explore_empty_body">Add a playlist to start watching. Your history, playlists and categories will appear here.</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">Fullscreen\nContent</string>
 
 </resources>

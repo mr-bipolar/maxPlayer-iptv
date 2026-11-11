@@ -82,4 +82,15 @@
     <dimen name="tv_card_h">90dp</dimen>
     <dimen name="tv_key_h">40dp</dimen>
 
+
+    <dimen name="splash_padding">24dp</dimen>
+    <dimen name="splash_logo_size">105dp</dimen>
+    <dimen name="splash_title_margin">20dp</dimen>
+    <dimen name="splash_title_size">38sp</dimen>
+    <dimen name="splash_subtitle_size">11sp</dimen>
+    <dimen name="splash_tagline_size">14sp</dimen>
+    <dimen name="splash_loading_margin">48dp</dimen>
+    <dimen name="splash_progress_size">24dp</dimen>
+    <dimen name="splash_loading_text_size">13sp</dimen>
+
 </resources>

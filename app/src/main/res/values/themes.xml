@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="Theme.MaxPlayer" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@drawable/bg_primary_background</item>
         <item name="android:statusBarColor">@color/bg</item>
         <item name="android:windowLightStatusBar">false</item>
-
-        <!-- Navigation bar color for both system framework and AppCompat -->
-        <item name="android:navigationBarColor">@color/bg_1</item>
-        <item name="android:windowLightNavigationBar">false</item>
-
         <item name="android:textColorPrimary">@color/ink</item>
         <item name="android:textColorSecondary">@color/ink_dim</item>
         <item name="alertDialogTheme">@style/Theme.MaxPlayer.AlertDialog</item>
@@ -19,6 +15,7 @@
         <item name="colorAccent">@color/accent</item>
         <item name="colorControlActivated">@color/accent</item>
     </style>
+
     <style name="Theme.MaxPlayer.AlertDialog" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
         <item name="android:windowBackground">@drawable/bg_dialog_black</item>
         <item name="android:textColorPrimary">@color/ink</item>
@@ -26,5 +23,18 @@
         <item name="android:textColor">@color/ink</item>
         <item name="colorAccent">@color/primary_highlight</item>
         <item name="colorControlActivated">@color/primary_highlight</item>
+    </style>
+
+    <style name="Theme.MaxPlayer.Fullscreen" parent="Theme.MaxPlayer">
+        <item name="android:actionBarStyle">@style/Widget.Theme.MaxPlayer.ActionBar.Fullscreen
+        </item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@color/bg_1</item>
+        <item name="android:theme">@style/Theme.MaxPlayer</item>
+    </style>
+
+    <style name="ThemeOverlay.MaxPlayer.FullscreenContainer" parent="">
+        <item name="fullscreenBackgroundColor">@color/light_blue_600</item>
+        <item name="fullscreenTextColor">@color/light_blue_A200</item>
     </style>
 </resources>

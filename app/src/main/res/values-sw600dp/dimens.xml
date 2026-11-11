@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="splash_padding">48dp</dimen>
+    <dimen name="splash_logo_size">145dp</dimen>
+    <dimen name="splash_title_margin">26dp</dimen>
+    <dimen name="splash_title_size">58sp</dimen>
+    <dimen name="splash_subtitle_size">15sp</dimen>
+    <dimen name="splash_tagline_size">20sp</dimen>
+    <dimen name="splash_loading_margin">60dp</dimen>
+    <dimen name="splash_progress_size">30dp</dimen>
+    <dimen name="splash_loading_text_size">17sp</dimen>
+</resources>
