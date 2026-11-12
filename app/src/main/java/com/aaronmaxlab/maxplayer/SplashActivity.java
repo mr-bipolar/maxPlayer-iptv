@@ -2,6 +2,7 @@
 package com.aaronmaxlab.maxplayer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,16 +14,36 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.aaronmaxlab.maxplayer.databinding.ActivitySplashBinding;
+import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
 
 public class SplashActivity extends AppCompatActivity {
 
     private ActivitySplashBinding binding;
-
+    SharedPreferences sharedPreferences;
     private static final long SPLASH_DELAY = 3000L;
+    private static final String PREFS_NAME = "AppPrefs";
+    private static final String KEY_AD_SHOWN = "ad_shown";
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     private final Runnable splashRunnable = () -> {
+        boolean isTV = DeviceUtils.isTv(this);
+
+        if(!isTV){
+            try {
+                sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                boolean isAddShow = sharedPreferences.getBoolean(KEY_AD_SHOWN, false);
+                if (isAddShow) {
+                    sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean(KEY_AD_SHOWN, false);
+                    editor.apply();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         startActivity(new Intent(SplashActivity.this, MainActivity.class));
         finish();
     };

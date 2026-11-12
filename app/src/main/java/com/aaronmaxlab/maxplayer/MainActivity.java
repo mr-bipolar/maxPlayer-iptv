@@ -1,19 +1,24 @@
 package com.aaronmaxlab.maxplayer;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -37,10 +42,26 @@ import com.aaronmaxlab.maxplayer.keyboard.RemotePairingActivity;
 import com.aaronmaxlab.maxplayer.player.media3.audio.AudioPlayerActivity;
 import com.aaronmaxlab.maxplayer.playlists.TvPlaylistsActivity;
 import com.aaronmaxlab.maxplayer.search.TvSearchActivity;
+import com.aaronmaxlab.maxplayer.utils.AdConfig;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
 import com.aaronmaxlab.maxplayer.utils.StreamLauncher;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
+import com.google.android.libraries.ads.mobile.sdk.MobileAds;
+import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAd;
+import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAdEventCallback;
+import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAdPreloader;
+import com.google.android.libraries.ads.mobile.sdk.banner.AdSize;
+import com.google.android.libraries.ads.mobile.sdk.banner.AdView;
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAd;
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest;
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback;
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest;
+import com.google.android.libraries.ads.mobile.sdk.common.AdValue;
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError;
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError;
+import com.google.android.libraries.ads.mobile.sdk.common.PreloadConfiguration;
+import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -55,6 +76,16 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String EXTRA_STREAM_URI = "stream_uri";
     public static final String EXTRA_STREAM_NAME = "stream_name";
+    public static final String TAG = "Mobile-SDK";
+
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+    private static final String PREFS_NAME = "AppPrefs";
+    private static final String KEY_AD_SHOWN = "ad_shown";
+    private AppOpenAd appOpenAd;
+    private FrameLayout adViewContainer;
+    private boolean bannerLoadStarted = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         UIUtils.applySystemBarPadding(binding.getRoot(), false);
         sqlDbHelper = new SqlDbHelper(this);
         boolean isTv = DeviceUtils.isTv(this);
+
 
         if(isTv){
             ImageButton settingsBtn = binding.tvSettingsButton;
@@ -97,6 +129,52 @@ public class MainActivity extends AppCompatActivity {
                 v.setLayoutParams(lp);
                 return insets;
             });
+
+            adViewContainer = binding.bannerAd;
+
+            new Thread(
+                    () -> {
+                        MobileAds.initialize(
+                                this,
+                                new InitializationConfig.Builder(AdConfig.AD_ROOT_ID)
+                                        .build(),
+                                initializationStatus -> {
+                                    // Adapter initialization is complete.
+                                    loadBannerAd(this);
+
+                                    AdRequest adRequest = new AdRequest.Builder(AdConfig.APP_OPEN_AD_UNIT_ID).build();
+                                    PreloadConfiguration preloadConfig = new PreloadConfiguration(adRequest);
+                                    AppOpenAdPreloader.start(AdConfig.APP_OPEN_AD_UNIT_ID, preloadConfig);
+
+                                    try {
+                                        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                                        boolean isAdShows = sharedPreferences.getBoolean(KEY_AD_SHOWN, false);
+                                        if (!isAdShows) {
+
+                                            AppOpenAd.load(adRequest, new AdLoadCallback<>() {
+                                                @Override
+                                                public void onAdFailedToLoad(@NonNull LoadAdError adError) {
+                                                    AdLoadCallback.super.onAdFailedToLoad(adError);
+                                                }
+
+                                                @Override
+                                                public void onAdLoaded(AppOpenAd ad) {
+                                                    AdLoadCallback.super.onAdLoaded(ad);
+                                                    appOpenAd = ad;
+                                                    pollAndShowAd();
+                                                }
+                                            });
+
+                                        }
+                                    } catch (Exception e) {
+                                        Log.d("Error", Objects.requireNonNull(e.getMessage()));
+                                    }
+
+                                });
+                    })
+                    .start();
+
+
 
             NavHostFragment navHost =
                     (NavHostFragment) getSupportFragmentManager()
@@ -262,6 +340,83 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+    // show ads
+    private void pollAndShowAd() {
+        if (appOpenAd != null && !sharedPreferences.getBoolean(KEY_AD_SHOWN, false)) {
+
+            appOpenAd.setAdEventCallback(new AppOpenAdEventCallback() {
+                @Override
+                public void onAdClicked() {
+                    AppOpenAdEventCallback.super.onAdClicked();
+                }
+
+                @Override
+                public void onAdDismissedFullScreenContent() {
+                    markAdAsShown();
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(@NonNull FullScreenContentError fullScreenContentError) {
+                    markAdAsShown();
+                }
+
+
+                @Override
+                public void onAdShowedFullScreenContent() {
+                    markAdAsShown();
+                }
+            });
+
+            // Show the ad if it's loaded
+            appOpenAd.show(this);
+        }
+    }
+
+    private void markAdAsShown() {
+        try {
+            sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(KEY_AD_SHOWN, true);
+            editor.apply();
+        } catch (Exception e) {
+            Log.d(TAG, Objects.requireNonNull(e.getMessage()));
+        }
+    }
+
+
+    private void loadBannerAd(Activity activity) {
+        if (bannerLoadStarted) return;
+
+        bannerLoadStarted = true;
+
+        adViewContainer.setVisibility(View.GONE);
+
+        AdView adView = binding.adView;
+
+        AdSize adSize =
+                AdSize.getLargeAnchoredAdaptiveBannerAdSize(activity, 360);
+
+        BannerAdRequest adRequest =
+                new BannerAdRequest.Builder(AdConfig.BANNER_AD_UNIT_ID, adSize).build();
+
+        if(adView != null) {
+            adView.loadAd(adRequest, new AdLoadCallback<BannerAd>() {
+
+                @Override
+                public void onAdLoaded(@NonNull BannerAd bannerAd) {
+                    adViewContainer.setVisibility(View.VISIBLE);
+                    Log.d(TAG, "Banner ad loaded.");
+                }
+
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError adError) {
+                    adViewContainer.setVisibility(View.GONE);
+                    Log.e(TAG, "Banner ad failed: " + adError);
+                }
+            });
+        }
+    }
 
 
 }

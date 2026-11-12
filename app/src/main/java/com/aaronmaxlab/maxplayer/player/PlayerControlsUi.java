@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -188,14 +189,20 @@ final class PlayerControlsUi {
         b.tvSubtitle.setText(sb);
     }
 
+
+
     private boolean isLive(Player p) {
+        if (p == null) return false;
+
         return p.isCurrentMediaItemLive()
-                || (p.getPlaybackState() == Player.STATE_READY && p.getDuration() == C.TIME_UNSET);
+                || (p.getPlaybackState() == Player.STATE_READY
+                && p.getDuration() == C.TIME_UNSET);
     }
 
     private boolean isVod(Player p) {
-        long d = p.getDuration();
-        return !p.isCurrentMediaItemLive() && d != C.TIME_UNSET && d > 0;
+        return p != null
+                && !p.isCurrentMediaItemLive()
+                && p.getDuration() > 0;
     }
 
     /** LIVE badge + live row for live/unknown streams, timeline for VOD. */

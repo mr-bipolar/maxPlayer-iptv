@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.zxing)
     implementation(libs.java.websocket)
     implementation(libs.zxing.embedded)
+    implementation(libs.ads.mobile.sdk)
     implementation(files("libs/mpvengine-release.aar"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)

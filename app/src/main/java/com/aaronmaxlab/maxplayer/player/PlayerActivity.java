@@ -332,8 +332,6 @@ public class PlayerActivity extends AppCompatActivity {
         }
         resolveSourceAndStart();
 
-
-
     }
 
     @Override
@@ -590,9 +588,9 @@ public class PlayerActivity extends AppCompatActivity {
 
 
     private boolean isVod() {
-        assert player != null;
-        long d = player.getDuration();
-        return !player.isCurrentMediaItemLive() && d != C.TIME_UNSET && d > 0;
+        return player != null
+                && !player.isCurrentMediaItemLive()
+                && player.getDuration() > 0;
     }
 
     // =====================================================================================
@@ -1190,7 +1188,12 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private boolean isLiveNow() {
-        return player != null && (player.isCurrentMediaItemLive() || player.getDuration() == C.TIME_UNSET);
+
+        if (player == null) return false;
+
+        return player.isCurrentMediaItemLive()
+                || (player.getPlaybackState() == Player.STATE_READY
+                && player.getDuration() == C.TIME_UNSET);
     }
 
 
