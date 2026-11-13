@@ -1,7 +1,6 @@
 package com.aaronmaxlab.maxplayer.channels;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -17,13 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.core.widget.ImageViewCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 
@@ -32,14 +27,15 @@ import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
 import com.aaronmaxlab.maxplayer.database.adapter.LocalDbChannelAdapter;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbChannel;
-import com.aaronmaxlab.maxplayer.database.models.LocalDbPlaylist;
 import com.aaronmaxlab.maxplayer.databinding.ActivityChannelBinding;
-import com.aaronmaxlab.maxplayer.player.PlayerActivity;
 import com.aaronmaxlab.maxplayer.player.media3.audio.AudioPlayerActivity;
 import com.aaronmaxlab.maxplayer.playlist.SaveChannelDialog;
 import com.aaronmaxlab.maxplayer.remote.RemoteKeyController;
+import com.aaronmaxlab.maxplayer.ads.AdConfig;
+import com.aaronmaxlab.maxplayer.ads.AdMobManager;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.AppUtils;
+import com.aaronmaxlab.maxplayer.ads.BannerAdHelper;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
 import com.aaronmaxlab.maxplayer.utils.StreamLauncher;
@@ -47,8 +43,7 @@ import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.aaronmaxlab.maxplayer.utils.UrlUtils;
 
 import android.view.ViewGroup;
-import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
 
 public class ChannelActivity extends AppCompatActivity {
@@ -75,7 +70,8 @@ public class ChannelActivity extends AppCompatActivity {
                 .putExtra(EXTRA_CATEGORY_NAME, categoryName);
     }
 
-   private RemoteKeyController remoteKeys;
+    private RemoteKeyController remoteKeys;
+    private boolean isTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +80,7 @@ public class ChannelActivity extends AppCompatActivity {
         binding = ActivityChannelBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        boolean isTv = DeviceUtils.isTv(this);
+        isTv = DeviceUtils.isTv(this);
 
         if (!isTv) {
             UIUtils.setLightNavigationBars(this, false); // black bottom nav
@@ -101,6 +97,7 @@ public class ChannelActivity extends AppCompatActivity {
         if (isTv) {
             setupTvChannels(currentCategoryId, currentCategoryName);
         } else {
+
             if (binding.channelSort != null) {
                 binding.channelSort.setOnClickListener(v -> {
                     channelAdapter.sortUpDown();
@@ -126,6 +123,7 @@ public class ChannelActivity extends AppCompatActivity {
 
         ClickUtils.applyTouchEffect(binding.backChannelList, v -> finish());
     }
+
 
     private void setupTvChannels(int catId, String catName) {
         Integer categoryIndex = catId == -1 ? null : catId - 1;
@@ -256,11 +254,27 @@ public class ChannelActivity extends AppCompatActivity {
             binding.emptyChannelsView.setVisibility(View.VISIBLE);
             binding.channelsRecyclerView.setVisibility(View.GONE);
         } else {
+            BannerAdHelper bannerAdHelper = new BannerAdHelper(binding.bannerAd, binding.adView);
+            setupBannerAd(bannerAdHelper);
             binding.emptyChannelsView.setVisibility(View.GONE);
             binding.channelsRecyclerView.setVisibility(View.VISIBLE);
         }
 
 
+    }
+
+    private void setupBannerAd( BannerAdHelper bannerAdHelper ) {
+        if (isTv) return;
+        AdMobManager.initialize(this, () -> {
+            runOnUiThread(() -> {
+                if (!isFinishing() && !isDestroyed()) {
+                    bannerAdHelper.load(
+                            this,
+                            AdConfig.CHANNEL_AD_UNIT_ID
+                    );
+                }
+            });
+        });
     }
 
 

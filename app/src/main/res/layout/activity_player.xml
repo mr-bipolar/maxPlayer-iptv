@@ -9,6 +9,7 @@
     android:background="@color/bg"
     tools:context=".player.PlayerActivity">
 
+
     <!-- VIDEO PLAYER: FIXED 400DP HEIGHT -->
     <FrameLayout
         android:id="@+id/videoContainer"
@@ -38,6 +39,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/bg_player_glass_scrim">
+
+
 
             <!-- TOP TOOLBAR -->
             <LinearLayout
@@ -240,10 +243,6 @@
                     android:padding="14dp"
                     android:src="@drawable/ic_next"
                     app:tint="#FFFFFF" />
-
-
-
-
 
             </LinearLayout>
 
@@ -655,6 +654,25 @@
             </LinearLayout>
 
         </FrameLayout>
+
+    </FrameLayout>
+
+    <!-- ADS  -->
+    <FrameLayout
+        android:id="@+id/bannerAd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.libraries.ads.mobile.sdk.banner.AdView
+            android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
 
     </FrameLayout>
 
