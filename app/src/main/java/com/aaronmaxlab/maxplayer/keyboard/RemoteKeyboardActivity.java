@@ -122,9 +122,8 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
                         + " | port: " + deviceInfo.getPort());
 
         RemoteWebSocketClient client = new RemoteWebSocketClient(
-                // Temporary emulator testing address.
-                "192.168.1.5",
-                8766, // 8766 local loop
+                deviceInfo.getIp(),
+                deviceInfo.getPort(), // 8766 local loop
                 deviceInfo.getToken(),
                 new RemoteWebSocketClient.Listener() {
 
