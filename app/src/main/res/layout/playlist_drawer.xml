@@ -148,6 +148,8 @@
             android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:overScrollMode="never"
+            android:paddingStart="@dimen/space_6"
+            android:paddingEnd="@dimen/space_6"
             android:paddingBottom="12dp"
             android:scrollbars="vertical" />
     </LinearLayout>

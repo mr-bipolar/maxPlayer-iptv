@@ -78,6 +78,7 @@ import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.SubtitleView;
 import androidx.media3.ui.TrackSelectionDialogBuilder;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -91,6 +92,7 @@ import com.aaronmaxlab.maxplayer.database.models.LocalDbHistory;
 import com.aaronmaxlab.maxplayer.databinding.ActivityPlayerBinding;
 import com.aaronmaxlab.maxplayer.player.mpv.MpvPlayerAdapter;
 import com.aaronmaxlab.maxplayer.playlist.PlaylistParser;
+import com.aaronmaxlab.maxplayer.playlist.PlaylistViewPreferences;
 import com.aaronmaxlab.maxplayer.playlist.SaveChannelDialog;
 import com.aaronmaxlab.maxplayer.playlist.adapter.PlaylistAdapter;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistChannel;
@@ -1658,7 +1660,7 @@ public class PlayerActivity extends AppCompatActivity {
     // =====================================================================================
 
     private boolean isInPip() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode();
+        return isInPictureInPictureMode();
     }
 
     private boolean canEnterPip() {
@@ -1786,7 +1788,16 @@ public class PlayerActivity extends AppCompatActivity {
         showSearchBox = false;
 
         adapter = new PlaylistAdapter();
-        rvChannels.setLayoutManager(new LinearLayoutManager(this));
+
+        boolean gridMode = !isTv && PlaylistViewPreferences.isGridEnabled(this);
+
+        if (gridMode) {
+            rvChannels.setLayoutManager(new GridLayoutManager(this, 3));
+        } else {
+            rvChannels.setLayoutManager(new LinearLayoutManager(this));
+        }
+
+        adapter.setGridMode(gridMode);
         rvChannels.setAdapter(adapter);
         adapter.setChannels(playlistModel.channels);
         adapter.setPlayingPosition(currentChannelPosition);

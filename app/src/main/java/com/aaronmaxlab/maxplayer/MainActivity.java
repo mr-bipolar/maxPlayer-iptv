@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
                 new GridLayoutManager(this, 3);
 
         rvChannels.setLayoutManager(layoutManager);
-        rvChannels.setHasFixedSize(true);
+        rvChannels.setHasFixedSize(false);
 
         channelAdapter.setGridMode(true);
         rvChannels.setAdapter(channelAdapter);

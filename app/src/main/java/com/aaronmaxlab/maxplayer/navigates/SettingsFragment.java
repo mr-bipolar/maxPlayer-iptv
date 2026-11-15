@@ -34,6 +34,7 @@ import com.aaronmaxlab.maxplayer.keyboard.RemoteKeyboardActivity;
 import com.aaronmaxlab.maxplayer.keyboard.RemotePairingActivity;
 import com.aaronmaxlab.maxplayer.player.PlayerEngineType;
 import com.aaronmaxlab.maxplayer.player.PlayerSettings;
+import com.aaronmaxlab.maxplayer.playlist.PlaylistViewPreferences;
 import com.aaronmaxlab.maxplayer.remote.RemoteKeyController;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
@@ -52,6 +53,7 @@ public class SettingsFragment extends Fragment {
     private TextView engineSummary;
     private TextView subtitleSummary;
     private TextView remoteSummary;
+    private TextView playlistViewSummary;
     private AlertDialog themeDialog;
 
     public SettingsFragment() { }
@@ -141,6 +143,23 @@ public class SettingsFragment extends Fragment {
                 true,
                 v -> confirmClearHistory()
         );
+
+        if (!isTV) {
+            View playlistViewRow = addRow(
+                    library,
+                    R.drawable.ic_clock,
+                    R.string.settings_playlist_view,
+                    R.string.settings_playlist_view_list,
+                    true,
+                    v -> showPlaylistViewPicker()
+            );
+
+            playlistViewSummary = playlistViewRow.findViewById(
+                    R.id.settings_row_summary
+            );
+
+            updatePlaylistViewSummary();
+        }
 
         View remoteRow = addRow(
                 library,
@@ -607,6 +626,41 @@ public class SettingsFragment extends Fragment {
         intent.putExtra(Intent.EXTRA_TEXT, message);
 
         startActivity(Intent.createChooser(intent, "Share app"));
+    }
+
+    private void showPlaylistViewPicker() {
+
+        String[] options = {
+                getString(R.string.settings_playlist_view_list),
+                getString(R.string.settings_playlist_view_grid)
+        };
+
+        boolean current = PlaylistViewPreferences.isGridEnabled(requireContext());
+
+        new AlertDialog.Builder(requireContext(), R.style.PlayerDialogTheme)
+                .setTitle(R.string.settings_playlist_view)
+                .setSingleChoiceItems(options, current ? 1 : 0, (dialog, which) -> {
+
+                    PlaylistViewPreferences.setGridEnabled(
+                            requireContext(),
+                            which == 1
+                    );
+
+                    updatePlaylistViewSummary();
+                    dialog.dismiss();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void updatePlaylistViewSummary() {
+        if (playlistViewSummary == null || !isAdded()) return;
+
+        playlistViewSummary.setText(
+                PlaylistViewPreferences.isGridEnabled(requireContext())
+                        ? R.string.settings_playlist_view_grid
+                        : R.string.settings_playlist_view_list
+        );
     }
 
     @Override
