@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="preview.png" alt="MaxPlayer IPTV Preview" width="100%">
+</p>
+
 # MaxPlayer IPTV
 
 **Your media. Your way.**
