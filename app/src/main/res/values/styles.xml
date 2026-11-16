@@ -35,7 +35,6 @@
     </style>
 
 
-
     <style name="PlayerGlassAction">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
@@ -51,15 +50,13 @@
         <item name="android:elevation">6dp</item>
     </style>
 
-    <style name="zxing_CaptureTheme"
-        parent="Theme.AppCompat.NoActionBar">
+    <style name="zxing_CaptureTheme" parent="Theme.AppCompat.NoActionBar">
 
         <item name="android:windowActionModeOverlay">true</item>
         <item name="android:windowBackground">#000000</item>
         <item name="android:navigationBarColor">#000000</item>
         <item name="android:statusBarColor">#000000</item>
     </style>
-
 
 
     <style name="TvSettingsTab">
@@ -78,6 +75,15 @@
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:stateListAnimator">@animator/tv_focus_scale_sm</item>
+    </style>
+
+    <style name="Widget.Theme.MaxPlayer.ActionBar.Fullscreen" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
+    </style>
+
+    <style name="Widget.Theme.MaxPlayer.ButtonBar.Fullscreen" parent="">
+        <item name="android:background">@color/black_overlay</item>
+        <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
     </style>
 
 

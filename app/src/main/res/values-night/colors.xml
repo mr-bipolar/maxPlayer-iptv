@@ -26,6 +26,8 @@
     <color name="glass_reflection_top">#14FFFFFF</color>
     <color name="fill_overlay">#E41A1A1D</color>
     <color name="fill_overlay_card">#C8202022</color>
+    <color name="primary_surface_top">#0A0A0C</color>
+    <color name="primary_surface_bottom">#202128</color>
     <color name="live">#FF4D5E</color>
     <color name="ok">#3DDC97</color>
     <color name="warn_text">#E3B463</color>

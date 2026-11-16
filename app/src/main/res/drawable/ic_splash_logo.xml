@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- TV body -->
+    <path
+        android:fillColor="#7726D9FF"
+        android:strokeColor="#C9A96E"
+        android:strokeWidth="2"
+        android:pathData="M25,22 Q25,12 35,12 H85 Q95,12 95,22 V88 Q95,98 85,98 H35 Q25,98 25,88 Z"/>
+
+    <!-- Screen -->
+    <path
+        android:fillColor="#151B49"
+        android:pathData="M32,25 H88 V85 H32 Z"/>
+
+    <!-- Play symbol -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M47,36 Q45,34 45,40 V70 Q45,76 51,72 L77,57 Q82,54 77,51 Z"/>
+
+    <!-- Antenna -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#C9A96E"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M43,12 L32,2 M77,12 L88,2"/>
+
+</vector>
