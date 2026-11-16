@@ -3,27 +3,27 @@ package com.aaronmaxlab.maxplayer.keyboard;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.databinding.ActivityRemotePairingBinding;
-import com.aaronmaxlab.maxplayer.remote.RemoteWebSocketServer;
-import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
-import com.google.zxing.WriterException;
+import com.aaronmaxlab.maxplayer.remote.RemoteInputController;
+import com.aaronmaxlab.maxplayer.utils.UIUtils;
+import com.aaronmaxlab.maxplayer.MaxPlayerApplication;
+import com.aaronmaxlab.maxplayer.remote.RemoteInputManager;
+
+import org.json.JSONObject;
 
 public class RemotePairingActivity extends AppCompatActivity {
 
     private ActivityRemotePairingBinding binding;
-    private RemoteWebSocketServer remoteServer;
-
-    private static final int REMOTE_PORT = 8765;
-
-    private RemotePairingSession pairingSession;
+    private RemoteInputManager remoteInputManager;
+    private RemoteInputController remoteInputController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,102 +32,251 @@ public class RemotePairingActivity extends AppCompatActivity {
 
         binding = ActivityRemotePairingBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        UIUtils.applySystemBarPadding(binding.getRoot(), false);
 
-        startRemoteServer();
 
+
+        // Create pairing session before starting the server.
+        String ip = NetworkUtils.getLocalIpv4Address(this);
+
+        if (ip == null) {
+            Log.e("REMOTE", "Unable to detect TV IP address");
+            return;
+        }
+
+        MaxPlayerApplication app =
+                (MaxPlayerApplication) getApplication();
+
+        remoteInputManager = app.getRemoteInputManager();
+        remoteInputController = app.getRemoteInputController();
+
+        remoteInputManager.start(ip, remoteListener);
+        remoteInputController.setPhoneConnected(
+                remoteInputManager.isClientConnected()
+        );
+
+        setupKeyboardActions();
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
-        if (remoteServer != null) {
-            new Thread(() -> {
-                try {
-                    remoteServer.stop(1000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    Log.e("REMOTE", "Server stop interrupted", e);
-                }
-            }).start();
-
-            remoteServer = null;
+        if (remoteInputManager != null) {
+            remoteInputManager.setListener(null);
         }
+
+        binding = null;
+
+        super.onDestroy();
     }
 
 
+    private final RemoteInputManager.Listener remoteListener =
+            new RemoteInputManager.Listener() {
 
+                @Override
+                public void onServerStarted(int port) {
+                    RemotePairingActivity.this.onServerStarted(port);
+                }
 
-    private void startRemoteServer() {
+                @Override
+                public void onClientConnected() {
+                    Log.d("REMOTE", "Phone authenticated!");
 
-        remoteServer = new RemoteWebSocketServer(
-                REMOTE_PORT,
-                new RemoteWebSocketServer.Listener() {
-
-                    @Override
-                    public void onServerStarted(int port) {
-                        Log.d("REMOTE", "Server ready on port: " + port);
-                        RemotePairingActivity.this.onServerStarted(port);
-                    }
-
-                    @Override
-                    public void onClientConnected() {
-                        Log.d("REMOTE", "Phone connected!");
-                    }
-
-                    @Override
-                    public void onClientDisconnected() {
-                        Log.d("REMOTE", "Phone disconnected!");
-                    }
-
-                    @Override
-                    public void onMessageReceived(String message) {
-                        Log.d("REMOTE", "Phone message: " + message);
-                    }
-
-                    @Override
-                    public void onServerError(Exception error) {
-                        Log.e("REMOTE", "Server error", error);
+                    if (remoteInputController != null) {
+                        remoteInputController.setPhoneConnected(true);
                     }
                 }
-        );
 
-        remoteServer.start();
-    }
+                @Override
+                public void onClientDisconnected() {
+                    Log.d("REMOTE", "Phone disconnected!");
+
+                    if (remoteInputController != null) {
+                        remoteInputController.setPhoneConnected(false);
+                    }
+                }
+
+                @Override
+                public void onMessageReceived(String message) {
+                    handleRemoteMessage(message);
+                }
+
+                @Override
+                public void onServerError(Exception error) {
+                    Log.e("REMOTE", "Server error", error);
+                }
+            };
+
 
 
     private void onServerStarted(int port) {
 
+        Log.d("REMOTE", "onServerStarted called");
+
         runOnUiThread(() -> {
 
-            String ip = NetworkUtils.getLocalIpv4Address(
-                    RemotePairingActivity.this
-            );
-
-            if (ip == null) {
-                Log.e("REMOTE", "Unable to detect TV IP address");
-                return;
-            }
+            Log.d("REMOTE", "UI thread reached");
 
             try {
-                pairingSession = new RemotePairingSession(ip, port);
+                String payload = remoteInputManager.getQrPayload();
 
-                String payload = pairingSession.toQrPayload();
+                Log.d("REMOTE", "QR payload: " +
+                        (payload != null ? "available" : "NULL"));
+
+                if (payload == null || binding == null) {
+                    Log.e("REMOTE", "QR generation skipped");
+                    return;
+                }
 
                 Bitmap qrBitmap = QrCodeManager.generateQrCode(
                         payload,
                         400
                 );
 
+                Log.d("REMOTE", "QR bitmap: " +
+                        (qrBitmap != null ? "generated" : "NULL"));
+
                 binding.ivPairingQr.setImageBitmap(qrBitmap);
 
-                Log.d("REMOTE", "Pairing QR generated");
-                Log.d("REMOTE", "TV IP: " + ip);
-                Log.d("REMOTE", "TV Port: " + port);
+                Log.d("REMOTE", "ImageView width: " +
+                        binding.ivPairingQr.getWidth());
+
+                Log.d("REMOTE", "ImageView height: " +
+                        binding.ivPairingQr.getHeight());
+
+                Log.d("REMOTE", "ImageView drawable: " +
+                        binding.ivPairingQr.getDrawable());
 
             } catch (Exception e) {
                 Log.e("REMOTE", "QR generation failed", e);
             }
         });
     }
+
+    private void handleRemoteMessage(String message) {
+        try {
+            JSONObject json = new JSONObject(message);
+
+            if (!"text".equals(json.optString("type"))) {
+                return;
+            }
+
+            String text = json.optString("text", "");
+
+            runOnUiThread(() -> {
+                    updateInputText(text, false);
+            });
+
+        } catch (Exception e) {
+            Log.e("REMOTE", "Invalid remote message", e);
+        }
+    }
+
+    private void setupKeyboardActions() {
+
+        setupCharacterKeys(binding.tvKeyboardContainer);
+
+        // Space
+        binding.keySpace.setOnClickListener(v -> {
+            appendText(" ");
+        });
+
+        // Clear
+        binding.keyClear.setOnClickListener(v -> {
+            updateInputText("", true);
+        });
+
+        // Backspace
+        binding.keyBackspace.setOnClickListener(v -> {
+            String current = binding.tvInputText.getText().toString();
+
+            if (!current.isEmpty()) {
+                updateInputText(
+                        current.substring(0, current.length() - 1),
+                        true
+                );
+            }
+        });
+
+        // Add Playlist
+        binding.keyAddPlaylist.setOnClickListener(v -> {
+            String playlistUrl = binding.tvInputText.getText().toString().trim();
+
+            if (playlistUrl.isEmpty()) {
+                return;
+            }
+
+            // TODO: Connect your existing Add Playlist logic here.
+        });
+    }
+
+    private void setupCharacterKeys(LinearLayout container) {
+
+        for (int i = 0; i < container.getChildCount(); i++) {
+
+            View row = container.getChildAt(i);
+
+            if (!(row instanceof LinearLayout)) {
+                continue;
+            }
+
+            LinearLayout keyRow = (LinearLayout) row;
+
+            for (int j = 0; j < keyRow.getChildCount(); j++) {
+
+                View key = keyRow.getChildAt(j);
+
+                // Skip special keys
+                if (key.getId() == R.id.keyClear ||
+                        key.getId() == R.id.keySpace ||
+                        key.getId() == R.id.keyBackspace ||
+                        key.getId() == R.id.keyAddPlaylist) {
+                    continue;
+                }
+
+                if (!(key instanceof LinearLayout)) {
+                    continue;
+                }
+
+                LinearLayout keyLayout = (LinearLayout) key;
+
+                if (keyLayout.getChildCount() == 0) {
+                    continue;
+                }
+
+                View child = keyLayout.getChildAt(0);
+
+                if (!(child instanceof TextView)) {
+                    continue;
+                }
+
+                TextView keyText = (TextView) child;
+
+                String character = keyText.getText().toString();
+
+                keyLayout.setOnClickListener(v -> appendText(character));
+            }
+        }
+    }
+
+    private void appendText(String value) {
+
+        String current = binding.tvInputText.getText().toString();
+
+        updateInputText(current + value, true);
+    }
+
+
+    private void updateInputText(String text, boolean notifyPhone) {
+        if (binding == null) {
+            return;
+        }
+
+        binding.tvInputText.setText(text);
+
+        if (notifyPhone && remoteInputManager != null) {
+            remoteInputManager.sendTextToClient(text);
+        }
+    }
+
 }

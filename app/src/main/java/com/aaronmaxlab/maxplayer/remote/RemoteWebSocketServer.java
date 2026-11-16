@@ -6,12 +6,16 @@ import android.util.Log;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
 
 public class RemoteWebSocketServer extends WebSocketServer {
 
     private static final String TAG = "RemoteWebSocketServer";
+    private final String expectedToken;
+    private WebSocket authenticatedClient;
+    private volatile boolean serverStarted = false;
 
     public interface Listener {
         void onServerStarted(int port);
@@ -27,13 +31,20 @@ public class RemoteWebSocketServer extends WebSocketServer {
 
     private final Listener listener;
 
-    public RemoteWebSocketServer(int port, Listener listener) {
+    public RemoteWebSocketServer(
+            int port,
+            String expectedToken,
+            Listener listener
+    ) {
         super(new InetSocketAddress("0.0.0.0", port));
+        this.expectedToken = expectedToken;
         this.listener = listener;
     }
 
     @Override
     public void onStart() {
+        serverStarted = true;
+
         Log.d(TAG, "Server started on port: " + getPort());
 
         if (listener != null) {
@@ -41,21 +52,64 @@ public class RemoteWebSocketServer extends WebSocketServer {
         }
     }
 
-    @Override
-    public void onOpen(WebSocket connection, ClientHandshake handshake) {
-        Log.d(TAG, "Client connected: " + connection.getRemoteSocketAddress());
-
-        if (listener != null) {
-            listener.onClientConnected();
-        }
+    public boolean isServerStarted() {
+        return serverStarted;
     }
 
     @Override
-    public void onMessage(WebSocket connection, String message) {
-        Log.d(TAG, "Received: " + message);
+    public void onOpen(WebSocket connection, ClientHandshake handshake) {
+        Log.d(TAG, "Client connected: " + connection.getRemoteSocketAddress());
+    }
 
-        if (listener != null) {
-            listener.onMessageReceived(message);
+    @Override
+    public synchronized void onMessage(WebSocket connection, String message) {
+
+        // Already authenticated client
+        if (connection == authenticatedClient) {
+
+            if (listener != null) {
+                listener.onMessageReceived(message);
+            }
+
+            return;
+        }
+
+        // Reject another client if one is already authenticated
+        if (authenticatedClient != null) {
+            connection.close(1008, "Another client is connected");
+            return;
+        }
+
+        // First message must authenticate
+        try {
+            JSONObject json = new JSONObject(message);
+
+            if (!"auth".equals(json.optString("type"))) {
+                connection.close(1008, "Authentication required");
+                return;
+            }
+
+            String receivedToken = json.optString("token");
+
+            if (!expectedToken.equals(receivedToken)) {
+                connection.send("{\"type\":\"auth_failed\"}");
+                connection.close(1008, "Invalid token");
+                return;
+            }
+
+            authenticatedClient = connection;
+
+            connection.send("{\"type\":\"auth_success\"}");
+
+            Log.d(TAG, "Client authenticated");
+
+            if (listener != null) {
+                listener.onClientConnected();
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Authentication failed", e);
+            connection.close(1008, "Invalid authentication message");
         }
     }
 
@@ -70,17 +124,42 @@ public class RemoteWebSocketServer extends WebSocketServer {
     ) {
         Log.d(TAG, "Client disconnected: " + reason);
 
-        if (listener != null) {
-            listener.onClientDisconnected();
+        if (connection == authenticatedClient) {
+            authenticatedClient = null;
+
+            if (listener != null) {
+                listener.onClientDisconnected();
+            }
         }
     }
 
     @Override
     public void onError(WebSocket connection, Exception error) {
+        serverStarted = false;
+
         Log.e(TAG, "WebSocket error", error);
 
         if (listener != null) {
             listener.onServerError(error);
+        }
+    }
+
+
+    public synchronized void sendTextToClient(String text) {
+        if (authenticatedClient == null || !authenticatedClient.isOpen()) {
+            Log.w(TAG, "Cannot send text: no authenticated client");
+            return;
+        }
+
+        try {
+            JSONObject json = new JSONObject();
+            json.put("type", "text");
+            json.put("text", text);
+
+            authenticatedClient.send(json.toString());
+
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to send text to client", e);
         }
     }
 

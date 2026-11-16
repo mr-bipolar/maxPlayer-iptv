@@ -1,6 +1,7 @@
 
 package com.aaronmaxlab.maxplayer.keyboard;
 
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,6 +45,10 @@ public class RemotePairingSession {
 
     public boolean isExpired() {
         return System.currentTimeMillis() >= expiresAt;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
     }
 
     public String toQrPayload() throws JSONException {

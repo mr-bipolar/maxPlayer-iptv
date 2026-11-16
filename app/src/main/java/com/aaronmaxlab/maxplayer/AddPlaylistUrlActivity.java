@@ -21,8 +21,10 @@ import com.aaronmaxlab.maxplayer.databinding.ActivityAddPlaylistUrlBinding;
 import com.aaronmaxlab.maxplayer.player.PlayerActivity;
 import com.aaronmaxlab.maxplayer.playlist.PlaylistParser;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
+import com.aaronmaxlab.maxplayer.remote.RemoteInputController;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
+import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
 import com.aaronmaxlab.maxplayer.utils.Playlist;
 import com.aaronmaxlab.maxplayer.utils.PlaylistType;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
@@ -42,8 +44,9 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
     /** Set only after a playlist was loaded successfully; "Open stream" uses it. */
     @Nullable private String loadedPlaylistUrl;
 
-    SqlDbHelper sqlDbHelper;
-    LocalDbFavorites favorites;
+    private SqlDbHelper sqlDbHelper;
+    private LocalDbFavorites favorites;
+    private RemoteInputController remoteInputController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,18 +61,43 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
 
         sqlDbHelper = new SqlDbHelper(this);
 
-        binding.errorCard.setVisibility(INVISIBLE);
-        assert binding.btnFavorite != null;
+        final boolean isTv = DeviceUtils.isTv(this);
 
+        binding.errorCard.setVisibility(INVISIBLE);
         ClickUtils.applyTouchEffect(binding.backAddPlayListUrlOpen, v -> finish());
         ClickUtils.applyTouchEffect(binding.btnAddPlaylistCall, v -> onAddPlaylistClicked());
         ClickUtils.applyTouchEffect(binding.openPlaylistStream, v -> onOpenStreamClicked());
-        ClickUtils.applyTouchEffect(binding.btnFavorite, v -> onAddFavorite());
+
+        if(isTv){
+
+            MaxPlayerApplication app =
+                    (MaxPlayerApplication) getApplication();
+
+            remoteInputController = app.getRemoteInputController();
+
+            remoteInputController.registerInputs(
+                    binding.inputPlaylistUrl,
+                    binding.inputPlaylistName
+            );
+
+        }else{
+            assert binding.btnFavorite != null;
+            ClickUtils.applyTouchEffect(binding.btnFavorite, v -> onAddFavorite());
+        }
+
     }
 
     @Override
     protected void onDestroy() {
         executor.shutdownNow();
+
+        if (remoteInputController != null && binding != null) {
+            remoteInputController.unregisterInputs(
+                    binding.inputPlaylistUrl,
+                    binding.inputPlaylistName
+            );
+        }
+
         super.onDestroy();
     }
 
