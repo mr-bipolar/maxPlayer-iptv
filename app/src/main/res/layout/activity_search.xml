@@ -89,7 +89,7 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:overScrollMode="never"
-            android:padding="16dp"
+            android:padding="@dimen/space_16"
             android:scrollbars="none"
             android:visibility="gone" />
 

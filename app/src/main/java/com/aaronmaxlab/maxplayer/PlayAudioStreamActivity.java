@@ -174,22 +174,22 @@ public class PlayAudioStreamActivity extends AppCompatActivity {
 
                     @Override
                     public void onFavoriteClick(LocalDbRecentView item) {
-                        // Toggle favorite in your database.
-                        LocalDbFavorites favorites = new LocalDbFavorites(item.getChannelName(), "Internet radio", item.getChannelUrl(), null, PlaylistType.AUDIO );
-                        boolean result =  sqlDbHelper.setFavorite(favorites);
-                          if(result){
-                              boolean isFav = sqlDbHelper.isFavorite(item.getChannelUrl());
-                              AppToast.success(PlayAudioStreamActivity.this, isFav ? "Added to favorites." : "Removed from favorites.");
-                              ImageView favButton = findViewById(R.id.mediaFav);
-                              if (favButton != null) {
-                                  favButton.setImageResource(
-                                          isFav
-                                                  ? R.drawable.ic_heart_filled
-                                                  : R.drawable.ic_heart_outline
-                                  );
-                              }
-                          }
-                        adapter.notifyDataSetChanged();
+
+                        LocalDbFavorites favorites = new LocalDbFavorites(item.getChannelName(), "Internet radio", item.getChannelUrl(),
+                                null, PlaylistType.AUDIO
+                        );
+
+                        boolean result = sqlDbHelper.setFavorite(favorites);
+                        if (result) {
+                            boolean isFav = sqlDbHelper.isFavorite(item.getChannelUrl());
+                            AppToast.success(
+                                    PlayAudioStreamActivity.this, isFav ? "Added to favorites." : "Removed from favorites.");
+
+                            ImageView favButton = findViewById(R.id.mediaFav);
+                            if (favButton != null) {
+                                favButton.setImageResource(isFav ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline);
+                            }
+                        }
                     }
 
                     @Override

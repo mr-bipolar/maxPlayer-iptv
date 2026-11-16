@@ -4,11 +4,8 @@ import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -74,8 +71,9 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
             remoteInputController = app.getRemoteInputController();
             remoteInputController.registerInputs(binding.inputPlaylistUrl, binding.inputPlaylistName);
         }else{
-            assert binding.btnFavorite != null;
-            ClickUtils.applyTouchEffect(binding.btnFavorite, v -> onAddFavorite());
+            if(binding.btnFavorite != null) {
+                ClickUtils.applyTouchEffect(binding.btnFavorite, v -> onAddFavorite());
+            }
         }
 
     }
@@ -231,7 +229,7 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
 
     private void addHistory(PlaylistInfo info, String url){
         try {
-            LocalDbHistory dbHistory = new LocalDbHistory(info.fileName, String.valueOf(info.channelCount) + " Channels", url, null, PlaylistType.PLAYLIST, null, null);
+            LocalDbHistory dbHistory = new LocalDbHistory(info.fileName, info.channelCount + " Channels", url, null, PlaylistType.PLAYLIST, null, null);
             sqlDbHelper.saveHistory(dbHistory);
         }catch (Exception e) {
             AppToast.error(this, e.getMessage());

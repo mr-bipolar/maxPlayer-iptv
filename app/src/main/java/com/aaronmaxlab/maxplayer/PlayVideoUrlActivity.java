@@ -1,8 +1,5 @@
 package com.aaronmaxlab.maxplayer;
 
-import static android.view.View.VISIBLE;
-
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -188,15 +185,10 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
                             AppToast.success( PlayVideoUrlActivity.this,  isFav ?"Added to favorites." : "Removed from favorites.");
                             ImageView favButton = findViewById(R.id.mediaFav);
                             if (favButton != null) {
-                                favButton.setImageResource(
-                                        isFav
-                                                ? R.drawable.ic_heart_filled
-                                                : R.drawable.ic_heart_outline
-                                );
+                                favButton.setImageResource(isFav ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline);
                             }
 
                         }
-                        adapter.notifyDataSetChanged();
                     }
 
                     @Override

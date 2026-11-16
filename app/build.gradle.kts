@@ -37,9 +37,13 @@ android {
 
     buildTypes {
         release {
-            optimization {
-                enable = false
-            }
+            isMinifyEnabled = true
+            isShrinkResources = true
+
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
@@ -69,7 +73,8 @@ dependencies {
     implementation(libs.zxing)
     implementation(libs.java.websocket)
     implementation(libs.zxing.embedded)
-    implementation(libs.ads.mobile.sdk)
+    implementation(libs.ads.sdk)
+    implementation(libs.splash.screen)
     implementation(files("libs/mpvengine-release.aar"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)

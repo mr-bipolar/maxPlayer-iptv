@@ -121,8 +121,14 @@ public class RemoteKeyboardActivity extends AppCompatActivity {
                         + " | type: " + deviceInfo.getType()
                         + " | port: " + deviceInfo.getPort());
 
+         /**
+         *  adb -s emulator-5554 forward tcp:8765 tcp:8765
+         *  socat TCP-LISTEN:8766,bind=0.0.0.0,reuseaddr,fork TCP:127.0.0.1:8765
+         *  for test - Android Tv emulator and Phone.
+         */
+
         RemoteWebSocketClient client = new RemoteWebSocketClient(
-                deviceInfo.getIp(),
+                deviceInfo.getIp(),   // Use 192.168.1.5 - for tv emulator test
                 deviceInfo.getPort(), // 8766 local loop
                 deviceInfo.getToken(),
                 new RemoteWebSocketClient.Listener() {

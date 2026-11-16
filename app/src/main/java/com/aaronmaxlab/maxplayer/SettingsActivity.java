@@ -2,6 +2,7 @@ package com.aaronmaxlab.maxplayer;
 
 import android.os.Bundle;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.aaronmaxlab.maxplayer.databinding.ActivitySettingsBinding;
@@ -16,7 +17,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
-
+        EdgeToEdge.enable(this);
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -33,5 +34,13 @@ public class SettingsActivity extends AppCompatActivity {
                     )
                     .commit();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(binding != null){
+            binding = null;
+        }
+        super.onDestroy();
     }
 }

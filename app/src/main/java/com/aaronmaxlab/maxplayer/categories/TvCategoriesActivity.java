@@ -33,7 +33,6 @@ public class TvCategoriesActivity extends AppCompatActivity {
     private View emptyView;
     private TextView errorView;
     private TextView countView;
-    private ImageButton backBtn;
 
     private int lastSelectedPosition = 0;
     private volatile boolean destroyed;
@@ -50,7 +49,7 @@ public class TvCategoriesActivity extends AppCompatActivity {
         emptyView = findViewById(R.id.tvCategoriesEmptyView);
         errorView = findViewById(R.id.tvCategoriesErrorView);
         countView = findViewById(R.id.tvCategoriesCount);
-        backBtn = findViewById(R.id.backButton);
+        ImageButton backBtn = findViewById(R.id.backButton);
 
         if (backBtn != null) {
             ClickUtils.applyTouchEffect(backBtn, v -> finish());
