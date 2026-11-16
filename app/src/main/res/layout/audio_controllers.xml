@@ -40,7 +40,7 @@
                 android:alpha="0.50"
                 android:importantForAccessibility="no"
                 android:src="@drawable/ic_play"
-                app:tint="@color/accent" />
+                app:tint="@color/primary_highlight" />
         </FrameLayout>
 
         <include

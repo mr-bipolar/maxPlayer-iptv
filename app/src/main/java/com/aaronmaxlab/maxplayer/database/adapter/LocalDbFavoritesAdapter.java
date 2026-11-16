@@ -104,9 +104,10 @@ public class LocalDbFavoritesAdapter
     public void submitList(List<LocalDbFavorites> favorites) {
         rows.clear();
 
-        addGroup(favorites, "VOD", "Channels");
+        addGroup(favorites, "VOD", "Videos");
         addGroup(favorites, "PLAYLIST", "Playlists");
         addGroup(favorites, "AUDIO", "Streams");
+        addGroup(favorites, "LIVE", "Channels");
 
         notifyDataSetChanged();
     }

@@ -55,7 +55,7 @@ public final class AspectRatioUtils {
 
         TextView title = dialog.findViewById(androidx.appcompat.R.id.alertTitle);
         if (title != null) {
-            title.setTextColor(ContextCompat.getColor(activity, R.color.accent));
+            title.setTextColor(ContextCompat.getColor(activity, R.color.primary_highlight));
         }
     }
 

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AddPlaylistActivity"
-    android:background="@color/bg">
+    android:background="@drawable/bg_primary_background">
 
 
     <LinearLayout
@@ -92,7 +92,7 @@
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:src="@drawable/ic_folder"
-                        app:tint="@color/accent" />
+                        app:tint="@color/primary_highlight" />
                 </FrameLayout>
 
                 <LinearLayout
@@ -154,7 +154,7 @@
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:src="@drawable/ic_file"
-                        app:tint="@color/accent" />
+                        app:tint="@color/primary_highlight" />
                 </FrameLayout>
 
                 <LinearLayout
@@ -216,7 +216,7 @@
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:src="@drawable/ic_link"
-                        app:tint="@color/accent" />
+                        app:tint="@color/primary_highlight" />
                 </FrameLayout>
 
                 <LinearLayout
@@ -278,7 +278,7 @@
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:src="@drawable/ic_play"
-                        app:tint="@color/accent" />
+                        app:tint="@color/primary_highlight" />
                 </FrameLayout>
 
                 <LinearLayout
@@ -340,7 +340,7 @@
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:src="@drawable/ic_radio"
-                        app:tint="@color/accent" />
+                        app:tint="@color/primary_highlight" />
                 </FrameLayout>
 
                 <LinearLayout

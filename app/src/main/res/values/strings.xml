@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tv_loading">Loading…</string>
+    <string name="tv_load_error">Could not load this section. Press Back and try again.</string>
+    <string name="tv_see_more">See more</string>
 
     <string name="app_name">MaxPlayer</string>
 
@@ -63,7 +66,7 @@
     <!-- Playlist URL -->
     <string name="title_add_playlist_url">Add playlist URL</string>
     <string name="label_playlist_url">Playlist URL</string>
-    <string name="hint_playlist_url">https://iptv-org.github.io/iptv/languages/mal.m3u</string>
+    <string name="hint_playlist_url">https://example.com/index.m3u8</string>
     <string name="label_playlist_name_optional">Playlist name (optional)</string>
     <string name="hint_playlist_name">e.g. World Live TV</string>
     <string name="label_states">STATES</string>
@@ -169,6 +172,46 @@
 
     <!-- Settings -->
     <string name="title_settings">Settings</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_intro">Personalize your MaxPlayer experience.</string>
+    <string name="settings_section_appearance">APPEARANCE</string>
+    <string name="settings_section_player">PLAYER</string>
+    <string name="settings_section_library_remote">LIBRARY &amp; REMOTE</string>
+    <string name="settings_theme_summary">Choose how MaxPlayer looks.</string>
+    <string name="settings_engine">Preferred player</string>
+    <string name="settings_engine_summary">Choose Media3 or MPV for playback.</string>
+    <string name="settings_subtitle_summary">Applies to new playback.</string>
+    <string name="settings_subtitle_summary_format">%1$s · applies to new playback</string>
+    <string name="settings_open_playlists">Open playlists</string>
+    <string name="settings_open_playlists_summary">Browse your saved playlist library.</string>
+    <string name="settings_clear_history">Clear playback history</string>
+    <string name="settings_clear_history_summary">Remove watched items and saved positions.</string>
+    <string name="settings_clear_history_confirm">This permanently removes playback history and resume positions. Your playlists and favorites will remain.</string>
+    <string name="settings_clear">Clear</string>
+    <string name="settings_history_cleared">Playback history cleared.</string>
+    <string name="settings_history_clear_failed">Could not clear playback history.</string>
+    <string name="settings_remote">Remote control</string>
+    <string name="settings_remote_summary">Pair a phone with this TV.</string>
+    <string name="settings_remote_connected">Phone connected</string>
+    <string name="settings_remote_disconnected">No phone connected · open pairing</string>
+    <string name="settings_version_summary">Version information</string>
+    <string name="settings_version_summary_format">Version %1$s</string>
+    <string name="settings_version_unknown">Version unavailable</string>
+    <string name="settings_credits">Open-source credits</string>
+    <string name="settings_credits_summary">MPV and its Android engine integration.</string>
+    <string name="settings_credit_mpv">mpv-android (MPV / FFmpeg)</string>
+    <string name="settings_credit_engine">mpv-android-engine integration</string>
+    <string name="settings_credit_mpv_url">https://github.com/mpv-android/mpv-android/releases/tag/2026-09-17</string>
+    <string name="settings_credit_engine_url">https://github.com/mr-bipolar/mpv-android-engine</string>
+    <string name="settings_link_unavailable">Could not open this link.</string>
+    <string name="selected">selected</string>
+    <string name="unknown">Unknown</string>
+    <string name="theme_system">System</string>
+    <string name="theme_system_summary">Follow your device appearance.</string>
+    <string name="theme_primary_choice">Primary</string>
+    <string name="theme_primary_summary">Dark purple with a purple gradient accent.</string>
+    <string name="theme_dark_choice">Dark</string>
+    <string name="theme_dark_summary">Keep the black and amber appearance.</string>
     <string name="settings_section_playback">PLAYBACK</string>
     <string name="settings_section_subtitles_audio">SUBTITLES &amp; AUDIO</string>
     <string name="settings_section_interface">INTERFACE</string>
@@ -185,6 +228,11 @@
     <string name="settings_volume_norm">Volume normalization</string>
     <string name="settings_theme">Theme</string>
     <string name="settings_theme_value">Dark</string>
+    <string name="theme_primary">Primary · Dark Purple</string>
+    <string name="theme_dark">Dark · Black / Amber</string>
+    <string name="theme_primary_preview">Dark Purple / Black</string>
+    <string name="theme_dark_preview">Black / Amber</string>
+    <string name="theme_choose_title">Choose theme</string>
     <string name="settings_default_view">Default browse view</string>
     <string name="settings_default_view_value">Grid</string>
     <string name="settings_auto_refresh">Auto refresh</string>
@@ -340,5 +388,21 @@
     <string name="update_channel_submit">Update</string>
     <string name="no_favorites_yet">No Favorites Yet</string>
     <string name="empty_fav">Your favorite channels will appear here. Add channels to your favorites for quick and easy access.</string>
+    <string name="tv_no_channels">No channels available</string>
+    <string name="tv_channels_load_error">Channels could not be loaded. Please try again later.</string>
+    <string name="credit_info">Special thanks to the developers and contributors behind these projects.</string>
+
+    <!-- Search Activity -->
+    <string name="search_hint_channels">Search all channels…</string>
+    <string name="search_prompt_title">Search channels</string>
+    <string name="search_prompt_body">Search across all your playlists and categories.</string>
+    <string name="search_no_results_title">No results</string>
+    <string name="search_no_results_body">No matches for &#8220;%1$s&#8221;. Try a different keyword.</string>
+    <string name="search_error">Could not search. Please try again.</string>
+    <string name="cd_clear">Clear</string>
+
+    <!-- Explore empty state -->
+    <string name="explore_empty_title">Nothing here yet</string>
+    <string name="explore_empty_body">Add a playlist to start watching. Your history, playlists and categories will appear here.</string>
 
 </resources>

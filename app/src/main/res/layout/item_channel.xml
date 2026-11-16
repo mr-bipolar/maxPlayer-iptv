@@ -31,7 +31,7 @@
                 android:contentDescription="@null"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_tv"
-                app:tint="@color/ink_faint" />
+                app:tint="@color/ink_dim" />
         </FrameLayout>
 
         <TextView

@@ -95,13 +95,6 @@ public class RemoteWebSocketClient extends WebSocketClient {
     @Override
     public void onClose(int code, String reason, boolean remote) {
         authenticated = false;
-
-        Log.e(TAG, "========== WEBSOCKET CLOSED ==========");
-        Log.e(TAG, "Code: " + code);
-        Log.e(TAG, "Reason: " + reason);
-        Log.e(TAG, "Remote: " + remote);
-        Log.e(TAG, "======================================");
-
         if (listener != null) {
             listener.onDisconnected();
         }
@@ -109,7 +102,7 @@ public class RemoteWebSocketClient extends WebSocketClient {
 
     @Override
     public void onError(Exception error) {
-        Log.e(TAG, "========== WEBSOCKET ERROR ==========", error);
+        Log.e(TAG, "WEBSOCKET ERROR ", error);
 
         if (listener != null) {
             listener.onError(error);

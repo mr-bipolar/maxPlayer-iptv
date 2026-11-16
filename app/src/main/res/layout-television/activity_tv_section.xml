@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@drawable/bg_primary_background"
+    android:padding="32dp"
+    tools:ignore="MissingDefaultResource">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="@dimen/space_22">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_margin="@dimen/tv_margin_v"
+            android:background="@drawable/bg_tv_btn_ghost"
+            android:contentDescription="@string/cd_back"
+            android:focusable="true"
+            android:src="@drawable/ic_back"
+            android:stateListAnimator="@animator/tv_focus_scale_sm"
+            app:tint="@color/ink_dim" />
+
+    <TextView android:id="@+id/tvSectionTitle" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:textColor="@color/white"
+        android:textSize="@dimen/tv_text_title" android:textStyle="bold"  />
+
+    </LinearLayout>
+
+    <TextView android:id="@+id/tvSectionStatus" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:gravity="center" android:padding="24dp"
+        android:textColor="@color/white_alpha_65" android:textSize="@dimen/tv_text_headline"
+        android:text="@string/tv_loading" />
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/tvSectionRecycler"
+        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:clipChildren="false" android:clipToPadding="false" android:padding="8dp" />
+</LinearLayout>

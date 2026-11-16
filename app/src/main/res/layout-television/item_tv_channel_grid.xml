@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:background="@drawable/bg_tv_playlist_item"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:padding="14dp"
+    android:stateListAnimator="@null"
+    tools:ignore="MissingDefaultResource">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="128dp"
+        android:background="@drawable/bg_tv_card_art_default"
+        android:padding="18dp">
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_tv"
+           />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="2"
+        android:paddingTop="12dp"
+        android:textColor="@color/white"
+        android:textSize="@dimen/tv_text_body"
+        android:textStyle="bold" />
+</LinearLayout>

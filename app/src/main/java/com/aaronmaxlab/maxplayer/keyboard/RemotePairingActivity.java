@@ -13,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.databinding.ActivityRemotePairingBinding;
 import com.aaronmaxlab.maxplayer.remote.RemoteInputController;
+import com.aaronmaxlab.maxplayer.utils.AppToast;
+import com.aaronmaxlab.maxplayer.utils.ClickUtils;
+import com.aaronmaxlab.maxplayer.utils.ClipboardUtils;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.aaronmaxlab.maxplayer.MaxPlayerApplication;
 import com.aaronmaxlab.maxplayer.remote.RemoteInputManager;
@@ -34,13 +37,22 @@ public class RemotePairingActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         UIUtils.applySystemBarPadding(binding.getRoot(), false);
 
-
+        ClickUtils.applyTouchEffect(binding.backQrBtn, view -> finish());
+        ClickUtils.applyTouchEffect(binding.copyKeyboardOut, view -> {
+            final String copyText = binding.tvInputText.getText().toString().trim();
+            if(copyText.isEmpty()){
+                AppToast.warning(this, "Empty textbox");
+                return;
+            }
+            ClipboardUtils.copyText(this, copyText);
+        });
 
         // Create pairing session before starting the server.
         String ip = NetworkUtils.getLocalIpv4Address(this);
 
         if (ip == null) {
-            Log.e("REMOTE", "Unable to detect TV IP address");
+            binding.btnRestartQr.setVisibility(View.VISIBLE);
+            AppToast.error(this, "Unable to detect TV IP address");
             return;
         }
 
@@ -55,7 +67,9 @@ public class RemotePairingActivity extends AppCompatActivity {
                 remoteInputManager.isClientConnected()
         );
 
-        setupKeyboardActions();
+        ClickUtils.applyTouchEffect(binding.btnRestartQr, v -> regenerateQr());
+
+       setupKeyboardActions();
     }
 
     @Override
@@ -70,6 +84,32 @@ public class RemotePairingActivity extends AppCompatActivity {
     }
 
 
+    private void regenerateQr() {
+        if (binding == null || remoteInputManager == null) {
+            return;
+        }
+
+        try {
+            String payload = remoteInputManager.getQrPayload();
+
+            if (payload == null || payload.trim().isEmpty()) {
+                AppToast.warning(this, "Pairing session is not ready");
+                return;
+            }
+
+            Bitmap qrBitmap = QrCodeManager.generateQrCode(payload, 400);
+            binding.ivPairingQr.setImageBitmap(qrBitmap);
+            binding.btnRestartQr.setVisibility(View.GONE);
+
+            Log.d("REMOTE", "QR code generated successfully");
+
+        } catch (Exception e) {
+            AppToast.error(this, "QR generation failed");
+            Log.e("REMOTE", "QR generation failed", e);
+        }
+    }
+
+
     private final RemoteInputManager.Listener remoteListener =
             new RemoteInputManager.Listener() {
 
@@ -80,8 +120,7 @@ public class RemotePairingActivity extends AppCompatActivity {
 
                 @Override
                 public void onClientConnected() {
-                    Log.d("REMOTE", "Phone authenticated!");
-
+                    AppToast.success(RemotePairingActivity.this, "Phone authenticated!");
                     if (remoteInputController != null) {
                         remoteInputController.setPhoneConnected(true);
                     }
@@ -89,8 +128,7 @@ public class RemotePairingActivity extends AppCompatActivity {
 
                 @Override
                 public void onClientDisconnected() {
-                    Log.d("REMOTE", "Phone disconnected!");
-
+                    AppToast.warning(RemotePairingActivity.this, "Phone disconnected!");
                     if (remoteInputController != null) {
                         remoteInputController.setPhoneConnected(false);
                     }
@@ -110,45 +148,32 @@ public class RemotePairingActivity extends AppCompatActivity {
 
 
     private void onServerStarted(int port) {
-
-        Log.d("REMOTE", "onServerStarted called");
-
         runOnUiThread(() -> {
-
-            Log.d("REMOTE", "UI thread reached");
+            if (binding == null || remoteInputManager == null) {
+                return;
+            }
 
             try {
                 String payload = remoteInputManager.getQrPayload();
 
-                Log.d("REMOTE", "QR payload: " +
-                        (payload != null ? "available" : "NULL"));
-
-                if (payload == null || binding == null) {
-                    Log.e("REMOTE", "QR generation skipped");
-                    return;
+                if (payload == null || payload.trim().isEmpty()) {
+                    throw new IllegalStateException("QR payload is empty");
                 }
 
-                Bitmap qrBitmap = QrCodeManager.generateQrCode(
-                        payload,
-                        400
-                );
-
-                Log.d("REMOTE", "QR bitmap: " +
-                        (qrBitmap != null ? "generated" : "NULL"));
+                Bitmap qrBitmap = QrCodeManager.generateQrCode(payload, 400);
 
                 binding.ivPairingQr.setImageBitmap(qrBitmap);
-
-                Log.d("REMOTE", "ImageView width: " +
-                        binding.ivPairingQr.getWidth());
-
-                Log.d("REMOTE", "ImageView height: " +
-                        binding.ivPairingQr.getHeight());
-
-                Log.d("REMOTE", "ImageView drawable: " +
-                        binding.ivPairingQr.getDrawable());
+                binding.btnRestartQr.setVisibility(View.GONE);
+                Log.d("QR_DEBUG", "QR generated successfully");
 
             } catch (Exception e) {
-                Log.e("REMOTE", "QR generation failed", e);
+                binding.btnRestartQr.setVisibility(View.VISIBLE);
+                binding.btnRestartQr.setFocusable(true);
+                binding.btnRestartQr.setFocusableInTouchMode(true);
+                binding.btnRestartQr.post(() -> binding.btnRestartQr.requestFocus());
+
+                Log.e("QR_DEBUG", "QR generation failed", e);
+                AppToast.error(this, "QR generation failed");
             }
         });
     }

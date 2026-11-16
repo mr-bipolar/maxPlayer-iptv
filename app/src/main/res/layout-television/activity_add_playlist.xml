@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/main"
-    android:background="@color/bg">
+    android:background="@drawable/bg_primary_background">
 
 
 
@@ -78,7 +78,7 @@
                         android:src="@drawable/ic_link"
                         android:importantForAccessibility="no"
                         android:layout_gravity="center"
-                        app:tint="@color/accent" />
+                        app:tint="@color/primary_highlight" />
                 </FrameLayout>
 
                 <TextView
@@ -128,7 +128,7 @@
                         android:src="@drawable/ic_folder"
                         android:importantForAccessibility="no"
                         android:layout_gravity="center"
-                        app:tint="@color/accent" />
+                        app:tint="@color/primary_highlight" />
                 </FrameLayout>
 
                 <TextView
@@ -176,7 +176,7 @@
                         android:src="@drawable/ic_file"
                         android:importantForAccessibility="no"
                         android:layout_gravity="center"
-                        app:tint="@color/accent" />
+                        app:tint="@color/primary_highlight" />
                 </FrameLayout>
                 <TextView
                     android:layout_width="wrap_content"
@@ -219,7 +219,7 @@
                         android:src="@drawable/ic_play"
                         android:importantForAccessibility="no"
                         android:layout_gravity="center"
-                        app:tint="@color/accent" />
+                        app:tint="@color/primary_highlight" />
                 </FrameLayout>
                 <TextView
                     android:layout_width="wrap_content"

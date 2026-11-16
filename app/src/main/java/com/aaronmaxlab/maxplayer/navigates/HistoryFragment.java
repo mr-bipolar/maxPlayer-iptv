@@ -20,11 +20,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.aaronmaxlab.maxplayer.AddPlaylistUrlActivity;
+import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
 import com.aaronmaxlab.maxplayer.database.adapter.LocalDbHistoryAdapter;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbHistory;
 import com.aaronmaxlab.maxplayer.databinding.FragmentHistoryBinding;
 import com.aaronmaxlab.maxplayer.player.PlayerActivity;
+import com.aaronmaxlab.maxplayer.player.media3.audio.AudioMiniPlayer;
 import com.aaronmaxlab.maxplayer.player.media3.audio.AudioPlayerActivity;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
@@ -40,6 +42,7 @@ public class HistoryFragment extends Fragment {
     private FragmentHistoryBinding binding;
     private SqlDbHelper dbHelper;
     private LocalDbHistoryAdapter historyAdapter;
+    private AudioMiniPlayer audioMiniPlayer;
 
     private final ExecutorService networkExecutor =
             Executors.newSingleThreadExecutor();
@@ -70,6 +73,11 @@ public class HistoryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        audioMiniPlayer = new AudioMiniPlayer(
+                requireActivity(),
+                binding.getRoot().findViewById(R.id.audioPlayerOverlay)
+        );
+        audioMiniPlayer.attach();
 
         dbHelper = new SqlDbHelper(requireContext());
 
@@ -162,6 +170,14 @@ public class HistoryFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        if (audioMiniPlayer != null) {
+            audioMiniPlayer.release();
+            audioMiniPlayer = null;
+        }
+        if (dbHelper != null) {
+            dbHelper.close();
+            dbHelper = null;
+        }
         networkExecutor.shutdownNow();
         super.onDestroy();
     }
@@ -177,7 +193,6 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         if (binding != null && dbHelper != null && historyAdapter != null) {
             loadHistory();
         }
@@ -185,14 +200,11 @@ public class HistoryFragment extends Fragment {
 
     private void loadHistory() {
         if (binding == null || dbHelper == null || historyAdapter == null) {
-
             return;
         }
 
         List<LocalDbHistory> history = dbHelper.getAllHistory();
-
         historyAdapter.submitList(history);
-
         boolean isEmpty = history.isEmpty();
         binding.layoutHistoryEmpty.getRoot()
                 .setVisibility(isEmpty ? View.VISIBLE : View.GONE);

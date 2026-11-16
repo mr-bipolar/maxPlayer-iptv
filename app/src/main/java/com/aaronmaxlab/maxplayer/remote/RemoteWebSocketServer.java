@@ -98,9 +98,7 @@ public class RemoteWebSocketServer extends WebSocketServer {
             }
 
             authenticatedClient = connection;
-
             connection.send("{\"type\":\"auth_success\"}");
-
             Log.d(TAG, "Client authenticated");
 
             if (listener != null) {

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:clipChildren="false" android:clipToPadding="false" xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@drawable/bg_primary_background"
+    android:paddingStart="32dp"
+    android:paddingEnd="32dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="20dp"
+    tools:ignore="MissingDefaultResource">
+
+    <LinearLayout android:clipChildren="false" android:clipToPadding="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_gravity="top|start"
+            android:layout_margin="@dimen/tv_margin_v"
+            android:background="@drawable/bg_tv_btn_ghost"
+            android:contentDescription="@string/cd_back"
+            android:focusable="true"
+            android:nextFocusDown="@id/channelGrid"
+            android:src="@drawable/ic_back"
+            android:stateListAnimator="@animator/tv_focus_scale_sm"
+            app:tint="@color/ink_dim" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:text="All Channels"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_text_section_title"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:gravity="end"
+            android:textColor="@color/primary_highlight"
+            android:textSize="@dimen/tv_text_button" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/channelGrid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:padding="8dp"
+            android:scrollbars="none" />
+
+        <ProgressBar
+            android:id="@+id/loading"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:id="@+id/message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="32dp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_text_body"
+            android:visibility="gone" />
+    </FrameLayout>
+</LinearLayout>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="PlayerDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/bg_dialog_black</item>
+
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorSecondary">@color/white_alpha_75</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="buttonBarButtonStyle">@style/PlayerDialogButton</item>
+        <item name="android:colorAccent">@color/accent</item>
+
+        <item name="colorAccent">@color/accent</item>
+    </style>
+
+
+    <style name="PlayerDialogButton"
+        parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+</resources>

@@ -303,7 +303,7 @@ public class LocalDbHistoryAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 icon.setImageResource(R.drawable.ic_radio);
                 type.setBackgroundResource(R.drawable.bg_tag_audio);
                 type.setTextColor(
-                        itemView.getContext().getColor(R.color.accent)
+                        itemView.getContext().getColor(R.color.primary_highlight)
                 );
             } else if("VOD".equalsIgnoreCase(mediaType)){
                 icon.setImageResource(R.drawable.ic_play);

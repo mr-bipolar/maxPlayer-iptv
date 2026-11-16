@@ -1,6 +1,7 @@
 
 package com.aaronmaxlab.maxplayer.database.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.util.Log;
@@ -19,6 +20,7 @@ import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbChannel;
 import com.aaronmaxlab.maxplayer.databinding.ChannelViewBinding;
 import com.aaronmaxlab.maxplayer.databinding.ChannelViewGridBinding;
+import com.aaronmaxlab.maxplayer.utils.AppUtils;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -45,7 +47,7 @@ public class LocalDbChannelAdapter
     private final OnChannelClickListener listener;
 
     public interface OnChannelClickListener {
-        void onChannelClick(LocalDbChannel channel);
+        void onChannelClick(LocalDbChannel channel, boolean isRadio);
         void onMenuClick(LocalDbChannel channel, View anchor);
     }
 
@@ -78,6 +80,9 @@ public class LocalDbChannelAdapter
             @NonNull ViewGroup parent,
             int viewType
     ) {
+
+        Log.d("ChannelAdapter", "viewType = " + viewType
+                + ", gridMode = " + gridMode);
         if (viewType == TYPE_GRID) {
             ChannelViewGridBinding binding =
                     ChannelViewGridBinding.inflate(inflater, parent, false);
@@ -130,16 +135,31 @@ public class LocalDbChannelAdapter
             this.binding = binding;
         }
 
+        @SuppressLint("ClickableViewAccessibility")
         void bind(LocalDbChannel channel) {
 
             binding.channelName.setText(channel.getChannelName());
             binding.channelCategory.setText(selectedCategoryName);
-            binding.channelIcon.setImageResource(R.drawable.ic_tv);
+
+            boolean isRadio = isRadioCategory(channel.getChannelCategory());
+
+            binding.channelIcon.setImageResource(isRadio ? R.drawable.ic_radio : R.drawable.ic_tv);
+
+            binding.channelMenu.setVisibility(
+                    showMenu ? View.VISIBLE : View.GONE
+            );
 
             ClickUtils.applyTouchEffect(itemView, view -> {
                 if (listener != null) {
-                    listener.onChannelClick(channel);
+                    listener.onChannelClick(channel, isRadio);
                 }
+            });
+
+            binding.channelMenu.setOnTouchListener((v, event) -> {
+                if (v.getParent() != null) {
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                }
+                return false;
             });
 
             binding.channelMenu.setOnClickListener(v -> {
@@ -163,18 +183,29 @@ public class LocalDbChannelAdapter
             this.binding = binding;
         }
 
+        @SuppressLint("ClickableViewAccessibility")
         void bind(LocalDbChannel channel) {
 
             binding.channelName.setText(channel.getChannelName());
+
+            boolean isRadio = isRadioCategory(channel.getChannelCategory());
             loadChannelLogo(binding.channelGridIcon, channel);
+
             binding.channelMenu.setVisibility(
                     showMenu ? View.VISIBLE : View.GONE
             );
 
             ClickUtils.applyTouchEffect(itemView, view -> {
                 if (listener != null) {
-                    listener.onChannelClick(channel);
+                    listener.onChannelClick(channel, isRadio);
                 }
+            });
+
+            binding.channelMenu.setOnTouchListener((v, event) -> {
+                if (v.getParent() != null) {
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                }
+                return false;
             });
 
             binding.channelMenu.setOnClickListener(v -> {
@@ -254,21 +285,28 @@ public class LocalDbChannelAdapter
     // IMAGE FOR LOGO
     private void loadChannelLogo(ImageView imageView, LocalDbChannel channel) {
         String imageUrl = channel.getChannelImage();
+        int catId = channel.getChannelCategory();
+
+        if(catId == -1){ catId = 0; }
+
+        boolean isRadio = isRadioCategory(catId);
 
         if (imageUrl == null || imageUrl.trim().isEmpty()) {
             Glide.with(imageView).clear(imageView);
 
-            imageView.setImageResource(R.drawable.ic_tv);
+            imageView.setImageResource(isRadio ? R.drawable.audio : R.drawable.ic_tv);
 
-            ImageViewCompat.setImageTintList(
-                    imageView,
-                    ColorStateList.valueOf(
-                            ContextCompat.getColor(
-                                    imageView.getContext(),
-                                    R.color.ink_faint
-                            )
-                    )
-            );
+          if(!isRadio) {
+              ImageViewCompat.setImageTintList(
+                      imageView,
+                      ColorStateList.valueOf(
+                              ContextCompat.getColor(
+                                      imageView.getContext(),
+                                      R.color.ink_faint
+                              )
+                      )
+              );
+          }
 
             return;
         }
@@ -285,8 +323,8 @@ public class LocalDbChannelAdapter
 
         Glide.with(imageView)
                 .load(imageUrl)
-                .placeholder(R.drawable.ic_tv)
-                .error(R.drawable.ic_tv)
+                .placeholder(isRadio ? R.drawable.audio : R.drawable.ic_tv)
+                .error(isRadio ? R.drawable.audio : R.drawable.ic_tv)
                 .override(120, 120)
                 .centerInside()
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
@@ -297,6 +335,12 @@ public class LocalDbChannelAdapter
     private int dpToPx(int dp, ImageView imageView) {
         return (int) (dp * imageView.getResources()
                 .getDisplayMetrics().density + 0.5f);
+    }
+
+    private boolean isRadioCategory(int categoryIndex) {
+        return categoryIndex == 17
+                || categoryIndex == 18
+                || categoryIndex == 9;
     }
 
 

@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg"
+    android:background="@drawable/bg_primary_background"
     android:clipChildren="false"
     tools:context=".filepicker.FileDetailsActivity">
 
@@ -96,7 +96,7 @@
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:src="@drawable/ic_playlist_filled"
-                        app:tint="@color/accent" />
+                        app:tint="@color/primary_highlight" />
                 </FrameLayout>
 
                 <LinearLayout
@@ -284,7 +284,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/line_soft" />
 
         <LinearLayout
             android:layout_width="match_parent"

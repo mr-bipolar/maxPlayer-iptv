@@ -46,6 +46,11 @@
         <item name="tint">#F4F7FF</item>
     </style>
 
+    <style name="GlassSurface">
+        <item name="android:background">@drawable/bg_glass_surface</item>
+        <item name="android:elevation">6dp</item>
+    </style>
+
     <style name="zxing_CaptureTheme"
         parent="Theme.AppCompat.NoActionBar">
 
@@ -54,5 +59,26 @@
         <item name="android:navigationBarColor">#000000</item>
         <item name="android:statusBarColor">#000000</item>
     </style>
+
+
+
+    <style name="TvSettingsTab">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">22dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:textColor">@color/ink_dim</item>
+        <item name="android:textSize">@dimen/tv_text_body</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:drawablePadding">12dp</item>
+        <item name="android:drawableTint">@color/ink_dim</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:stateListAnimator">@animator/tv_focus_scale_sm</item>
+    </style>
+
 
 </resources>

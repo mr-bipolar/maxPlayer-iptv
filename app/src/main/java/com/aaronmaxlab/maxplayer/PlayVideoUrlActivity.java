@@ -50,29 +50,18 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-
         binding = ActivityPlayVideoUrlBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         final  boolean isTv = DeviceUtils.isTv(this);
-
-
-
         sqlDbHelper = new SqlDbHelper(this);
-
         UIUtils.setLightNavigationBars(this, false); // black bottom nav
         UIUtils.applySystemBarPadding(binding.getRoot());
 
-
-        if(isTv){
-
-        }else {
+        if(!isTv){
             recyclerView = binding.recyclerRecentViews;
             loader = findViewById(R.id.loaderOverlay);
             setupRecentViews(sqlDbHelper);
         }
-
-
 
         ClickUtils.applyTouchEffect(binding.backPlayVideoUrl, v -> finish());
         ClickUtils.applyTouchEffect(binding.playVideoUrl, v -> onPlayClicked());
@@ -196,15 +185,8 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
 
                         if(result){
                             boolean isFav = sqlDbHelper.isFavorite(item.getChannelUrl());
-
-                            if (isFav) {
-                                AppToast.success( PlayVideoUrlActivity.this, "Added to favorites.");
-                            } else {
-                                AppToast.success(PlayVideoUrlActivity.this, "Removed from favorites.");
-                            }
-
+                            AppToast.success( PlayVideoUrlActivity.this,  isFav ?"Added to favorites." : "Removed from favorites.");
                             ImageView favButton = findViewById(R.id.mediaFav);
-
                             if (favButton != null) {
                                 favButton.setImageResource(
                                         isFav
@@ -214,7 +196,6 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
                             }
 
                         }
-
                         adapter.notifyDataSetChanged();
                     }
 
@@ -260,11 +241,8 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(
                     new LinearLayoutManager(this)
             );
-
             recyclerView.setAdapter(adapter);
         }
-
-
         refreshRecentViews();
     }
 
@@ -272,14 +250,12 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
         try {
             List<LocalDbRecentView> recentViews =
                     sqlDbHelper.getAllRecentViews(PlaylistType.VOD);
-
-            assert binding.recentLabel != null;
-
-            binding.recentLabel.setVisibility( recentViews.isEmpty() ? View.GONE : VISIBLE);
-
+            if (binding.recentLabel != null) {
+                binding.recentLabel.setVisibility(
+                        recentViews.isEmpty() ? View.GONE : View.VISIBLE
+                );
+            }
             adapter.submitList(recentViews);
-            Log.d("RECENT_VIEW", "Loaded recent views: " + recentViews.size());
-
         } catch (Exception e) {
             Log.e("RECENT_VIEW", "Failed to load recent views", e);
         }
@@ -290,7 +266,6 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
             sqlDbHelper.setRecentViews(recentView);
             // Reload the RecyclerView after inserting.
             refreshRecentViews();
-
         } catch (Exception e) {
             Log.e("RECENT_VIEW", "Failed to add recent view", e);
         }
@@ -300,6 +275,10 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         ioExecutor.shutdownNow();
+        if (sqlDbHelper != null) {
+            sqlDbHelper.close();
+            sqlDbHelper = null;
+        }
         binding = null;
         super.onDestroy();
     }

@@ -22,6 +22,7 @@ import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
 import com.aaronmaxlab.maxplayer.database.adapter.LocalDbCategoryAdapter;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbCategory;
 import com.aaronmaxlab.maxplayer.databinding.FragmentPlaylistsBinding;
+import com.aaronmaxlab.maxplayer.player.media3.audio.AudioMiniPlayer;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 
@@ -36,6 +37,7 @@ public class PlaylistsFragment extends Fragment {
     private SqlDbHelper sqlDbHelper;
     private Integer spanCount = 1;
     private RecyclerView recyclerView;
+    private AudioMiniPlayer audioMiniPlayer;
 
     public PlaylistsFragment() {
         // Required empty public constructor
@@ -54,6 +56,12 @@ public class PlaylistsFragment extends Fragment {
         binding = FragmentPlaylistsBinding.inflate(inflater, container, false);
         recyclerView = binding.categoryRecyclerView;
         sqlDbHelper = new SqlDbHelper(getContext());
+
+        audioMiniPlayer = new AudioMiniPlayer(
+                requireActivity(),
+                binding.getRoot().findViewById(R.id.audioPlayerOverlay)
+        );
+        audioMiniPlayer.attach();
 
         spanChange();
         setupCategories();
@@ -75,6 +83,8 @@ public class PlaylistsFragment extends Fragment {
         ClickUtils.applyTouchEffect(binding.sortBtn, view -> showCategorySort());
         ClickUtils.applyTouchEffect(binding.gridView, view -> spanChange());
         ClickUtils.applyTouchEffect(binding.listView, view -> spanChange());
+        ClickUtils.applyTouchEffect(binding.btnAddPlaylist, view ->
+                startActivity(new Intent(getContext(), com.aaronmaxlab.maxplayer.AddPlaylistActivity.class)));
 
         return binding.getRoot();
     }
@@ -93,7 +103,7 @@ public class PlaylistsFragment extends Fragment {
                 isGrid ? R.drawable.bg_chip : R.drawable.bg_chip_active
         );
 
-        int activeColor = ContextCompat.getColor(requireContext(), R.color.accent);
+        int activeColor = ContextCompat.getColor(requireContext(), R.color.primary_highlight);
         int inactiveColor = ContextCompat.getColor(requireContext(), R.color.ink_dim);
 
         binding.gridText.setTextColor(isGrid ? activeColor : inactiveColor);
@@ -122,6 +132,13 @@ public class PlaylistsFragment extends Fragment {
             sqlDbHelper.syncCategoryCounts();
 
             List<LocalDbCategory> categories = sqlDbHelper.getCategories();
+            if (categories == null || categories.isEmpty()) {
+                binding.emptyCategoriesView.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+            } else {
+                binding.emptyCategoriesView.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+            }
 
             categoryAdapter = new LocalDbCategoryAdapter(
                     requireContext(),
@@ -203,7 +220,14 @@ public class PlaylistsFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        sqlDbHelper.close();
+        if (audioMiniPlayer != null) {
+            audioMiniPlayer.release();
+            audioMiniPlayer = null;
+        }
+        if (sqlDbHelper != null) {
+            sqlDbHelper.close();
+            sqlDbHelper = null;
+        }
         super.onDestroy();
     }
 }

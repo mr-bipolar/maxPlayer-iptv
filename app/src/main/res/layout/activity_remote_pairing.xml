@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg">
+    android:background="@drawable/bg_primary_background">
 
     <View
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/tv_pair_eyebrow_fast"
-                android:textColor="@color/accent"
+                android:textColor="@color/primary_highlight"
                 android:textSize="@dimen/tv_text_label"
                 android:textStyle="bold" />
 
@@ -60,7 +60,30 @@
                     android:importantForAccessibility="no"
                     android:layout_gravity="center"
                     />
+
+
+                <ImageView
+                    android:id="@+id/btnRestartQr"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_restart"
+                    android:background="@drawable/bg_pill_accent"
+                    android:padding="12dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:contentDescription="Restart QR code"
+                    android:elevation="4dp"
+                    android:visibility="gone"
+                    android:nextFocusUp="@id/backQrBtn"
+                    android:nextFocusDown="@id/copyKeyboardOut"
+                    android:stateListAnimator="@animator/tv_focus_scale_sm"
+                    app:tint="@color/ink" />
+
+
             </FrameLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -68,15 +91,7 @@
                 android:textColor="@color/ink_dim"
                 android:textSize="@dimen/tv_text_label"
                 android:layout_marginBottom="4dp"/>
-            <TextView
-                android:id="@+id/tvPairingCode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tv_pair_code"
-                android:textColor="@color/white"
-                android:textSize="@dimen/tv_text_title"
-                android:textStyle="bold"
-                android:letterSpacing="0.04"/>
+
         </LinearLayout>
         <View
             android:layout_width="1dp"
@@ -93,7 +108,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/tv_pair_eyebrow_type"
-                android:textColor="@color/accent"
+                android:textColor="@color/primary_highlight"
                 android:textSize="@dimen/tv_text_label"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"/>
@@ -120,12 +135,16 @@
                     android:textSize="@dimen/tv_text_button"
                     android:maxLines="1"
                     android:ellipsize="start"/>
-                <View
-                    android:id="@+id/tvInputCaret"
-                    android:layout_width="2dp"
-                    android:layout_height="16dp"
-                    android:background="@drawable/bg_tv_caret"
-                    android:layout_marginStart="2dp"/>
+                <ImageView
+                    android:id="@+id/copyKeyboardOut"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/space_8"
+                    android:src="@drawable/ic_copy"
+                    android:focusable="true"
+                    android:background="@drawable/bg_tv_key"
+                    android:stateListAnimator="@animator/tv_focus_scale_sm"
+                    app:tint="@color/ink" />
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/tvKeyboardContainer"
@@ -995,7 +1014,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/btn_add_playlist"
+                            android:text="Submit"
                             android:textColor="@color/accent_ink"
                             android:textSize="@dimen/tv_text_label"
                             android:textStyle="bold"/>
@@ -1004,4 +1023,18 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/backQrBtn"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_gravity="top|start"
+        android:layout_margin="@dimen/tv_margin_v"
+        android:background="@drawable/bg_tv_btn_ghost"
+        android:contentDescription="@string/cd_back"
+        android:focusable="true"
+        android:src="@drawable/ic_back"
+        android:stateListAnimator="@animator/tv_focus_scale_sm"
+        app:tint="@color/ink_dim" />
+
 </FrameLayout>

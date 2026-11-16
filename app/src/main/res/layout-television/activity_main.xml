@@ -1,949 +1,349 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/main"
     android:background="@color/bg">
 
+    <!-- 1. Cinematic Full-Bleed Background Image -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/wall"
+        android:contentDescription="@null" />
+
+    <!-- 2. Dark/Cinematic Gradient Overlay -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_tv_hero_backdrop" />
+        android:background="@drawable/bg_tv_home_overlay" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/bg_tv_hero_scrim" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="90dp"
-        android:scrollbars="none"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:overScrollMode="never">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:paddingBottom="24dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="0dp"
-                android:clipChildren="false"
-                android:clipToPadding="false">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/section_continue_watching"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/tv_text_row_title"
-                    android:textStyle="bold"
-                    android:paddingStart="@dimen/tv_margin_h"
-                    android:paddingEnd="@dimen/tv_margin_h" />
-
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="none"
-                    android:clipToPadding="false"
-                    android:clipChildren="false"
-                    android:paddingStart="@dimen/tv_margin_h"
-                    android:paddingEnd="@dimen/tv_margin_h"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="top"
-                        android:clipChildren="false">
-
-                        <LinearLayout
-                            android:layout_width="@dimen/tv_card_wide_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale"
-                            tools:scaleX="1.08"
-                            tools:scaleY="1.08"
-                            android:layout_marginEnd="12dp">
-
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_wide_h"
-                                android:background="@drawable/bg_tv_card_art"
-                                android:duplicateParentState="true"
-                                tools:background="@drawable/bg_tv_card_art_focused">
-
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_tv"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/ink_faint" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/player_channel_name"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/tv_live_42"
-                                    android:textColor="@color/white_alpha_55"
-                                    android:textSize="@dimen/tv_text_caption"
-                                    android:maxLines="1"/>
-                            </LinearLayout>
-                            <requestFocus/>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="@dimen/tv_card_wide_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale"
-                            android:layout_marginEnd="12dp">
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_wide_h"
-                                android:background="@drawable/bg_tv_card_art"
-                                android:duplicateParentState="true">
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_cat_movies"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/ink_faint" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/tv_card_movie"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/tv_card_movie_sub"
-                                    android:textColor="@color/white_alpha_55"
-                                    android:textSize="@dimen/tv_text_caption"
-                                    android:maxLines="1"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="@dimen/tv_card_wide_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale"
-                            android:layout_marginEnd="12dp">
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_wide_h"
-                                android:background="@drawable/bg_tv_card_art"
-                                android:duplicateParentState="true">
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_cat_news"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/ink_faint" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/now_playing_bbc"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/tv_live"
-                                    android:textColor="@color/white_alpha_55"
-                                    android:textSize="@dimen/tv_text_caption"
-                                    android:maxLines="1"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="@dimen/tv_card_wide_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale"
-                            android:layout_marginEnd="12dp">
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_wide_h"
-                                android:background="@drawable/bg_tv_card_art"
-                                android:duplicateParentState="true">
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_tv"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/ink_faint" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/channel_eurosport"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/tv_live"
-                                    android:textColor="@color/white_alpha_55"
-                                    android:textSize="@dimen/tv_text_caption"
-                                    android:maxLines="1"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="@dimen/tv_card_wide_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale">
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_wide_h"
-                                android:background="@drawable/bg_tv_card_art"
-                                android:duplicateParentState="true">
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_tv"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/ink_faint" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/channel_dazn"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/tv_live"
-                                    android:textColor="@color/white_alpha_55"
-                                    android:textSize="@dimen/tv_text_caption"
-                                    android:maxLines="1"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                    </LinearLayout>
-                </HorizontalScrollView>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="10dp"
-                android:clipChildren="false"
-                android:clipToPadding="false">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/section_my_playlists"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/tv_text_row_title"
-                    android:textStyle="bold"
-                    android:paddingStart="@dimen/tv_margin_h"
-                    android:paddingEnd="@dimen/tv_margin_h"/>
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="none"
-                    android:clipToPadding="false"
-                    android:clipChildren="false"
-                    android:paddingStart="@dimen/tv_margin_h"
-                    android:paddingEnd="@dimen/tv_margin_h"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp">
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="top"
-                        android:clipChildren="false">
-                        <LinearLayout
-                            android:layout_width="@dimen/tv_card_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale"
-                            android:layout_marginEnd="12dp">
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_h"
-                                android:background="@drawable/bg_tv_card_art"
-                                android:duplicateParentState="true">
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_tv"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/ink_faint" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/playlist_world_live_tv"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/fav_world_live_tv_cat"
-                                    android:textColor="@color/white_alpha_55"
-                                    android:textSize="@dimen/tv_text_caption"
-                                    android:maxLines="1"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="@dimen/tv_card_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale"
-                            android:layout_marginEnd="12dp">
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_h"
-                                android:background="@drawable/bg_tv_card_art"
-                                android:duplicateParentState="true">
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_tv"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/ink_faint" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/playlist_sports_feed"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/cat_sports_count"
-                                    android:textColor="@color/white_alpha_55"
-                                    android:textSize="@dimen/tv_text_caption"
-                                    android:maxLines="1"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="@dimen/tv_card_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale"
-                            android:layout_marginEnd="12dp">
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_h"
-                                android:background="@drawable/bg_tv_card_art"
-                                android:duplicateParentState="true">
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_tv"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/ink_faint" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/playlist_family_mix"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/tv_count_54"
-                                    android:textColor="@color/white_alpha_55"
-                                    android:textSize="@dimen/tv_text_caption"
-                                    android:maxLines="1"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="@dimen/tv_card_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale"
-                            android:layout_marginEnd="12dp">
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_h"
-                                android:background="@drawable/bg_tv_card_art"
-                                android:duplicateParentState="true">
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_radio"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/ink_faint" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/playlist_radio_stations"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/cat_radio_count"
-                                    android:textColor="@color/white_alpha_55"
-                                    android:textSize="@dimen/tv_text_caption"
-                                    android:maxLines="1"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/tvAddPlaylist"
-                            android:layout_width="@dimen/tv_card_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale">
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_h"
-                                android:background="@drawable/bg_tv_card_add_art"
-                                android:duplicateParentState="true">
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_plus"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/accent" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/btn_add_playlist"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                    </LinearLayout>
-                </HorizontalScrollView>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="10dp"
-                android:clipChildren="false"
-                android:clipToPadding="false">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/tv_row_categories"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/tv_text_row_title"
-                    android:textStyle="bold"
-                    android:paddingStart="@dimen/tv_margin_h"
-                    android:paddingEnd="@dimen/tv_margin_h"/>
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="none"
-                    android:clipToPadding="false"
-                    android:clipChildren="false"
-                    android:paddingStart="@dimen/tv_margin_h"
-                    android:paddingEnd="@dimen/tv_margin_h"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp">
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="top"
-                        android:clipChildren="false">
-                        <LinearLayout
-                            android:layout_width="@dimen/tv_card_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale"
-                            android:layout_marginEnd="12dp">
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_h"
-                                android:background="@drawable/bg_tv_card_art"
-                                android:duplicateParentState="true">
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_cat_sport"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/ink_faint" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/cat_sports"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/cat_sports_count"
-                                    android:textColor="@color/white_alpha_55"
-                                    android:textSize="@dimen/tv_text_caption"
-                                    android:maxLines="1"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="@dimen/tv_card_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale"
-                            android:layout_marginEnd="12dp">
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_h"
-                                android:background="@drawable/bg_tv_card_art"
-                                android:duplicateParentState="true">
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_cat_news"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/ink_faint" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/cat_news"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/cat_news_count"
-                                    android:textColor="@color/white_alpha_55"
-                                    android:textSize="@dimen/tv_text_caption"
-                                    android:maxLines="1"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="@dimen/tv_card_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale"
-                            android:layout_marginEnd="12dp">
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_h"
-                                android:background="@drawable/bg_tv_card_art"
-                                android:duplicateParentState="true">
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_cat_movies"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/ink_faint" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/cat_movies"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/cat_movies_count"
-                                    android:textColor="@color/white_alpha_55"
-                                    android:textSize="@dimen/tv_text_caption"
-                                    android:maxLines="1"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="@dimen/tv_card_w"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:clipChildren="false"
-                            android:focusable="true"
-                            android:stateListAnimator="@animator/tv_focus_scale">
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="@dimen/tv_card_h"
-                                android:background="@drawable/bg_tv_card_art"
-                                android:duplicateParentState="true">
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:src="@drawable/ic_cat_kids"
-                                    android:importantForAccessibility="no"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    app:tint="@color/ink_faint" />
-                            </FrameLayout>
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingTop="6dp">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/cat_kids"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/tv_text_label"
-                                    android:textStyle="bold"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/cat_kids_count"
-                                    android:textColor="@color/white_alpha_55"
-                                    android:textSize="@dimen/tv_text_caption"
-                                    android:maxLines="1"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                    </LinearLayout>
-                </HorizontalScrollView>
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+    <!-- 3. Main Content Container -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_gravity="top"
-        android:paddingStart="@dimen/tv_margin_h"
-        android:paddingEnd="@dimen/tv_margin_h"
-        android:paddingTop="24dp">
-        <LinearLayout
-            android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingStart="48dp"
+        android:paddingEnd="48dp"
+        android:paddingTop="32dp"
+        android:paddingBottom="28dp">
+
+        <!-- Top Bar: Branding on Left, Settings/Favorites on Right -->
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/bg_pill_accent"
-            android:paddingStart="14dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="9dp"
-            android:paddingBottom="9dp"
-            android:layout_marginEnd="6dp"
-            android:focusable="true">
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@drawable/ic_home"
-                android:importantForAccessibility="no"
-                android:layout_marginEnd="7dp"
-                app:tint="@color/accent_ink" />
-            <TextView
+            android:layout_marginBottom="16dp">
+
+            <!-- App Title & Legal Disclaimer (inspired by your reference image) -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/nav_home"
-                android:textColor="@color/accent_ink"
-                android:textSize="@dimen/tv_text_label"
-                android:textStyle="bold"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/bg_tv_nav_item"
-            android:paddingStart="14dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="9dp"
-            android:paddingBottom="9dp"
-            android:layout_marginEnd="6dp"
-            android:focusable="true">
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@drawable/ic_tv"
-                android:importantForAccessibility="no"
-                android:layout_marginEnd="7dp"
-                app:tint="@color/white_alpha_65" />
-            <TextView
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MAX PLAYER"
+                    android:textColor="@color/ink"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="This application does not host or provide any media content.\nPlease use your own legally obtained media sources."
+                    android:textColor="@color/ink_dim"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- Top-Right Action Buttons -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/tv_nav_live_tv"
-                android:textColor="@color/white_alpha_65"
-                android:textSize="@dimen/tv_text_label"
-                android:textStyle="bold"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/bg_tv_nav_item"
-            android:paddingStart="14dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="9dp"
-            android:paddingBottom="9dp"
-            android:layout_marginEnd="6dp"
-            android:focusable="true">
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@drawable/ic_nav_playlists"
-                android:importantForAccessibility="no"
-                android:layout_marginEnd="7dp"
-                app:tint="@color/white_alpha_65" />
-            <TextView
-                android:layout_width="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/tvSearchCard"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_tv_nav_item"
+                    android:src="@drawable/ic_search"
+                    android:scaleType="center"
+                    android:padding="14dp"
+                    android:contentDescription="@string/cd_search"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:layout_marginEnd="12dp"
+                    app:tint="@color/ink" />
+
+                <ImageButton
+                    android:id="@+id/tvSettingsButton"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_tv_nav_item"
+                    android:src="@drawable/ic_settings_gear"
+                    android:scaleType="center"
+                    android:padding="14dp"
+                    android:contentDescription="Settings"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:layout_marginEnd="12dp"
+                    app:tint="@color/ink" />
+
+                <ImageButton
+                    android:id="@+id/tvFavoritesButton"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_tv_nav_item"
+                    android:src="@drawable/ic_heart_filled"
+                    android:scaleType="center"
+                    android:padding="14dp"
+                    android:contentDescription="Favorites"
+                    android:focusable="true"
+                    android:clickable="true"
+                    app:tint="@color/ink" />
+
+            </LinearLayout>
+        </RelativeLayout>
+
+        <!-- Main Navigation Cards (Centered Horizontally) -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/nav_playlists"
-                android:textColor="@color/white_alpha_65"
-                android:textSize="@dimen/tv_text_label"
-                android:textStyle="bold"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/space_40"
+                android:orientation="horizontal">
+
+                <!-- Explore Card -->
+                <LinearLayout
+                    android:id="@+id/tvExploreCard"
+                    android:layout_width="0dp"
+                    android:layout_height="180dp"
+                    android:layout_weight="1"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/bg_tv_home_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_regional"
+                        android:contentDescription="@null"
+                        app:tint="@color/ink" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:text="Explore"
+                        android:textColor="@color/ink"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- Live TV Card -->
+                <LinearLayout
+                    android:id="@+id/tvLiveCard"
+                    android:layout_width="0dp"
+                    android:layout_height="180dp"
+                    android:layout_weight="1"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/bg_tv_home_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_tv"
+                        android:contentDescription="@null"
+                        app:tint="@color/ink" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:text="Live TV"
+                        android:textColor="@color/ink"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- Playlists Card -->
+                <LinearLayout
+                    android:id="@+id/tvPlaylistsCard"
+                    android:layout_width="0dp"
+                    android:layout_height="180dp"
+                    android:layout_weight="1"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/bg_tv_home_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_nav_playlists"
+                        android:contentDescription="@null"
+                        app:tint="@color/ink" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:text="Playlists"
+                        android:textColor="@color/ink"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- Categories Card -->
+                <LinearLayout
+                    android:id="@+id/tvCategoriesCard"
+                    android:layout_width="0dp"
+                    android:layout_height="180dp"
+                    android:layout_weight="1"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/bg_tv_home_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_other"
+                        android:contentDescription="@null"
+                        app:tint="@color/ink" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:text="Categories"
+                        android:textColor="@color/ink"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Bottom Actions Bar -->
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/bg_tv_nav_item"
-            android:paddingStart="14dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="9dp"
-            android:paddingBottom="9dp"
-            android:layout_marginEnd="6dp"
-            android:focusable="true">
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@drawable/ic_heart_outline"
-                android:importantForAccessibility="no"
-                android:layout_marginEnd="7dp"
-                app:tint="@color/white_alpha_65" />
-            <TextView
+            android:gravity="center_vertical">
+
+            <!-- Import Playlist Button -->
+            <LinearLayout
+                android:id="@+id/tvImportButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/nav_favorites"
-                android:textColor="@color/white_alpha_65"
-                android:textSize="@dimen/tv_text_label"
-                android:textStyle="bold"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/bg_tv_nav_item"
-            android:paddingStart="14dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="9dp"
-            android:paddingBottom="9dp"
-            android:layout_marginEnd="6dp"
-            android:focusable="true">
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@drawable/ic_search"
-                android:importantForAccessibility="no"
-                android:layout_marginEnd="7dp"
-                app:tint="@color/white_alpha_65" />
-            <TextView
+                android:layout_height="52dp"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/bg_tv_nav_item"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="18dp"
+                android:paddingEnd="22dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_plus"
+                    android:contentDescription="@null"
+                    app:tint="@color/ink" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Import Playlist"
+                    android:textColor="@color/ink"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- MPV Credit Subtext -->
+            <LinearLayout
+                android:id="@+id/tvMpvCredit"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/cd_search"
-                android:textColor="@color/white_alpha_65"
-                android:textSize="@dimen/tv_text_label"
-                android:textStyle="bold"/>
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/remotePair"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/bg_tv_nav_item"
-            android:paddingStart="14dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="9dp"
-            android:paddingBottom="9dp"
-            android:layout_marginEnd="6dp"
-            android:focusable="true">
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@drawable/ic_settings_gear"
-                android:importantForAccessibility="no"
-                android:layout_marginEnd="7dp"
-                app:tint="@color/white_alpha_65" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/nav_settings"
-                android:textColor="@color/white_alpha_65"
-                android:textSize="@dimen/tv_text_label"
-                android:textStyle="bold"/>
-        </LinearLayout>
+                android:layout_height="48dp"
+                android:layout_toStartOf="@id/tvRemoteButton"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="20dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_mpv_symbolic"
+                    android:contentDescription="MPV"
+                    app:tint="@color/ink_dim" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/space_12"
+                    android:text="Powered by MPV"
+                    android:textColor="@color/ink_dim"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <!-- Remote Connect Button -->
+            <ImageButton
+                android:id="@+id/tvRemoteButton"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/bg_tv_nav_item"
+                android:src="@drawable/ic_remote"
+                android:scaleType="center"
+                android:padding="14dp"
+                android:contentDescription="Remote Connect"
+                android:focusable="true"
+                android:clickable="true"
+                app:tint="@color/ink" />
+
+        </RelativeLayout>
+
     </LinearLayout>
+
 </FrameLayout>

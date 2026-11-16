@@ -121,10 +121,31 @@ public class RemoteInputController implements RemoteInputManager.InputListener {
                 return;
             }
 
-            View focusedView = activity.getCurrentFocus();
+            View focusedView = null;
+
+            // First check the active dialog window.
+            RemoteKeyController keyController =
+                    application.getRemoteKeyController();
+
+            if (keyController != null) {
+                android.app.Dialog dialog = keyController.getActiveDialog();
+
+                if (dialog != null && dialog.isShowing()
+                        && dialog.getWindow() != null) {
+                    focusedView = dialog.getWindow()
+                            .getDecorView().findFocus();
+                }
+            }
+
+            // Otherwise check the Activity window.
+            if (focusedView == null) {
+                focusedView = activity.getCurrentFocus();
+            }
 
             if (!(focusedView instanceof EditText)) {
-                Log.d("RemoteInput", "No focused EditText found");
+                Log.d("RemoteInput",
+                        "No focused EditText found. Focused view: "
+                                + focusedView);
                 return;
             }
 
@@ -134,6 +155,9 @@ public class RemoteInputController implements RemoteInputManager.InputListener {
             activeInput.setSelection(activeInput.length());
         });
     }
+
+
+
 
 
 }

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg"
+    android:background="@drawable/bg_primary_background"
     tools:context=".navigates.HistoryFragment">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -12,12 +12,19 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:overScrollMode="never"
-        android:paddingBottom="16dp"
+        android:paddingBottom="@dimen/space_64"
         tools:listitem="@layout/item_history" />
 
     <include
         android:id="@+id/layoutHistoryEmpty"
         layout="@layout/fragment_history_empty"
         android:visibility="gone" />
+
+    <include
+        android:id="@+id/audioPlayerOverlay"
+        layout="@layout/audio_bg_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
 </FrameLayout>

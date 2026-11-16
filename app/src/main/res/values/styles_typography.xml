@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextAppearance.MaxPlayer" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">@font/poppins_regular</item>
+    </style>
+    <style name="TextAppearance.MaxPlayer.Regular" parent="TextAppearance.MaxPlayer">
+        <item name="android:fontFamily">@font/poppins_regular</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+    <style name="TextAppearance.MaxPlayer.Medium" parent="TextAppearance.MaxPlayer">
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+    <style name="TextAppearance.MaxPlayer.Bold" parent="TextAppearance.MaxPlayer">
+        <item name="android:fontFamily">@font/poppins_bold</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+</resources>

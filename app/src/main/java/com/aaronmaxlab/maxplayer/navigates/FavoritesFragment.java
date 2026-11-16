@@ -9,6 +9,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,13 +27,16 @@ import com.aaronmaxlab.maxplayer.database.adapter.LocalDbFavoritesAdapter;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbFavorites;
 import com.aaronmaxlab.maxplayer.databinding.FragmentFavoritesBinding;
 import com.aaronmaxlab.maxplayer.player.PlayerActivity;
+import com.aaronmaxlab.maxplayer.player.media3.audio.AudioMiniPlayer;
 import com.aaronmaxlab.maxplayer.player.media3.audio.AudioPlayerActivity;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
+import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.PlaylistType;
 import com.aaronmaxlab.maxplayer.utils.StreamLauncher;
 import com.aaronmaxlab.maxplayer.utils.UrlUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 
 public class FavoritesFragment extends Fragment {
@@ -40,6 +45,7 @@ public class FavoritesFragment extends Fragment {
     private SqlDbHelper sqlDbHelper;
     private LocalDbFavoritesAdapter favoritesAdapter;
     private RecyclerView recyclerView;
+    private AudioMiniPlayer audioMiniPlayer;
 
     public FavoritesFragment() {
         // Required empty public constructor
@@ -58,6 +64,22 @@ public class FavoritesFragment extends Fragment {
         recyclerView = binding.favoritesRecyclerView;
 
         setupFavorites();
+
+        audioMiniPlayer = new AudioMiniPlayer(
+                requireActivity(),
+                binding.getRoot().findViewById(R.id.audioPlayerOverlay)
+        );
+        audioMiniPlayer.attach();
+
+        ClickUtils.applyTouchEffect(binding.browsePlaylists, v -> {
+            if (getActivity() != null) {
+                NavController navController =
+                        NavHostFragment.findNavController(this);
+
+                navController.navigate(R.id.navPlaylists);
+            }
+        });
+
         return binding.getRoot();
     }
 
@@ -69,6 +91,14 @@ public class FavoritesFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        if (audioMiniPlayer != null) {
+            audioMiniPlayer.release();
+            audioMiniPlayer = null;
+        }
+        if (sqlDbHelper != null) {
+            sqlDbHelper.close();
+            sqlDbHelper = null;
+        }
         binding = null;
         super.onDestroy();
     }
@@ -106,6 +136,8 @@ public class FavoritesFragment extends Fragment {
 
                         } else if (type.contains(PlaylistType.VOD.name())) {
                             StreamLauncher.launch(requireContext(), item.getFavUrl(), item.getFavName());
+                        }else{
+                            StreamLauncher.launch(requireContext(), item.getFavUrl(), item.getFavName());
                         }
                     }
 
@@ -128,8 +160,8 @@ public class FavoritesFragment extends Fragment {
 
     private void loadFavorites() {
         List<LocalDbFavorites> favoritesList = sqlDbHelper.getAllFavorites();
-        recyclerView.setVisibility(favoritesList.isEmpty() ? View.GONE : View.VISIBLE);
-        binding.emptyFav.setVisibility(favoritesList.isEmpty() ? View.VISIBLE : View.GONE);
+       recyclerView.setVisibility(favoritesList.isEmpty() ? View.GONE : View.VISIBLE);
+       binding.emptyFav.setVisibility(favoritesList.isEmpty() ? View.VISIBLE : View.GONE);
         favoritesAdapter.submitList(favoritesList);
     }
 }

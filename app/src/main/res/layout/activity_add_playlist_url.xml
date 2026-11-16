@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AddPlaylistUrlActivity"
-    android:background="@color/bg">
+    android:background="@drawable/bg_primary_background">
 
 
     <LinearLayout
@@ -178,7 +178,7 @@
                         android:layout_height="13dp"
                         android:layout_marginEnd="7dp"
                         android:indeterminate="true"
-                        android:indeterminateTint="@color/accent" />
+                        android:indeterminateTint="@color/primary_highlight" />
 
                     <TextView
                         android:layout_width="wrap_content"

@@ -1,36 +1,42 @@
 package com.aaronmaxlab.maxplayer;
 
-import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aaronmaxlab.maxplayer.categories.TvCategoriesActivity;
+import com.aaronmaxlab.maxplayer.channels.AllChannelsActivity;
 import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
 import com.aaronmaxlab.maxplayer.database.adapter.LocalDbChannelAdapter;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbChannel;
 import com.aaronmaxlab.maxplayer.databinding.ActivityMainBinding;
+import com.aaronmaxlab.maxplayer.favorites.TvFavoritesActivity;
 import com.aaronmaxlab.maxplayer.keyboard.RemoteKeyboardActivity;
 import com.aaronmaxlab.maxplayer.keyboard.RemotePairingActivity;
-import com.aaronmaxlab.maxplayer.utils.AppToast;
+import com.aaronmaxlab.maxplayer.player.media3.audio.AudioPlayerActivity;
+import com.aaronmaxlab.maxplayer.playlists.TvPlaylistsActivity;
+import com.aaronmaxlab.maxplayer.search.TvSearchActivity;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
 import com.aaronmaxlab.maxplayer.utils.StreamLauncher;
@@ -38,61 +44,133 @@ import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
 
+
 import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
-
     private SqlDbHelper sqlDbHelper;
     private LocalDbChannelAdapter channelAdapter;
+    private ActivityMainBinding binding;
+
+    public static final String EXTRA_STREAM_URI = "stream_uri";
+    public static final String EXTRA_STREAM_NAME = "stream_name";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);                       // before setContentView
-
-        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        EdgeToEdge.enable(this);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         UIUtils.setLightNavigationBars(this, false);
         UIUtils.applySystemBarPadding(binding.getRoot(), false);
-
-
         sqlDbHelper = new SqlDbHelper(this);
-
-        final boolean isTv =DeviceUtils.isTv(this);
-
+        boolean isTv = DeviceUtils.isTv(this);
 
         if(isTv){
+            ImageButton settingsBtn = binding.tvSettingsButton;
+            ImageButton favoritesBtn = binding.tvFavoritesButton;
+            ImageButton remoteBtn  = binding.tvRemoteButton;
+            ImageButton searchBtn  = binding.tvSearchCard;
 
-            assert binding.tvAddPlaylist != null;
-            ClickUtils.applyTouchEffect(binding.tvAddPlaylist, v -> {
-                startActivity(new Intent(this, AddPlaylistActivity.class));
-            });
+            LinearLayout importPlaylist = binding.tvImportButton;
+            LinearLayout liveChannels = binding.tvLiveCard;
+            LinearLayout playlists = binding.tvPlaylistsCard;
+            LinearLayout exploreItems = binding.tvExploreCard;
+            LinearLayout categories = binding.tvCategoriesCard;
 
-            assert binding.remotePair != null;
-            ClickUtils.applyTouchEffect(binding.remotePair, v -> {
-                startActivity(new Intent(this, RemotePairingActivity.class));
-            });
-
+            buttonCall(settingsBtn, SettingsActivity.class);
+            buttonCall(favoritesBtn, TvFavoritesActivity.class);
+            buttonCall(remoteBtn, RemotePairingActivity.class);
+            buttonCall(searchBtn, TvSearchActivity.class);
+            buttonCall(importPlaylist, AddPlaylistActivity.class);
+            buttonCall(liveChannels, AllChannelsActivity.class);
+            buttonCall(playlists, TvPlaylistsActivity.class);
+            buttonCall(exploreItems, ExploreActivity.class);
+            buttonCall(categories, TvCategoriesActivity.class);
         }else {
+            View bottomBar = findViewById(R.id.customBottomBar);
+            ViewCompat.setOnApplyWindowInsetsListener(bottomBar, (v, insets) -> {
+                Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+                lp.bottomMargin = bars.bottom;
+                v.setLayoutParams(lp);
+                return insets;
+            });
 
-            assert binding.bottomNavigation != null;
-            UIUtils.adjustBottomNavGap(binding.bottomNavigation);
+            NavHostFragment navHost =
+                    (NavHostFragment) getSupportFragmentManager()
+                            .findFragmentById(R.id.nav_host_fragment);
+            if (navHost == null) return;
+            NavController navController = navHost.getNavController();
+            ImageView searchBtn = binding.searchChannel;
+            ImageView settingsBtn = binding.settings;
+            buttonCall(searchBtn, SearchActivity.class);
+            buttonCall(settingsBtn, SettingsActivity.class);
+            setupNavItem(bottomBar, R.id.navHome, navController, R.id.navHome);
+            setupNavItem(bottomBar, R.id.navPlaylists, navController, R.id.navPlaylists);
+            setupNavItem(bottomBar, R.id.navFavorites, navController, R.id.navFavorites);
+            setupNavItem(bottomBar, R.id.navHistory, navController, R.id.navHistory);
 
-            NavHostFragment navHost = (NavHostFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.nav_host_fragment);
-            if (navHost != null) {
-                NavigationUI.setupWithNavController(binding.bottomNavigation, navHost.getNavController());
+            if(bottomBar.findViewById(R.id.btnChannels) != null){
+                ClickUtils.applyTouchEffect(bottomBar.findViewById(R.id.btnChannels), v -> showChannelsBottomSheet());
             }
 
-            assert binding.searchChannel != null;
-            ClickUtils.applyTouchEffect(binding.searchChannel, view -> showChannelsBottomSheet());
+            navController.addOnDestinationChangedListener(
+                    (controller, destination, arguments) -> {
 
-            assert binding.playerInfo != null;
-            ClickUtils.applyTouchEffect(binding.playerInfo, view -> startActivity(new Intent(this, RemoteKeyboardActivity.class)));
+                        int destinationId = destination.getId();
+
+                        bottomBar.findViewById(R.id.navHome).setSelected(
+                                destinationId == R.id.navHome);
+
+                        bottomBar.findViewById(R.id.navPlaylists).setSelected(
+                                destinationId == R.id.navPlaylists);
+
+                        bottomBar.findViewById(R.id.navFavorites).setSelected(
+                                destinationId == R.id.navFavorites);
+
+                        bottomBar.findViewById(R.id.navHistory).setSelected(
+                                destinationId == R.id.navHistory);
+                    });
+
+
         }
 
+
+    }
+
+    // Helper function
+    private void buttonCall(View view, Class<?> callback) {
+        if (view != null) {
+            ClickUtils.applyTouchEffect(view,
+                    v -> startActivity(new Intent(this, callback)));
+        }
+    }
+
+    private void setupNavItem(View bottomBar, int viewId,
+                              NavController navController, int destinationId) {
+        View view = bottomBar.findViewById(viewId);
+        if (view != null) {
+            ClickUtils.applyTouchEffect(
+                    view,
+                    v -> navController.navigate(destinationId)
+            );
+        }
+    }
+
+
+    @Override protected void onResume() {
+        super.onResume();
+    }
+
+    @Override protected void onDestroy() {
+        if (sqlDbHelper != null) {
+            sqlDbHelper.close();
+            sqlDbHelper = null;
+        }
+        binding = null;
+        super.onDestroy();
     }
 
 
@@ -112,9 +190,15 @@ public class MainActivity extends AppCompatActivity {
                 channels,
                 new LocalDbChannelAdapter.OnChannelClickListener() {
                     @Override
-                    public void onChannelClick(LocalDbChannel channel) {
-                        StreamLauncher.launch(MainActivity.this, channel.getChannelUrl(),
-                                channel.getChannelName(), true);
+                    public void onChannelClick(LocalDbChannel channel, boolean isRadio) {
+                        if(isRadio){
+                            startActivity(new Intent(MainActivity.this, AudioPlayerActivity.class)
+                                    .putExtra(EXTRA_STREAM_URI, channel.getChannelUrl())
+                                    .putExtra(EXTRA_STREAM_NAME, channel.getChannelName()));
+                        }else {
+                            StreamLauncher.launch(MainActivity.this, channel.getChannelUrl(),
+                                    channel.getChannelName(), true);
+                        }
                     }
 
                     @Override
@@ -178,56 +262,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void showPlaybackCredits() {
 
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_playback_credits);
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent
-            );
-
-            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.90f);
-            dialog.getWindow().setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT
-            );
-        }
-
-        TextView linkMpvAndroid = dialog.findViewById(R.id.linkMpvAndroid);
-        TextView linkMpvEngine = dialog.findViewById(R.id.linkMpvEngine);
-        Button btnClose = dialog.findViewById(R.id.btnCloseCredits);
-
-        linkMpvAndroid.setOnClickListener(v ->
-                openCreditUrl(
-                        "https://github.com/mpv-android/mpv-android/releases/tag/2026-09-17"
-                )
-        );
-
-        linkMpvEngine.setOnClickListener(v ->
-                openCreditUrl(
-                        "https://github.com/mr-bipolar/mpv-android-engine"
-                )
-        );
-
-        btnClose.setOnClickListener(v -> dialog.dismiss());
-
-        dialog.show();
-
-        if (dialog.getWindow() != null) {
-            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.90f);
-
-            dialog.getWindow().setLayout(
-                    width, WindowManager.LayoutParams.WRAP_CONTENT
-            );
-        }
-    }
-
-    private void openCreditUrl(String url) {
-        try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            AppToast.warning(this, "Unable to open link");
-        }
-    }
 
 }

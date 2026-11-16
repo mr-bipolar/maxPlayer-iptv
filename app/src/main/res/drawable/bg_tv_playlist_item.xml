@@ -4,5 +4,5 @@
     <item android:state_focused="true" android:drawable="@drawable/bg_tv_playlist_item_focused" />
     <item android:state_selected="true" android:drawable="@drawable/bg_tv_playlist_item_selected" />
     <item android:state_pressed="true" android:drawable="@drawable/bg_tv_playlist_item_pressed" />
-    <item android:drawable="@drawable/bg_tv_playlist_item_default" />
+    <item android:drawable="@drawable/bg_tv_card_art" />
 </selector>

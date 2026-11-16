@@ -5,7 +5,9 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:background="@drawable/bg_primary_background"
     tools:context=".MainActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -13,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/space_18"
+        android:paddingEnd="@dimen/space_2"
         android:paddingTop="@dimen/space_12"
         android:paddingBottom="@dimen/space_14"
         android:theme="?attr/actionBarTheme"
@@ -71,14 +74,14 @@
                 app:tint="@color/ink" />
 
             <ImageView
-                android:id="@+id/playerInfo"
+                android:id="@+id/settings"
                 android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:background="@drawable/bg_circle_card"
                 android:contentDescription="@string/cd_settings"
                 android:padding="@dimen/space_10"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_remote"
+                android:src="@drawable/ic_settings_gear"
                 app:tint="@color/ink" />
         </LinearLayout>
 
@@ -90,42 +93,20 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
+        app:layout_constraintBottom_toBottomOf="@id/customBottomBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/materialToolbar"
         app:navGraph="@navigation/nav_graph" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/stroke_hairline"
-        android:background="@color/line_soft"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="match_parent"
+    <include
+        android:id="@+id/customBottomBar"
+        layout="@layout/view_custom_bottom_bar"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_nav_bar"
-        android:paddingTop="@dimen/space_8"
-        android:paddingBottom="@dimen/space_8"
-        app:itemActiveIndicatorStyle="@null"
-        app:itemIconSize="@dimen/space_20"
-        app:itemIconTint="@color/nav_item_icon_colors"
-        app:itemRippleColor="@null"
-        app:itemTextColor="@color/nav_item_colors"
-        app:labelVisibilityMode="labeled"
-        app:paddingBottomSystemWindowInsets="false"
-        app:paddingTopSystemWindowInsets="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_nav_menu" >
-
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
-
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

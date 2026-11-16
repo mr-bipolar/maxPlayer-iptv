@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tvMainCard"
+    android:layout_width="@dimen/tv_card_w"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="@dimen/space_16"
+    android:clipChildren="false"
+    android:focusable="true"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:stateListAnimator="@animator/tv_focus_scale"
+    tools:ignore="MissingDefaultResource">
+
+    <FrameLayout
+        android:id="@+id/cardArt"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tv_card_h"
+        android:background="@drawable/bg_tv_card_art"
+        android:duplicateParentState="true">
+
+        <ImageView
+            android:id="@+id/cardImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:padding="@dimen/space_12"
+            android:importantForAccessibility="no" />
+
+        <ImageView
+            android:id="@+id/cardFallbackIcon"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:duplicateParentState="true"
+            app:tint="@color/ink_faint" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="6dp">
+
+        <TextView
+            android:id="@+id/cardTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_card_title"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/cardSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/white_alpha_55"
+            android:textSize="@dimen/tv_card_caption" />
+    </LinearLayout>
+</LinearLayout>

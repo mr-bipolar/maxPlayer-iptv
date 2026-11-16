@@ -37,7 +37,7 @@
     <!-- TV: pair / keyboard -->
     <string name="tv_pair_eyebrow_fast">Fastest way</string>
     <string name="tv_pair_title">Scan to add from your phone</string>
-    <string name="tv_pair_code_label">Or go to maxplayer.tv/pair and enter</string>
+    <string name="tv_pair_code_label">Scan the QR code with your phone to connect your remote keyboard</string>
     <string name="tv_pair_code">482 919</string>
     <string name="tv_pair_eyebrow_type">Type with the remote</string>
     <string name="tv_kb_clear">Clear</string>
@@ -55,6 +55,11 @@
     <string name="tv_voice_search">Voice search</string>
     <string name="tv_search_channels">Channels</string>
 
+    <!-- TV: search screen -->
+    <string name="tv_search_hint">Search channels, playlists…</string>
+    <string name="tv_search_prompt_title">Search everything</string>
+    <string name="tv_search_prompt_body">Type to search across all your channels and playlists.</string>
+
     <!-- TV: settings -->
     <string name="tv_cat_playback">Playback</string>
     <string name="tv_cat_subtitles">Subtitles</string>
@@ -68,4 +73,7 @@
     <string name="tv_autoplay_next">Auto-play next channel</string>
     <string name="tv_buffer_size">Buffer size</string>
     <string name="tv_settings_desc">Hardware decoding uses your TV\'s chip to play video, saving power and improving performance on most streams. Switch to software decoding only if a stream won\'t play.</string>
+    <string name="tv_no_content">Nothing here yet</string>
+    <string name="tv_remote_connect">Remote Connect</string>
+    <string name="tv_playlist_count_subtitle">PLAYLIST • %1$d items</string>
 </resources>

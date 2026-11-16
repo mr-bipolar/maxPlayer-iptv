@@ -124,7 +124,7 @@ public class MediaFileAdapter
                             R.drawable.ic_play_round, R.drawable.bg_card_icon_playlist, videoPx);
                     break;
                 case PLAYLIST:
-                    out[t.ordinal()] = new Style(c, "IPTV playlist", R.drawable.ic_playlist_filled, R.color.accent,
+                    out[t.ordinal()] = new Style(c, "IPTV playlist", R.drawable.ic_playlist_filled, R.color.primary_highlight,
                             R.drawable.ic_chevron_right, R.drawable.bg_card_icon_playlist, defaultPx);
                     break;
                 case AUDIO:

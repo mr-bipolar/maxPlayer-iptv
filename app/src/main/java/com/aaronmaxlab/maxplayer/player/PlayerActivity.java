@@ -79,6 +79,7 @@ import androidx.media3.ui.TrackSelectionDialogBuilder;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aaronmaxlab.maxplayer.MaxPlayerApplication;
 import com.aaronmaxlab.maxplayer.R;
 import com.aaronmaxlab.maxplayer.animations.LoaderAnimator;
 import com.aaronmaxlab.maxplayer.database.SqlDbHelper;
@@ -92,6 +93,7 @@ import com.aaronmaxlab.maxplayer.playlist.SaveChannelDialog;
 import com.aaronmaxlab.maxplayer.playlist.adapter.PlaylistAdapter;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistChannel;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
+import com.aaronmaxlab.maxplayer.remote.RemoteKeyController;
 import com.aaronmaxlab.maxplayer.service.VideoPlaybackService;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.AppUtils;
@@ -242,6 +244,7 @@ public class PlayerActivity extends AppCompatActivity {
     private int aspectMode = 0;
     private boolean wasInPipMode = false;
     private boolean pipReceiverRegistered = false;
+    private RemoteKeyController remoteKeys;
     @Nullable private AlertDialog dialog;
     @Nullable private Dialog saveDialog;
 
@@ -289,7 +292,7 @@ public class PlayerActivity extends AppCompatActivity {
         isTv = DeviceUtils.isTv(this);
         if (isTv) setupTvPlaylist();
         sqlDbHelper = new SqlDbHelper(this);
-
+        remoteKeys = ((MaxPlayerApplication) getApplication()).getRemoteKeyController();
         // Never two players at once: mpv is a single native engine ("already initialized") and the Media3
         // service player is shared. Free the old screen's player/surface BEFORE this one creates its own.
         PlayerActivity previous = active;
@@ -1417,7 +1420,7 @@ public class PlayerActivity extends AppCompatActivity {
             if (channel.category != null) {category = channel.category;}
             if(channel.logoUrl != null) {channelIcon = channel.logoUrl;}
         }
-        return new LocalDbFavorites(name, category, currentUrl, channelIcon, PlaylistType.VOD);
+        return new LocalDbFavorites(name, category, currentUrl, channelIcon,  isVod() ? PlaylistType.VOD : PlaylistType.LIVE);
     }
 
     // ---- "more" menu: info, reload, jump to live, copy url, screenshot (mpv), switch engine
@@ -1496,11 +1499,16 @@ public class PlayerActivity extends AppCompatActivity {
         ui.setAutoHideBlocked(true);
         builder.setOnDismissListener(d -> { dialog = null; if (ui != null) ui.setAutoHideBlocked(false); });
         dialog = builder.show();
-        styleDialog(dialog);
+
+        if(dialog != null) {
+            remoteKeys.registerDialog(dialog);
+            dialog.setOnDismissListener(d -> remoteKeys.unregisterDialog(dialog));
+            styleDialog(dialog);
+        }
     }
 
     private void styleDialog(AlertDialog d) {
-        int accent = ContextCompat.getColor(this, R.color.accent);
+        int accent = ContextCompat.getColor(this, R.color.primary_highlight);
         if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(R.drawable.bg_dialog_black);
         accentTitle(d);
         for (int w : new int[]{DialogInterface.BUTTON_POSITIVE, DialogInterface.BUTTON_NEGATIVE, DialogInterface.BUTTON_NEUTRAL}) {
@@ -1514,8 +1522,8 @@ public class PlayerActivity extends AppCompatActivity {
     private void accentTitle(Dialog d) {
         TextView title = d.findViewById(androidx.appcompat.R.id.alertTitle);
         if (title != null) {
-            title.setTextColor(ContextCompat.getColor(this, R.color.accent));
-            title.setTypeface(null, Typeface.BOLD);
+            title.setTextColor(ContextCompat.getColor(this, R.color.primary_highlight));
+            title.setTypeface(com.aaronmaxlab.maxplayer.utils.ThemeTypography.bold(this));
         }
     }
 
@@ -1727,7 +1735,7 @@ public class PlayerActivity extends AppCompatActivity {
         label.setText(category);
         label.setTextColor(getColor(R.color.ink_dim));
         label.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.text_body_sm));
-        label.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        label.setTypeface(com.aaronmaxlab.maxplayer.utils.ThemeTypography.medium(this));
         chip.addView(label);
         return chip;
     }
@@ -1742,7 +1750,7 @@ public class PlayerActivity extends AppCompatActivity {
                 for (int j = 0; j < group.getChildCount(); j++) {
                     View inner = group.getChildAt(j);
                     if (inner instanceof TextView) {
-                        ((TextView) inner).setTextColor(getColor(selected ? R.color.accent : R.color.ink_dim));
+                        ((TextView) inner).setTextColor(getColor(selected ? R.color.primary_highlight : R.color.ink_dim));
                     }
                 }
             }

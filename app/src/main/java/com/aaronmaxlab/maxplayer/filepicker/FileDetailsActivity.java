@@ -122,7 +122,7 @@ public class FileDetailsActivity extends AppCompatActivity {
         final int padH = dp(14);
         final int padV = dp(8);
         final int marginEnd = dp(8);
-        final Typeface typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL);
+        final Typeface typeface = com.aaronmaxlab.maxplayer.utils.ThemeTypography.medium(this);
 
         for (String category : categories) {
             if (category == null) continue;

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg"
+    android:background="@drawable/bg_primary_background"
     tools:context=".navigates.HomeFragment">
 
     <LinearLayout
@@ -45,8 +45,15 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/playlistRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:overScrollMode="never"
+            android:paddingBottom="@dimen/space_64"
             />
+
 
     </LinearLayout>
 

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tvCategoryCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:focusable="true"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:stateListAnimator="@animator/tv_focus_scale"
+    tools:ignore="MissingDefaultResource">
+
+    <FrameLayout
+        android:id="@+id/cardArt"
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:background="@drawable/bg_tv_card_art"
+        android:duplicateParentState="true">
+
+        <ImageView
+            android:id="@+id/categoryIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_tv"
+            android:importantForAccessibility="no"
+            android:duplicateParentState="true"
+            app:tint="@color/accent" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="8dp">
+
+        <TextView
+            android:id="@+id/categoryTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/white"
+            android:textSize="@dimen/tv_card_title"
+            android:textStyle="bold"
+            tools:text="Sports" />
+
+        <TextView
+            android:id="@+id/categorySubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/white_alpha_55"
+            android:textSize="@dimen/tv_card_caption"
+            tools:text="42 Channels" />
+    </LinearLayout>
+</LinearLayout>

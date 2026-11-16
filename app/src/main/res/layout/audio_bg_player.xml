@@ -10,14 +10,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="92dp"
         android:background="@drawable/bg_mini_player"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="10dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="10dp"
-        android:paddingBottom="8dp"
+        android:paddingStart="@dimen/space_10"
+        android:paddingTop="@dimen/space_8"
+        android:paddingEnd="@dimen/space_10"
+        android:paddingBottom="@dimen/space_8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -28,8 +28,8 @@
             android:background="@drawable/bg_card_icon_square_sm">
 
             <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="@dimen/space_16"
+                android:layout_height="@dimen/space_16"
                 android:layout_gravity="center"
                 android:importantForAccessibility="no"
                 android:src="@drawable/ic_radio"
@@ -39,8 +39,8 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginStart="@dimen/space_10"
+            android:layout_marginEnd="@dimen/space_10"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -89,7 +89,7 @@
             android:layout_height="32dp"
             android:background="@color/transparent"
             android:contentDescription="@string/cd_expand"
-            android:padding="8dp"
+            android:padding="@dimen/space_8"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_expand"
             app:tint="@color/ink" />

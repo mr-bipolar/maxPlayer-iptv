@@ -23,7 +23,7 @@
             android:layout_gravity="center"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_tv"
-            app:tint="@color/ink_faint" />
+            app:tint="@color/ink_dim" />
     </FrameLayout>
 
     <LinearLayout
@@ -65,6 +65,6 @@
         android:padding="11dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_heart_filled"
-        app:tint="@color/accent" />
+        app:tint="@color/primary_highlight" />
 
 </LinearLayout>
