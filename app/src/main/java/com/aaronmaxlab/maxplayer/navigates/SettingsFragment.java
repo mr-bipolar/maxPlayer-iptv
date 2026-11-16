@@ -178,6 +178,24 @@ public class SettingsFragment extends Fragment {
                 true,
                 v -> showPlaybackCredits()
         );
+
+        addRow(
+                about,
+                R.drawable.ic_info,
+                R.string.settings_privacy_policy,
+                R.string.settings_privacy_policy_summary,
+                true,
+                v -> openPrivacyPolicy()
+        );
+
+        addRow(
+                about,
+                R.drawable.ic_info,
+                R.string.settings_share_app,
+                R.string.settings_share_app_summary,
+                true,
+                v -> shareApp()
+        );
     }
 
     private void setupTvTabs(View root) {
@@ -560,6 +578,35 @@ public class SettingsFragment extends Fragment {
 
     private int dp(int value) {
         return Math.round(value * getResources().getDisplayMetrics().density);
+    }
+
+
+    private void openPrivacyPolicy() {
+        String url = getString(R.string.privacy_policy_url);
+
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            AppToast.warning(requireActivity(), "Unable to open privacy policy");
+        }
+    }
+
+    private void shareApp() {
+        String appName = getString(R.string.app_name);
+
+        String playStoreUrl = "https://play.google.com/store/apps/details?id="
+                + requireContext().getPackageName();
+
+        String message = appName + "\n\n"
+                + "Download the app:\n" + playStoreUrl;
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, appName);
+        intent.putExtra(Intent.EXTRA_TEXT, message);
+
+        startActivity(Intent.createChooser(intent, "Share app"));
     }
 
     @Override

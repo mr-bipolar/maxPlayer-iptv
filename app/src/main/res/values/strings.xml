@@ -408,4 +408,13 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">Fullscreen\nContent</string>
 
+    <!-- about -->
+    <string name="settings_privacy_policy">Privacy Policy</string>
+    <string name="settings_privacy_policy_summary">Read our privacy policy</string>
+
+    <string name="settings_share_app">Share App</string>
+    <string name="settings_share_app_summary">Share MaxPlayer with friends</string>
+
+    <string name="privacy_policy_url">https://mr-bipolar.github.io/maxplayer-website/privacy.html</string>
+
 </resources>

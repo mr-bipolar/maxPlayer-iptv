@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,12 +19,14 @@ import android.database.Cursor;
 import android.graphics.Rect;
 import android.graphics.Color;
 import android.graphics.drawable.Icon;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -40,6 +43,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
@@ -111,6 +115,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -341,6 +350,8 @@ public class PlayerActivity extends AppCompatActivity {
 
     }
 
+
+
     private void setupBannerAd( BannerAdHelper bannerAdHelper ) {
         if (isTv) return;
         AdMobManager.initialize(this, () -> {
@@ -430,7 +441,8 @@ public class PlayerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        wasInPipMode = false;                 // back to full screen (PiP expanded or a new intent arrived)
+        wasInPipMode = false; // back to full screen (PiP expanded or a new intent arrived)
+        updateBanner();
         UIUtils.setLightNavigationBars(this, false);
         if (isTv) setupSystemUi();
     }
@@ -476,6 +488,7 @@ public class PlayerActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         ViewCompat.requestApplyInsets(binding.getRoot());
         ui.setFullscreenIcon(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE);
+        updateBanner();
         if (mpv != null) mpv.onConfigurationChanged();
     }
 
@@ -1237,8 +1250,14 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void updateBanner() {
-        if(binding.bannerAd == null) return;;
-        binding.bannerAd.setVisibility(isLandscape() ? View.VISIBLE : View.GONE);
+        if (binding.bannerAd == null || isTv) return;
+
+        boolean showBanner = !isInPictureInPictureMode()
+                && !isLandscape();
+
+        binding.bannerAd.setVisibility(
+                showBanner ? View.VISIBLE : View.GONE
+        );
     }
 
     // ---- channel navigation (prev / next buttons, PiP buttons, channel list)
@@ -1247,6 +1266,7 @@ public class PlayerActivity extends AppCompatActivity {
         int idx = currentChannelPosition + delta;
         if (idx < 0 || idx >= playlistModel.channels.size()) return;
         playChannelAt(idx);
+        if(!isTv){InterstitialAdHelper.recordEvent(this);}
     }
 
     private boolean playChannelAt(int index) {
@@ -1501,15 +1521,90 @@ public class PlayerActivity extends AppCompatActivity {
 
     private void takeScreenshot() {
         if (mpv == null) return;
-        File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        if (dir == null) dir = getCacheDir();
-        final File file = new File(dir, "mpv_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".jpg");
-        mpv.takeScreenshot(file);
-        handler.postDelayed(() -> {   // mpv reports no completion: check the file shortly afterwards
+
+        File tempFile = new File(getCacheDir(),
+                "mpv_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
+                        .format(new Date()) + ".jpg");
+
+        mpv.takeScreenshot(tempFile);
+
+        handler.postDelayed(() -> {
             if (isDestroyed()) return;
-            if (file.exists() && file.length() > 0) AppToast.success(this, getString(R.string.mp_screenshot_saved, file.getName()));
-            else AppToast.error(this, getString(R.string.mp_screenshot_failed));
+
+            if (!tempFile.exists() || tempFile.length() == 0) {
+                AppToast.error(this, getString(R.string.mp_screenshot_failed));
+                return;
+            }
+
+            Uri imageUri = null;
+
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.Images.Media.DISPLAY_NAME, tempFile.getName());
+                    values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+                    values.put(MediaStore.Images.Media.RELATIVE_PATH,
+                            Environment.DIRECTORY_PICTURES + "/MaxPlayer");
+
+                    imageUri = getContentResolver().insert(
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                    if (imageUri == null) throw new IOException("MediaStore insert failed");
+
+                    try (InputStream in = new FileInputStream(tempFile);
+                         OutputStream out = getContentResolver().openOutputStream(imageUri)) {
+                        if (out == null) throw new IOException("Output stream unavailable");
+                        copyScreenshot(in, out);
+                    }
+
+                } else {
+                    File folder = new File(
+                            Environment.getExternalStoragePublicDirectory(
+                                    Environment.DIRECTORY_PICTURES),
+                            "MaxPlayer");
+
+                    if (!folder.exists() && !folder.mkdirs()) {
+                        throw new IOException("Cannot create screenshot folder");
+                    }
+
+                    File destination = new File(folder, tempFile.getName());
+
+                    try (InputStream in = new FileInputStream(tempFile);
+                         OutputStream out = new FileOutputStream(destination)) {
+                        copyScreenshot(in, out);
+                    }
+
+                    MediaScannerConnection.scanFile(
+                            this,
+                            new String[]{destination.getAbsolutePath()},
+                            new String[]{"image/jpeg"},
+                            null);
+                }
+
+                tempFile.delete();
+
+                AppToast.success(this,
+                        getString(R.string.mp_screenshot_saved, tempFile.getName()));
+
+            } catch (IOException e) {
+                if (imageUri != null) {
+                    getContentResolver().delete(imageUri, null, null);
+                }
+                AppToast.error(this, getString(R.string.mp_screenshot_failed));
+            }
+
         }, 800);
+    }
+
+    private void copyScreenshot(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[8192];
+        int length;
+
+        while ((length = in.read(buffer)) != -1) {
+            out.write(buffer, 0, length);
+        }
+
+        out.flush();
     }
 
     private void copyText(@Nullable String text) {
@@ -1661,6 +1756,8 @@ public class PlayerActivity extends AppCompatActivity {
         } else {
             unregisterPipReceiver();
         }
+
+        updateBanner();
     }
 
     private void handleBackPress() {
