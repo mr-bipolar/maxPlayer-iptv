@@ -1,11 +1,13 @@
 package com.aaronmaxlab.maxplayer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -14,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -32,15 +35,26 @@ import com.aaronmaxlab.maxplayer.database.adapter.LocalDbChannelAdapter;
 import com.aaronmaxlab.maxplayer.database.models.LocalDbChannel;
 import com.aaronmaxlab.maxplayer.databinding.ActivityMainBinding;
 import com.aaronmaxlab.maxplayer.favorites.TvFavoritesActivity;
-import com.aaronmaxlab.maxplayer.keyboard.RemoteKeyboardActivity;
 import com.aaronmaxlab.maxplayer.keyboard.RemotePairingActivity;
 import com.aaronmaxlab.maxplayer.player.media3.audio.AudioPlayerActivity;
 import com.aaronmaxlab.maxplayer.playlists.TvPlaylistsActivity;
 import com.aaronmaxlab.maxplayer.search.TvSearchActivity;
+import com.aaronmaxlab.maxplayer.ads.AdConfig;
+import com.aaronmaxlab.maxplayer.ads.AdMobManager;
+import com.aaronmaxlab.maxplayer.ads.BannerAdHelper;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
 import com.aaronmaxlab.maxplayer.utils.StreamLauncher;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
+import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAd;
+import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAdEventCallback;
+import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAdPreloader;
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback;
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest;
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError;
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError;
+import com.google.android.libraries.ads.mobile.sdk.common.PreloadConfiguration;
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAdPreloader;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -55,6 +69,15 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String EXTRA_STREAM_URI = "stream_uri";
     public static final String EXTRA_STREAM_NAME = "stream_name";
+    public static final String TAG = "Mobile-SDK";
+
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+    private static final String PREFS_NAME = "AppPrefs";
+    private static final String KEY_AD_SHOWN = "ad_shown";
+    private AppOpenAd appOpenAd;
+    private BannerAdHelper bannerAdHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         UIUtils.applySystemBarPadding(binding.getRoot(), false);
         sqlDbHelper = new SqlDbHelper(this);
         boolean isTv = DeviceUtils.isTv(this);
+
 
         if(isTv){
             ImageButton settingsBtn = binding.tvSettingsButton;
@@ -96,6 +120,51 @@ public class MainActivity extends AppCompatActivity {
                 lp.bottomMargin = bars.bottom;
                 v.setLayoutParams(lp);
                 return insets;
+            });
+            bannerAdHelper = new BannerAdHelper(binding.bannerAd, binding.adView);
+
+            AdMobManager.initialize(this, () -> {
+                runOnUiThread(() -> {
+                    bannerAdHelper.load(this, AdConfig.BANNER_AD_UNIT_ID);
+
+                    AdRequest adRequest = new AdRequest.Builder(AdConfig.APP_OPEN_AD_UNIT_ID).build();
+                    PreloadConfiguration preloadConfig = new PreloadConfiguration(adRequest);
+                    AppOpenAdPreloader.start(AdConfig.APP_OPEN_AD_UNIT_ID, preloadConfig);
+
+                    // Interstitial preloader
+                    AdRequest videoAdRequest =
+                            new AdRequest.Builder(AdConfig.VIDEO_AD_UNIT_ID).build();
+
+                    PreloadConfiguration videoPreloadConfig =
+                            new PreloadConfiguration(videoAdRequest);
+
+                    InterstitialAdPreloader.start(AdConfig.VIDEO_AD_UNIT_ID, videoPreloadConfig);
+
+                    try {
+                        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                        boolean isAdShows = sharedPreferences.getBoolean(KEY_AD_SHOWN, false);
+                        if (!isAdShows) {
+
+                            AppOpenAd.load(adRequest, new AdLoadCallback<>() {
+                                @Override
+                                public void onAdFailedToLoad(@NonNull LoadAdError adError) {
+                                    AdLoadCallback.super.onAdFailedToLoad(adError);
+                                }
+
+                                @Override
+                                public void onAdLoaded(AppOpenAd ad) {
+                                    AdLoadCallback.super.onAdLoaded(ad);
+                                    appOpenAd = ad;
+                                    pollAndShowAd();
+                                }
+                            });
+
+                        }
+                    } catch (Exception e) {
+                        Log.d("Error", Objects.requireNonNull(e.getMessage()));
+                    }
+
+                });
             });
 
             NavHostFragment navHost =
@@ -262,6 +331,49 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+    // show ads
+    private void pollAndShowAd() {
+        if (appOpenAd != null && !sharedPreferences.getBoolean(KEY_AD_SHOWN, false)) {
+
+            appOpenAd.setAdEventCallback(new AppOpenAdEventCallback() {
+                @Override
+                public void onAdClicked() {
+                    AppOpenAdEventCallback.super.onAdClicked();
+                }
+
+                @Override
+                public void onAdDismissedFullScreenContent() {
+                    markAdAsShown();
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(@NonNull FullScreenContentError fullScreenContentError) {
+                    markAdAsShown();
+                }
+
+
+                @Override
+                public void onAdShowedFullScreenContent() {
+                    markAdAsShown();
+                }
+            });
+
+            // Show the ad if it's loaded
+            appOpenAd.show(this);
+        }
+    }
+
+    private void markAdAsShown() {
+        try {
+            sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(KEY_AD_SHOWN, true);
+            editor.apply();
+        } catch (Exception e) {
+            Log.d(TAG, Objects.requireNonNull(e.getMessage()));
+        }
+    }
 
 
 }

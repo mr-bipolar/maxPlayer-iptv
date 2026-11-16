@@ -44,6 +44,7 @@ public class HistoryFragment extends Fragment {
     private LocalDbHistoryAdapter historyAdapter;
     private AudioMiniPlayer audioMiniPlayer;
 
+
     private final ExecutorService networkExecutor =
             Executors.newSingleThreadExecutor();
 

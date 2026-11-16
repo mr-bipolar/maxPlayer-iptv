@@ -513,8 +513,10 @@ public final class MpvPlayerAdapter extends SimpleBasePlayer {
         holder.addCallback(surfaceCallback);
         if (holder.getSurface() != null && holder.getSurface().isValid()) {   // surface may already exist
             Rect f = holder.getSurfaceFrame();
-            engineSurfaceCb.surfaceCreated(holder);
-            engineSurfaceCb.surfaceChanged(holder, PixelFormat.RGBA_8888, f.width(), f.height());
+            if(engineSurfaceCb != null) {
+                engineSurfaceCb.surfaceCreated(holder);
+                engineSurfaceCb.surfaceChanged(holder, PixelFormat.RGBA_8888, f.width(), f.height());
+            }
             onSurfaceReady();
         }
     }

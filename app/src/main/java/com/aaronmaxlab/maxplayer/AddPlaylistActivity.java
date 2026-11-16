@@ -18,7 +18,10 @@ import com.aaronmaxlab.maxplayer.databinding.ActivityAddPlaylistBinding;
 import com.aaronmaxlab.maxplayer.filepicker.FileDetailsActivity;
 import com.aaronmaxlab.maxplayer.filepicker.MediaBrowserActivity;
 import com.aaronmaxlab.maxplayer.player.PlayerActivity;
+import com.aaronmaxlab.maxplayer.ads.AdConfig;
+import com.aaronmaxlab.maxplayer.ads.AdMobManager;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
+import com.aaronmaxlab.maxplayer.ads.BannerAdHelper;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
 import com.aaronmaxlab.maxplayer.utils.MediaTypes;
@@ -41,6 +44,8 @@ public class AddPlaylistActivity extends AppCompatActivity {
     private static final String EXTRA_PLAYLIST_URI = "playlist_uri";
     private static final String EXTRA_PLAYLIST_FILE_NAME = "playlist_file_name";
 
+    private boolean isTv;
+
 
     /** Launchers must be registered before the Activity is STARTED; */
     private final ActivityResultLauncher<Intent> mediaBrowserLauncher =
@@ -59,7 +64,7 @@ public class AddPlaylistActivity extends AppCompatActivity {
         ActivityAddPlaylistBinding binding = ActivityAddPlaylistBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        final boolean isTv = DeviceUtils.isTv(this);
+        isTv = DeviceUtils.isTv(this);
 
         UIUtils.setLightNavigationBars(this, false);
         UIUtils.applySystemBarPadding(binding.getRoot());
@@ -80,7 +85,25 @@ public class AddPlaylistActivity extends AppCompatActivity {
             openOnClick(binding.buttonOpenAudioStream, PlayAudioStreamActivity.class);
         }
 
+        BannerAdHelper bannerAdHelper = new BannerAdHelper(binding.bannerAd, binding.adView);
+        setupBannerAd(bannerAdHelper);
+
     }
+
+    private void setupBannerAd( BannerAdHelper bannerAdHelper ) {
+        if (isTv) return;
+        AdMobManager.initialize(this, () -> {
+            runOnUiThread(() -> {
+                if (!isFinishing() && !isDestroyed()) {
+                    bannerAdHelper.load(
+                            this,
+                            AdConfig.PLAYLIST_AD_UNIT_ID
+                    );
+                }
+            });
+        });
+    }
+
 
     private void openOnClick(@NonNull View button, @NonNull Class<? extends Activity> target) {
         ClickUtils.applyTouchEffect(button, v -> startActivity(new Intent(this, target)));

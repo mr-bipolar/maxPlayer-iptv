@@ -12,13 +12,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Rect;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
@@ -95,11 +93,15 @@ import com.aaronmaxlab.maxplayer.playlist.models.PlaylistChannel;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
 import com.aaronmaxlab.maxplayer.remote.RemoteKeyController;
 import com.aaronmaxlab.maxplayer.service.VideoPlaybackService;
+import com.aaronmaxlab.maxplayer.ads.AdConfig;
+import com.aaronmaxlab.maxplayer.ads.AdMobManager;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.AppUtils;
 import com.aaronmaxlab.maxplayer.utils.AspectRatioUtils;
+import com.aaronmaxlab.maxplayer.ads.BannerAdHelper;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
+import com.aaronmaxlab.maxplayer.ads.InterstitialAdHelper;
 import com.aaronmaxlab.maxplayer.utils.PlaylistType;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -111,9 +113,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -159,6 +159,7 @@ public class PlayerActivity extends AppCompatActivity {
     private static final String ACTION_PIP = "com.aaronmaxlab.maxplayer.PIP_CONTROL";
     private static final String EXTRA_PIP_CMD = "pip_cmd";
     private static final int PIP_PLAY_PAUSE = 1, PIP_PREV = 2, PIP_NEXT = 3;
+    private static final String TAG = "Mobile-SDK";
 
     public static Intent forPlaylist(Context c, String m3uUrl) {
         return new Intent(c, PlayerActivity.class).putExtra(EXTRA_PLAYLIST_URL, m3uUrl);
@@ -262,6 +263,7 @@ public class PlayerActivity extends AppCompatActivity {
     private SqlDbHelper sqlDbHelper;
 
 
+
     private final ActivityResultLauncher<String[]> subtitlePicker =
             registerForActivityResult(new ActivityResultContracts.OpenDocument(), this::onSubtitlePicked);
 
@@ -332,9 +334,27 @@ public class PlayerActivity extends AppCompatActivity {
         }
         resolveSourceAndStart();
 
-
+        if(!isTv){
+            BannerAdHelper bannerAdHelper = new BannerAdHelper(binding.bannerAd, binding.adView);
+            setupBannerAd(bannerAdHelper);
+        }
 
     }
+
+    private void setupBannerAd( BannerAdHelper bannerAdHelper ) {
+        if (isTv) return;
+        AdMobManager.initialize(this, () -> {
+            runOnUiThread(() -> {
+                if (!isFinishing() && !isDestroyed()) {
+                    bannerAdHelper.load(
+                            this,
+                            AdConfig.ALL_CHANNELS_AD_UNIT_ID
+                    );
+                }
+            });
+        });
+    }
+
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -590,9 +610,9 @@ public class PlayerActivity extends AppCompatActivity {
 
 
     private boolean isVod() {
-        assert player != null;
-        long d = player.getDuration();
-        return !player.isCurrentMediaItemLive() && d != C.TIME_UNSET && d > 0;
+        return player != null
+                && !player.isCurrentMediaItemLive()
+                && player.getDuration() > 0;
     }
 
     // =====================================================================================
@@ -1190,7 +1210,12 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private boolean isLiveNow() {
-        return player != null && (player.isCurrentMediaItemLive() || player.getDuration() == C.TIME_UNSET);
+
+        if (player == null) return false;
+
+        return player.isCurrentMediaItemLive()
+                || (player.getPlaybackState() == Player.STATE_READY
+                && player.getDuration() == C.TIME_UNSET);
     }
 
 
@@ -1205,9 +1230,15 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void toggleOrientation() {
+        updateBanner();
         setRequestedOrientation(isLandscape()
                 ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+    }
+
+    private void updateBanner() {
+        if(binding.bannerAd == null) return;;
+        binding.bannerAd.setVisibility(isLandscape() ? View.VISIBLE : View.GONE);
     }
 
     // ---- channel navigation (prev / next buttons, PiP buttons, channel list)
@@ -1678,10 +1709,12 @@ public class PlayerActivity extends AppCompatActivity {
         sheet.show();
     }
 
+
     private void onChannelSelected(PlaylistChannel channel, BottomSheetDialog sheet) {
         int originalPosition = playlistModel == null ? -1 : playlistModel.channels.indexOf(channel);   // adapter position may be filtered
         if (originalPosition == -1) { AppToast.error(this, "Channel not found in playlist"); return; }
         if (playChannelAt(originalPosition)) sheet.dismiss();
+        if(!isTv){InterstitialAdHelper.recordEvent(this);}
     }
 
     private void styleSheetNavigationBar(BottomSheetDialog sheet) {
