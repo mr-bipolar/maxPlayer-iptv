@@ -6,8 +6,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.content.Intent;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -55,6 +55,7 @@ public class SplashActivity extends AppCompatActivity {
 
         // Enable edge-to-edge layout
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        EdgeToEdge.enable(this);
 
         // Inflate splash layout
         binding = ActivitySplashBinding.inflate(getLayoutInflater());

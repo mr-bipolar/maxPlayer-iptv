@@ -51,7 +51,6 @@ public class ChannelActivity extends AppCompatActivity {
     private ActivityChannelBinding binding;
     private SqlDbHelper sqlDbHelper;
     private LocalDbChannelAdapter channelAdapter;
-    private TvCategoryChannelAdapter tvChannelAdapter;
     private GridLayoutManager channelLayoutManager;
     private int spanCount = 1;
     private int currentCategoryId = -1;
@@ -142,7 +141,7 @@ public class ChannelActivity extends AppCompatActivity {
         binding.channelsRecyclerView.setClipChildren(false);
         binding.channelsRecyclerView.setClipToPadding(false);
 
-        tvChannelAdapter = new TvCategoryChannelAdapter((channel, isRadio) -> {
+        TvCategoryChannelAdapter tvChannelAdapter = new TvCategoryChannelAdapter((channel, isRadio) -> {
             showTvChannelActions(channel, isRadio, catName, categoryIndex);
         });
         tvChannelAdapter.setCategoryName(catName);
@@ -265,16 +264,14 @@ public class ChannelActivity extends AppCompatActivity {
 
     private void setupBannerAd( BannerAdHelper bannerAdHelper ) {
         if (isTv) return;
-        AdMobManager.initialize(this, () -> {
-            runOnUiThread(() -> {
-                if (!isFinishing() && !isDestroyed()) {
-                    bannerAdHelper.load(
-                            this,
-                            AdConfig.CHANNEL_AD_UNIT_ID
-                    );
-                }
-            });
-        });
+        AdMobManager.initialize(this, () -> runOnUiThread(() -> {
+            if (!isFinishing() && !isDestroyed()) {
+                bannerAdHelper.load(
+                        this,
+                        AdConfig.CHANNEL_AD_UNIT_ID
+                );
+            }
+        }));
     }
 
 

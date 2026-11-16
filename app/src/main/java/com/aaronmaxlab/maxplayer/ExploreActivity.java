@@ -10,9 +10,6 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -161,10 +158,11 @@ public class ExploreActivity extends AppCompatActivity {
                     int restorePosition = focusedPosition;
                     restoreRow.post(() -> {
                         if (binding != null && !binding.getRoot().hasFocus()) {
-                            assert restoreRow.getAdapter() != null;
-                            if (restorePosition < restoreRow.getAdapter().getItemCount()
-                                    && restoreRow.findViewHolderForAdapterPosition(restorePosition) != null) {
-                                Objects.requireNonNull(restoreRow.findViewHolderForAdapterPosition(restorePosition)).itemView.requestFocus();
+                            if(restoreRow.getAdapter() != null) {
+                                if (restorePosition < restoreRow.getAdapter().getItemCount()
+                                        && restoreRow.findViewHolderForAdapterPosition(restorePosition) != null) {
+                                    Objects.requireNonNull(restoreRow.findViewHolderForAdapterPosition(restorePosition)).itemView.requestFocus();
+                                }
                             }
                         }
                     });

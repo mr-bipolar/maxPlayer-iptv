@@ -60,7 +60,7 @@ public class RemoteInputController implements RemoteInputManager.InputListener {
         mainHandler.post(() -> {
             phoneConnected = false;
 
-            Log.d("RemoteInput", "Disconnected; restoring registered inputs");
+            Log.d("RemoteInput", "Disconnected; restoring registered inputs " + connected);
 
             synchronized (registeredInputs) {
                 for (EditText input : registeredInputs) {
@@ -88,10 +88,7 @@ public class RemoteInputController implements RemoteInputManager.InputListener {
                                     Context.INPUT_METHOD_SERVICE);
 
                     if (imm != null) {
-                        imm.showSoftInput(
-                                input,
-                                InputMethodManager.SHOW_FORCED
-                        );
+                        imm.showSoftInput(input, 0);
                     }
                 }
             });

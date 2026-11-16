@@ -59,26 +59,11 @@ public class HomeFragment extends Fragment {
 
         emptyView = view.findViewById(R.id.layoutHomeEmpty);
 
-        ClickUtils.applyTouchEffect(binding.addPlaylistBtn, v -> {
-          startActivity(new Intent(getContext(), AddPlaylistActivity.class));
-
-        });
-
-        ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnAddPlaylist, v -> {
-            startActivity(new Intent(getContext(), AddPlaylistActivity.class));
-        });
-
-        ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnHowToAdd, v -> {
-            startActivity(new Intent(getContext(), AddPlaylistHelperActivity.class));
-        });
-
-        ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnPlayVideoUrl, v ->{
-            startActivity(new Intent(getContext(), PlayVideoUrlActivity.class));
-        });
-
-        ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnPlayAudioStream, v -> {
-            startActivity(new Intent(getContext(), PlayAudioStreamActivity.class));
-        });
+        ClickUtils.applyTouchEffect(binding.addPlaylistBtn, v -> startActivity(new Intent(getContext(), AddPlaylistActivity.class)));
+        ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnAddPlaylist, v -> startActivity(new Intent(getContext(), AddPlaylistActivity.class)));
+        ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnHowToAdd, v -> startActivity(new Intent(getContext(), AddPlaylistHelperActivity.class)));
+        ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnPlayVideoUrl, v -> startActivity(new Intent(getContext(), PlayVideoUrlActivity.class)));
+        ClickUtils.applyTouchEffect(binding.layoutHomeEmpty.btnPlayAudioStream, v -> startActivity(new Intent(getContext(), PlayAudioStreamActivity.class)));
 
         View overlay = view.findViewById(R.id.audioPlayerOverlay);
 

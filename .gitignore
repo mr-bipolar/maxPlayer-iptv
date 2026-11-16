@@ -40,3 +40,6 @@ captures/
 # OS generated files
 .DS_Store
 Thumbs.db
+# Generated release artifacts
+app/release/mapping.txt
+app/release/native-debug-symbols.zip

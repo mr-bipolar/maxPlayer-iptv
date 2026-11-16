@@ -11,6 +11,7 @@ import android.widget.AbsListView;
 
 import androidx.activity.ComponentActivity;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
@@ -258,11 +259,10 @@ public class RemoteKeyController implements RemoteInputManager.KeyListener {
                 && insets.isVisible(WindowInsetsCompat.Type.ime())) {
 
             WindowInsetsControllerCompat controller =
-                    ViewCompat.getWindowInsetsController(decorView);
+                    WindowCompat.getInsetsController(
+                            activity.getWindow(), decorView);
 
-            if (controller != null) {
-                controller.hide(WindowInsetsCompat.Type.ime());
-            }
+            controller.hide(WindowInsetsCompat.Type.ime());
 
             return;
         }

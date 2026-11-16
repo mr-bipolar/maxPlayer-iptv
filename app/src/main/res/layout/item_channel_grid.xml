@@ -1,0 +1,64 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_margin="@dimen/space_6"
+    android:gravity="center">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="@drawable/bg_card"
+        android:clipToOutline="true"
+        android:elevation="2dp">
+
+        <!-- Channel logo -->
+        <ImageView
+            android:id="@+id/channelGridIcon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="20dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_tv"
+            android:importantForAccessibility="no"
+            />
+
+        <!-- Top-right menu -->
+        <FrameLayout
+            android:id="@+id/channelStatus"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="8dp"
+            android:focusable="false"
+            android:visibility="invisible"
+            android:background="@drawable/active_bg_status">
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_check"
+                android:importantForAccessibility="no"
+                android:layout_gravity="center"
+                app:tint="@color/ink" />
+
+        </FrameLayout>
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/channelName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/channel_dazn"
+        android:textColor="@color/ink"
+        android:textSize="@dimen/text_caption_sm"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="7dp"
+        android:maxLines="1" />
+
+
+</LinearLayout>

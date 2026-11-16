@@ -43,7 +43,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
@@ -78,6 +78,7 @@ import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.SubtitleView;
 import androidx.media3.ui.TrackSelectionDialogBuilder;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -91,6 +92,7 @@ import com.aaronmaxlab.maxplayer.database.models.LocalDbHistory;
 import com.aaronmaxlab.maxplayer.databinding.ActivityPlayerBinding;
 import com.aaronmaxlab.maxplayer.player.mpv.MpvPlayerAdapter;
 import com.aaronmaxlab.maxplayer.playlist.PlaylistParser;
+import com.aaronmaxlab.maxplayer.playlist.PlaylistViewPreferences;
 import com.aaronmaxlab.maxplayer.playlist.SaveChannelDialog;
 import com.aaronmaxlab.maxplayer.playlist.adapter.PlaylistAdapter;
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistChannel;
@@ -161,14 +163,12 @@ public class PlayerActivity extends AppCompatActivity {
     private static final float[] MEDIA3_SUB_SCALE = {0.75f, 1f, 1.3f, 1.7f};
     private static final int[] ASPECT_LABELS = {R.string.mp_aspect_fit, R.string.mp_aspect_16_9,
             R.string.mp_aspect_4_3, R.string.mp_aspect_fill, R.string.mp_aspect_stretch};
-    private static final String PREFS = "player_prefs";
-    private static final String KEY_FAVORITES = "favorites";
+
 
     // ---- picture-in-picture remote actions
     private static final String ACTION_PIP = "com.aaronmaxlab.maxplayer.PIP_CONTROL";
     private static final String EXTRA_PIP_CMD = "pip_cmd";
     private static final int PIP_PLAY_PAUSE = 1, PIP_PREV = 2, PIP_NEXT = 3;
-    private static final String TAG = "Mobile-SDK";
 
     public static Intent forPlaylist(Context c, String m3uUrl) {
         return new Intent(c, PlayerActivity.class).putExtra(EXTRA_PLAYLIST_URL, m3uUrl);
@@ -354,16 +354,14 @@ public class PlayerActivity extends AppCompatActivity {
 
     private void setupBannerAd( BannerAdHelper bannerAdHelper ) {
         if (isTv) return;
-        AdMobManager.initialize(this, () -> {
-            runOnUiThread(() -> {
-                if (!isFinishing() && !isDestroyed()) {
-                    bannerAdHelper.load(
-                            this,
-                            AdConfig.ALL_CHANNELS_AD_UNIT_ID
-                    );
-                }
-            });
-        });
+        AdMobManager.initialize(this, () -> runOnUiThread(() -> {
+            if (!isFinishing() && !isDestroyed()) {
+                bannerAdHelper.load(
+                        this,
+                        AdConfig.ALL_CHANNELS_AD_UNIT_ID
+                );
+            }
+        }));
     }
 
 
@@ -809,8 +807,10 @@ public class PlayerActivity extends AppCompatActivity {
                         mpv.setStartPaused(false);
                         mpv.seekWhenLoaded(position);
                     } else {
-                        player.seekTo(position);
-                        player.play();
+                        if(player != null) {
+                            player.seekTo(position);
+                            player.play();
+                        }
                     }
                 })
                 .setNegativeButton("Start Over", (dialog, which) -> {
@@ -818,8 +818,10 @@ public class PlayerActivity extends AppCompatActivity {
                         mpv.setStartPaused(false);
                     }
 
+                    if(player != null){
                     player.seekTo(0);
                     player.play();
+                    }
                 })
                 .setCancelable(false)
                 .show();
@@ -1318,6 +1320,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void showTrackDialog(String title, int trackType) {
+        if(player == null) return;
         Dialog d = new TrackSelectionDialogBuilder(this, title, player, trackType)
                 .setTheme(R.style.PlayerDialogTheme)
                 .setShowDisableOption(trackType == C.TRACK_TYPE_TEXT)
@@ -1658,7 +1661,7 @@ public class PlayerActivity extends AppCompatActivity {
     // =====================================================================================
 
     private boolean isInPip() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode();
+        return isInPictureInPictureMode();
     }
 
     private boolean canEnterPip() {
@@ -1786,7 +1789,16 @@ public class PlayerActivity extends AppCompatActivity {
         showSearchBox = false;
 
         adapter = new PlaylistAdapter();
-        rvChannels.setLayoutManager(new LinearLayoutManager(this));
+
+        boolean gridMode = !isTv && PlaylistViewPreferences.isGridEnabled(this);
+
+        if (gridMode) {
+            rvChannels.setLayoutManager(new GridLayoutManager(this, 3));
+        } else {
+            rvChannels.setLayoutManager(new LinearLayoutManager(this));
+        }
+
+        adapter.setGridMode(gridMode);
         rvChannels.setAdapter(adapter);
         adapter.setChannels(playlistModel.channels);
         adapter.setPlayingPosition(currentChannelPosition);
@@ -1816,16 +1828,33 @@ public class PlayerActivity extends AppCompatActivity {
 
     private void styleSheetNavigationBar(BottomSheetDialog sheet) {
         Window window = sheet.getWindow();
+
         if (window != null) {
-            window.setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
+            WindowCompat.setDecorFitsSystemWindows(window, false);
+
+            WindowCompat.getInsetsController(
+                    window, window.getDecorView()
+            ).setAppearanceLightNavigationBars(false);
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 window.setNavigationBarContrastEnforced(false);
-                window.setNavigationBarDividerColor(Color.TRANSPARENT);
             }
-            WindowCompat.getInsetsController(window, window.getDecorView()).setAppearanceLightNavigationBars(false);
+
+            View decorView = window.getDecorView();
+
+            ViewCompat.setOnApplyWindowInsetsListener(decorView, (view, insets) -> {
+                view.setBackgroundColor(ContextCompat.getColor(this, R.color.black));
+                return insets;
+            });
+
+            ViewCompat.requestApplyInsets(decorView);
         }
+
         View s = sheet.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-        if (s != null) s.setBackgroundColor(Color.TRANSPARENT);
+
+        if (s != null) {
+            s.setBackgroundColor(Color.TRANSPARENT);
+        }
     }
 
     private void setupCategoryList(@Nullable LinearLayout categoryList) {

@@ -90,18 +90,17 @@ public class AddPlaylistActivity extends AppCompatActivity {
 
     }
 
+    // banner ad
     private void setupBannerAd( BannerAdHelper bannerAdHelper ) {
         if (isTv) return;
-        AdMobManager.initialize(this, () -> {
-            runOnUiThread(() -> {
-                if (!isFinishing() && !isDestroyed()) {
-                    bannerAdHelper.load(
-                            this,
-                            AdConfig.PLAYLIST_AD_UNIT_ID
-                    );
-                }
-            });
-        });
+        AdMobManager.initialize(this, () -> runOnUiThread(() -> {
+            if (!isFinishing() && !isDestroyed()) {
+                bannerAdHelper.load(
+                        this,
+                        AdConfig.PLAYLIST_AD_UNIT_ID
+                );
+            }
+        }));
     }
 
 

@@ -3,7 +3,6 @@ package com.aaronmaxlab.maxplayer;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,15 +17,16 @@ import android.widget.LinearLayout;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 
 import com.aaronmaxlab.maxplayer.categories.TvCategoriesActivity;
 import com.aaronmaxlab.maxplayer.channels.AllChannelsActivity;
@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "Mobile-SDK";
 
     private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
     private static final String PREFS_NAME = "AppPrefs";
     private static final String KEY_AD_SHOWN = "ad_shown";
     private AppOpenAd appOpenAd;
@@ -123,49 +122,47 @@ public class MainActivity extends AppCompatActivity {
             });
             bannerAdHelper = new BannerAdHelper(binding.bannerAd, binding.adView);
 
-            AdMobManager.initialize(this, () -> {
-                runOnUiThread(() -> {
-                    bannerAdHelper.load(this, AdConfig.BANNER_AD_UNIT_ID);
+            AdMobManager.initialize(this, () -> runOnUiThread(() -> {
+                bannerAdHelper.load(this, AdConfig.BANNER_AD_UNIT_ID);
 
-                    AdRequest adRequest = new AdRequest.Builder(AdConfig.APP_OPEN_AD_UNIT_ID).build();
-                    PreloadConfiguration preloadConfig = new PreloadConfiguration(adRequest);
-                    AppOpenAdPreloader.start(AdConfig.APP_OPEN_AD_UNIT_ID, preloadConfig);
+                AdRequest adRequest = new AdRequest.Builder(AdConfig.APP_OPEN_AD_UNIT_ID).build();
+                PreloadConfiguration preloadConfig = new PreloadConfiguration(adRequest);
+                AppOpenAdPreloader.start(AdConfig.APP_OPEN_AD_UNIT_ID, preloadConfig);
 
-                    // Interstitial preloader
-                    AdRequest videoAdRequest =
-                            new AdRequest.Builder(AdConfig.VIDEO_AD_UNIT_ID).build();
+                // Interstitial preloaded
+                AdRequest videoAdRequest =
+                        new AdRequest.Builder(AdConfig.VIDEO_AD_UNIT_ID).build();
 
-                    PreloadConfiguration videoPreloadConfig =
-                            new PreloadConfiguration(videoAdRequest);
+                PreloadConfiguration videoPreloadConfig =
+                        new PreloadConfiguration(videoAdRequest);
 
-                    InterstitialAdPreloader.start(AdConfig.VIDEO_AD_UNIT_ID, videoPreloadConfig);
+                InterstitialAdPreloader.start(AdConfig.VIDEO_AD_UNIT_ID, videoPreloadConfig);
 
-                    try {
-                        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-                        boolean isAdShows = sharedPreferences.getBoolean(KEY_AD_SHOWN, false);
-                        if (!isAdShows) {
+                try {
+                    sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                    boolean isAdShows = sharedPreferences.getBoolean(KEY_AD_SHOWN, false);
+                    if (!isAdShows) {
 
-                            AppOpenAd.load(adRequest, new AdLoadCallback<>() {
-                                @Override
-                                public void onAdFailedToLoad(@NonNull LoadAdError adError) {
-                                    AdLoadCallback.super.onAdFailedToLoad(adError);
-                                }
+                        AppOpenAd.load(adRequest, new AdLoadCallback<>() {
+                            @Override
+                            public void onAdFailedToLoad(@NonNull LoadAdError adError) {
+                                AdLoadCallback.super.onAdFailedToLoad(adError);
+                            }
 
-                                @Override
-                                public void onAdLoaded(AppOpenAd ad) {
-                                    AdLoadCallback.super.onAdLoaded(ad);
-                                    appOpenAd = ad;
-                                    pollAndShowAd();
-                                }
-                            });
+                            @Override
+                            public void onAdLoaded(AppOpenAd ad) {
+                                AdLoadCallback.super.onAdLoaded(ad);
+                                appOpenAd = ad;
+                                pollAndShowAd();
+                            }
+                        });
 
-                        }
-                    } catch (Exception e) {
-                        Log.d("Error", Objects.requireNonNull(e.getMessage()));
                     }
+                } catch (Exception e) {
+                    Log.d("Error", Objects.requireNonNull(e.getMessage()));
+                }
 
-                });
-            });
+            }));
 
             NavHostFragment navHost =
                     (NavHostFragment) getSupportFragmentManager()
@@ -231,6 +228,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override protected void onResume() {
         super.onResume();
+        UIUtils.setLightNavigationBars(this, false);
     }
 
     @Override protected void onDestroy() {
@@ -283,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
                 new GridLayoutManager(this, 3);
 
         rvChannels.setLayoutManager(layoutManager);
-        rvChannels.setHasFixedSize(true);
+        rvChannels.setHasFixedSize(false);
 
         channelAdapter.setGridMode(true);
         rvChannels.setAdapter(channelAdapter);
@@ -294,16 +292,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void styleSheetNavigationBar(BottomSheetDialog sheet) {
         Window window = sheet.getWindow();
+
         if (window != null) {
-            window.setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                window.setNavigationBarContrastEnforced(false);
-                window.setNavigationBarDividerColor(Color.TRANSPARENT);
-            }
-            WindowCompat.getInsetsController(window, window.getDecorView()).setAppearanceLightNavigationBars(false);
+            WindowCompat.setDecorFitsSystemWindows(window, false);
+            WindowInsetsControllerCompat controller =
+                    WindowCompat.getInsetsController(window, window.getDecorView());
+            controller.setAppearanceLightNavigationBars(false);
+            window.getDecorView().setBackgroundColor(Color.BLACK);
         }
-        View s = sheet.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-        if (s != null) s.setBackgroundColor(Color.TRANSPARENT);
+        View bottomSheet = sheet.findViewById(
+                com.google.android.material.R.id.design_bottom_sheet
+        );
+        if (bottomSheet != null) {
+            bottomSheet.setBackgroundColor(Color.TRANSPARENT);
+        }
     }
 
     private void setupChannelSearch(TextInputEditText view) {

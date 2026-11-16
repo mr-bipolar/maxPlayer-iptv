@@ -23,6 +23,7 @@ import com.aaronmaxlab.maxplayer.filepicker.MediaFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MediaFileAdapter
         extends ListAdapter<MediaFile, MediaFileAdapter.MediaViewHolder> {
@@ -45,8 +46,9 @@ public class MediaFileAdapter
 
                 @Override
                 public boolean areContentsTheSame(@NonNull MediaFile a, @NonNull MediaFile b) {
-                    // Implement equals() in MediaFile for a stricter check
-                    return a.getType() == b.getType() && a.getName().equals(b.getName());
+                    return a.getType().equals(b.getType())
+                            && a.getName().equals(b.getName())
+                            && Objects.equals(a.getUri(), b.getUri());
                 }
             };
 
