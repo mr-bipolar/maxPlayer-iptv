@@ -74,6 +74,10 @@ public class PlaylistAdapter
         }
     }
 
+    public int getPlayingPosition() {
+        return playingPosition;
+    }
+
     public interface OnChannelClickListener {
         void onChannelClick(PlaylistChannel channel, int position);
     }
