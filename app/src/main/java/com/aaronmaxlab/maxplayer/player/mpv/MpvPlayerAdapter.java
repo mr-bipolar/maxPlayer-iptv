@@ -688,6 +688,14 @@ public final class MpvPlayerAdapter extends SimpleBasePlayer {
         @Override public void onDurationChanged(double durationSeconds) { notifyChanged(); }
         @Override public void onSpeedChanged(double speed) { notifyChanged(); }
         @Override public void onTracksChanged(List<AudioTrackInfo> audio, List<SubtitleTrackInfo> subs) {
+            for (SubtitleTrackInfo sub : subs) {
+                Log.i(TAG, "Subtitle track:"
+                        + " id=" + sub.getId()
+                        + ", title=" + sub.getTitle()
+                        + ", language=" + sub.getLanguage()
+                        + ", selected=" + sub.isSelected());
+            }
+
             tracksDirty = true;
             notifyChanged();
         }

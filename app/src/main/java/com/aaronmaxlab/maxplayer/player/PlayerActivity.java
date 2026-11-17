@@ -108,6 +108,7 @@ import com.aaronmaxlab.maxplayer.ads.BannerAdHelper;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
 import com.aaronmaxlab.maxplayer.ads.InterstitialAdHelper;
+import com.aaronmaxlab.maxplayer.utils.GoogleDriveProxyServer;
 import com.aaronmaxlab.maxplayer.utils.PlaylistType;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -758,12 +759,13 @@ public class PlayerActivity extends AppCompatActivity {
 
         // Prepare the media without starting playback.
         player.pause();
-        player.setMediaItem(
-                new MediaItem.Builder()
-                        .setMediaId(streamUrl)
-                        .setUri(streamUrl)
-                        .build()
-        );
+//        player.setMediaItem(
+//                new MediaItem.Builder()
+//                        .setMediaId(streamUrl)
+//                        .setUri(streamUrl)
+//                        .build()
+//        );
+        player.setMediaItem(buildPlaybackMediaItem(streamUrl));
         player.prepare();
 
         // The dialog is shown when the media reaches STATE_READY.
@@ -902,6 +904,17 @@ public class PlayerActivity extends AppCompatActivity {
 
     }
 
+    private MediaItem buildPlaybackMediaItem(String originalUrl) {
+        String playbackUrl = GoogleDriveProxyServer
+                .getInstance()
+                .getPlaybackUrl(originalUrl);
+
+        return new MediaItem.Builder()
+                .setMediaId(originalUrl)
+                .setUri(playbackUrl)
+                .build();
+    }
+
     private void playStream(String url) {
         if (player == null || TextUtils.isEmpty(url)) return;
         currentUrl = url;
@@ -911,12 +924,15 @@ public class PlayerActivity extends AppCompatActivity {
             playerView.setPlayer(null);           // the surface may have been detached while the player was stopped
             playerView.setPlayer(player);         // -> audio without picture otherwise
         }
-        player.setMediaItem(new MediaItem.Builder().setMediaId(url).setUri(url).build());
+       // player.setMediaItem(new MediaItem.Builder().setMediaId(url).setUri(url).build());
+        player.setMediaItem(buildPlaybackMediaItem(url));
         player.prepare();
         player.play();
         ui.setFavorite(isFavorite(currentUrl));
 
     }
+
+
 
     /** The Media3 service player outlives the Activity: keep a healthy current item (rotation), replace a stale/failed one. */
     private void ensureStreamPlaying(String url) {
@@ -1409,8 +1425,14 @@ public class PlayerActivity extends AppCompatActivity {
                 .build();
         long position = player.isCurrentMediaItemLive() ? C.TIME_UNSET : player.getCurrentPosition();
         boolean playWhenReady = player.getPlayWhenReady();
-        player.setMediaItem(new MediaItem.Builder().setMediaId(currentUrl).setUri(currentUrl)
-                .setSubtitleConfigurations(ImmutableList.of(subtitle)).build(), position);
+//        player.setMediaItem(new MediaItem.Builder().setMediaId(currentUrl).setUri(currentUrl)
+//                .setSubtitleConfigurations(ImmutableList.of(subtitle)).build(), position);
+        MediaItem mediaItem = buildPlaybackMediaItem(currentUrl)
+                .buildUpon()
+                .setSubtitleConfigurations(ImmutableList.of(subtitle))
+                .build();
+
+        player.setMediaItem(mediaItem, position);
         player.prepare();
         player.setPlayWhenReady(playWhenReady);
         AppToast.success(this, "Subtitle added");
