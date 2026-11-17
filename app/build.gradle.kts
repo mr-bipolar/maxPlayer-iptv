@@ -16,8 +16,8 @@ android {
         applicationId = "com.aaronmaxlab.maxplayer"
         minSdk = 24
         targetSdk = 37
-        versionCode = 8026
-        versionName = "3.6"
+        versionCode = 8027
+        versionName = "3.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
