@@ -265,6 +265,8 @@ public class PlayerActivity extends AppCompatActivity {
     private boolean showSearchBox = false;
     private String selectedCategory = CATEGORY_ALL;
     private String searchQuery = "";
+    private RecyclerView channelsRecyclerView;
+    private View nowPlayingButton;
 
     // ---- static categories
     private static final List<String> IPTV_CATEGORIES = AppUtils.showCategories();
@@ -759,12 +761,6 @@ public class PlayerActivity extends AppCompatActivity {
 
         // Prepare the media without starting playback.
         player.pause();
-//        player.setMediaItem(
-//                new MediaItem.Builder()
-//                        .setMediaId(streamUrl)
-//                        .setUri(streamUrl)
-//                        .build()
-//        );
         player.setMediaItem(buildPlaybackMediaItem(streamUrl));
         player.prepare();
 
@@ -924,7 +920,6 @@ public class PlayerActivity extends AppCompatActivity {
             playerView.setPlayer(null);           // the surface may have been detached while the player was stopped
             playerView.setPlayer(player);         // -> audio without picture otherwise
         }
-       // player.setMediaItem(new MediaItem.Builder().setMediaId(url).setUri(url).build());
         player.setMediaItem(buildPlaybackMediaItem(url));
         player.prepare();
         player.play();
@@ -1425,8 +1420,6 @@ public class PlayerActivity extends AppCompatActivity {
                 .build();
         long position = player.isCurrentMediaItemLive() ? C.TIME_UNSET : player.getCurrentPosition();
         boolean playWhenReady = player.getPlayWhenReady();
-//        player.setMediaItem(new MediaItem.Builder().setMediaId(currentUrl).setUri(currentUrl)
-//                .setSubtitleConfigurations(ImmutableList.of(subtitle)).build(), position);
         MediaItem mediaItem = buildPlaybackMediaItem(currentUrl)
                 .buildUpon()
                 .setSubtitleConfigurations(ImmutableList.of(subtitle))
@@ -1803,8 +1796,12 @@ public class PlayerActivity extends AppCompatActivity {
 
         BottomSheetDialog sheet = new BottomSheetDialog(this);
         sheet.setContentView(R.layout.playlist_drawer);
+
         RecyclerView rvChannels = sheet.findViewById(R.id.rvChannels);
         if (rvChannels == null) return;
+
+        channelsRecyclerView = rvChannels;
+        nowPlayingButton = sheet.findViewById(R.id.btnNowPlaying);
 
         selectedCategory = CATEGORY_ALL;
         searchQuery = "";
@@ -1825,6 +1822,28 @@ public class PlayerActivity extends AppCompatActivity {
         adapter.setChannels(playlistModel.channels);
         adapter.setPlayingPosition(currentChannelPosition);
 
+        // Scroll to the currently playing channel when requested.
+        if (nowPlayingButton != null) {
+            nowPlayingButton.setOnClickListener(v -> {
+                if (adapter == null || channelsRecyclerView == null) return;
+
+                int position = adapter.getPlayingPosition();
+
+                if (position != RecyclerView.NO_POSITION) {
+                    channelsRecyclerView.smoothScrollToPosition(position);
+                }
+            });
+        }
+
+        // Update button visibility whenever the list scrolls.
+        rvChannels.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView,
+                                   int dx, int dy) {
+                updateNowPlayingButton();
+            }
+        });
+
         TextView topLabel = sheet.findViewById(R.id.topLabelView);
         if (topLabel != null) {
             topLabel.setText(getString(R.string.drawer_header,
@@ -1836,8 +1855,56 @@ public class PlayerActivity extends AppCompatActivity {
         adapter.setOnChannelClickListener((channel, position) -> onChannelSelected(channel, sheet));
         ui.setAutoHideBlocked(true);
         sheet.setOnShowListener(d -> styleSheetNavigationBar(sheet));
-        sheet.setOnDismissListener(d -> { adapter = null; if (ui != null) ui.setAutoHideBlocked(false); });
+        sheet.setOnDismissListener(d -> {
+            adapter = null;
+            channelsRecyclerView = null;
+            nowPlayingButton = null;
+
+            if (ui != null) {
+                ui.setAutoHideBlocked(false);
+            }
+        });
         sheet.show();
+        rvChannels.post(this::updateNowPlayingButton);
+    }
+
+    private void updateNowPlayingButton() {
+        if (channelsRecyclerView == null ||
+                nowPlayingButton == null ||
+                adapter == null) {
+            return;
+        }
+
+        int playingPosition = adapter.getPlayingPosition();
+
+        // Playing channel is not present in the filtered list.
+        if (playingPosition == RecyclerView.NO_POSITION) {
+            nowPlayingButton.setVisibility(View.GONE);
+            return;
+        }
+
+        RecyclerView.LayoutManager layoutManager =
+                channelsRecyclerView.getLayoutManager();
+
+        if (!(layoutManager instanceof LinearLayoutManager)) {
+            nowPlayingButton.setVisibility(View.GONE);
+            return;
+        }
+
+        LinearLayoutManager manager =
+                (LinearLayoutManager) layoutManager;
+
+        int firstVisible = manager.findFirstVisibleItemPosition();
+        int lastVisible = manager.findLastVisibleItemPosition();
+
+        boolean isVisible =
+                firstVisible != RecyclerView.NO_POSITION &&
+                        playingPosition >= firstVisible &&
+                        playingPosition <= lastVisible;
+
+        nowPlayingButton.setVisibility(
+                isVisible ? View.GONE : View.VISIBLE
+        );
     }
 
 
@@ -1994,10 +2061,23 @@ public class PlayerActivity extends AppCompatActivity {
                     || (channel.name != null && channel.name.toLowerCase(Locale.ROOT).contains(query));
             if (matchesCategory && matchesSearch) filtered.add(channel);
         }
+
         adapter.setChannels(filtered);
 
-        int playingIndex = filtered.indexOf(playlistModel.channels.get(currentChannelPosition));
-        if (playingIndex >= 0) adapter.setPlayingPosition(playingIndex);
+        int playingIndex = RecyclerView.NO_POSITION;
+
+        if (currentChannelPosition >= 0 &&
+                currentChannelPosition < playlistModel.channels.size()) {
+            PlaylistChannel playingChannel = playlistModel.channels.get(currentChannelPosition);
+            playingIndex = filtered.indexOf(playingChannel);
+        }
+
+        adapter.setPlayingPosition(playingIndex);
+
+        // Recheck after the filtered list has been laid out.
+        if (channelsRecyclerView != null) {
+            channelsRecyclerView.post(this::updateNowPlayingButton);
+        }
     }
 
     private int dp(int value) {
