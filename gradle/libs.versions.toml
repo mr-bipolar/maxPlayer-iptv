@@ -19,6 +19,7 @@ zxingEmbedded = "4.3.0"
 adsMobileSdk = "1.6.0"
 splashScreen = "1.2.0"
 okhttp = "4.12.0"
+robolectric = "4.17"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -47,6 +48,7 @@ zxing-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", v
 ads-sdk = { group = "com.google.android.libraries.ads.mobile.sdk", name = "ads-mobile-sdk", version.ref = "adsMobileSdk" }
 splash-screen = {group ="androidx.core", name = "core-splashscreen", version.ref = "splashScreen"}
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 
 
 [plugins]

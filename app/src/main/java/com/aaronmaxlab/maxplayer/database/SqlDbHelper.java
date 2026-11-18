@@ -1144,15 +1144,31 @@ public class SqlDbHelper extends SQLiteOpenHelper {
 
     // ============================================
     // Database functions channel
+    private static String normalizeChannelUrl(String url) {
+        if (url == null) return null;
+        String normalized = url.trim();
+        return normalized.isEmpty() ? null : normalized;
+    }
+
+    private static String normalizeChannelImage(String image) {
+        if (image == null || image.trim().isEmpty()) return null;
+        return image;
+    }
+
     public boolean addChannel(LocalDbChannel dbChannel) {
+        if (dbChannel == null) return false;
+
+        String url = normalizeChannelUrl(dbChannel.getChannelUrl());
+        if (url == null) return false;
+
         SQLiteDatabase database = this.getWritableDatabase();
 
         try {
             ContentValues values = new ContentValues();
 
             values.put(COL_CHANNEL_NAME, dbChannel.getChannelName());
-            values.put(COL_CHANNEL_IMAGE, dbChannel.getChannelImage());
-            values.put(COL_CHANNEL_URL, dbChannel.getChannelUrl());
+            values.put(COL_CHANNEL_IMAGE, normalizeChannelImage(dbChannel.getChannelImage()));
+            values.put(COL_CHANNEL_URL, url);
             values.put(COL_CATEGORY, dbChannel.getChannelCategory());
 
             database.beginTransaction();
@@ -1229,6 +1245,13 @@ public class SqlDbHelper extends SQLiteOpenHelper {
             return false;
         }
 
+        String newUrl = normalizeChannelUrl(dbChannel.getChannelUrl());
+        if (newUrl == null) return false;
+
+        String requestedImage = dbChannel.getChannelImage();
+        boolean hasImageReplacement = requestedImage != null;
+        String normalizedImage = normalizeChannelImage(requestedImage);
+
         SQLiteDatabase database = this.getWritableDatabase();
 
         try {
@@ -1248,8 +1271,8 @@ public class SqlDbHelper extends SQLiteOpenHelper {
 
             ContentValues values = new ContentValues();
             values.put(COL_CHANNEL_NAME, dbChannel.getChannelName());
-            values.put(COL_CHANNEL_IMAGE, dbChannel.getChannelImage());
-            values.put(COL_CHANNEL_URL, dbChannel.getChannelUrl());
+            if (hasImageReplacement) values.put(COL_CHANNEL_IMAGE, normalizedImage);
+            values.put(COL_CHANNEL_URL, newUrl);
             values.put(COL_CATEGORY, dbChannel.getChannelCategory());
 
             int result = database.update(
@@ -1269,20 +1292,22 @@ public class SqlDbHelper extends SQLiteOpenHelper {
             }
 
             if (oldUrl != null && !oldUrl.trim().isEmpty()) {
-                String newUrl = dbChannel.getChannelUrl() != null ? dbChannel.getChannelUrl().trim() : null;
                 String newName = dbChannel.getChannelName();
-                String newImg = dbChannel.getChannelImage();
 
                 ContentValues favCv = new ContentValues();
                 if (newName != null) favCv.put(COL_FAVORITE_NAME, newName);
-                if (newUrl != null && !newUrl.isEmpty()) favCv.put(COL_FAVORITE_URL, newUrl);
-                if (newImg != null) favCv.put(COL_FAVORITE_ICON, newImg);
+                favCv.put(COL_FAVORITE_URL, newUrl);
+                if (hasImageReplacement && normalizedImage != null) {
+                    favCv.put(COL_FAVORITE_ICON, normalizedImage);
+                }
                 database.update(TABLE_FAVORITES, favCv, COL_FAVORITE_URL + " = ?", new String[]{oldUrl.trim()});
 
                 ContentValues histCv = new ContentValues();
                 if (newName != null) histCv.put(COL_HISTORY_NAME, newName);
-                if (newUrl != null && !newUrl.isEmpty()) histCv.put(COL_HISTORY_URL, newUrl);
-                if (newImg != null) histCv.put(COL_HISTORY_ICON, newImg);
+                histCv.put(COL_HISTORY_URL, newUrl);
+                if (hasImageReplacement && normalizedImage != null) {
+                    histCv.put(COL_HISTORY_ICON, normalizedImage);
+                }
                 database.update(TABLE_HISTORY, histCv, COL_HISTORY_URL + " = ?", new String[]{oldUrl.trim()});
             }
 
