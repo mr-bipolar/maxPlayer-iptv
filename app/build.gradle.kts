@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.zxing.embedded)
     implementation(libs.ads.sdk)
     implementation(libs.splash.screen)
+    implementation(libs.okhttp)
     implementation(files("libs/mpvengine-release.aar"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)

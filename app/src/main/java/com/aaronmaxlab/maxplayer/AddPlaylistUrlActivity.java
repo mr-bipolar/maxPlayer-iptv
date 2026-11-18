@@ -24,7 +24,6 @@ import com.aaronmaxlab.maxplayer.remote.RemoteInputController;
 import com.aaronmaxlab.maxplayer.utils.AppToast;
 import com.aaronmaxlab.maxplayer.utils.ClickUtils;
 import com.aaronmaxlab.maxplayer.utils.DeviceUtils;
-import com.aaronmaxlab.maxplayer.utils.Playlist;
 import com.aaronmaxlab.maxplayer.utils.PlaylistType;
 import com.aaronmaxlab.maxplayer.utils.UIUtils;
 import com.aaronmaxlab.maxplayer.utils.UrlUtils;
@@ -141,7 +140,6 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
         executor.execute(() -> {
             try {
                 PlaylistInfo info = PlaylistParser.parseRemoteUrl(url, fileName);
-                Playlist.loadRemoteMetadata(url, info);  // populate name and size into 'info'
                 runOnUiThread(() -> onLoaded(url, info));
             } catch (Exception e) {
                 runOnUiThread(() -> onLoadFailed(e));

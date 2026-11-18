@@ -7,10 +7,6 @@ import android.provider.OpenableColumns;
 
 import com.aaronmaxlab.maxplayer.playlist.models.PlaylistInfo;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
 import java.util.Locale;
 
 public class Playlist {
@@ -56,48 +52,6 @@ public class Playlist {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    // remote
-    public static void loadRemoteMetadata(
-            String url,
-            PlaylistInfo info
-    ) throws IOException {
-
-        HttpURLConnection connection = null;
-
-        try {
-            URL remoteUrl = URI.create(url).toURL();
-
-            connection = (HttpURLConnection) remoteUrl.openConnection();
-            connection.setRequestMethod("HEAD");
-            connection.setConnectTimeout(10000);
-            connection.setReadTimeout(10000);
-            connection.setInstanceFollowRedirects(true);
-
-            connection.connect();
-
-            long size = connection.getContentLengthLong();
-
-            if (size >= 0) {
-                info.fileSize = size;
-            }
-
-            String path = remoteUrl.getPath();
-
-            if (path != null && !path.isEmpty() && info.fileName.isEmpty()) {
-                String fileName = path.substring(path.lastIndexOf('/') + 1);
-
-                if (!fileName.isEmpty()) {
-                    info.fileName = fileName;
-                }
-            }
-
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
         }
     }
 
