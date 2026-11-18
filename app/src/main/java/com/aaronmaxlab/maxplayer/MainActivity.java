@@ -373,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
             editor.putBoolean(KEY_AD_SHOWN, true);
             editor.apply();
         } catch (Exception e) {
-            Log.d(TAG, Objects.requireNonNull(e.getMessage()));
+            Log.d(TAG, "Ad mark as shows error", e);
         }
     }
 

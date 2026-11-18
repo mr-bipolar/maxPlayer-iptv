@@ -36,7 +36,7 @@ public final class GoogleDriveProxyServer {
     private int port;
 
     private GoogleDriveProxyServer() {
-        startServer();
+        // do not start here
     }
 
     public static GoogleDriveProxyServer getInstance() {
@@ -48,6 +48,11 @@ public final class GoogleDriveProxyServer {
             }
         }
         return instance;
+    }
+
+    private synchronized void ensureStarted() {
+        if (serverSocket != null) return;
+        startServer();
     }
 
     private void startServer() {
@@ -87,6 +92,13 @@ public final class GoogleDriveProxyServer {
 
         String fileId = extractFileId(originalUrl);
         if (fileId == null) return originalUrl;
+
+        try {
+            ensureStarted();
+        } catch (IllegalStateException e) {
+            Log.w(TAG, "Proxy unavailable; using original URL", e);
+            return originalUrl;
+        }
 
         return "http://127.0.0.1:" + port
                 + "/" + routeToken + "/drive/" + fileId;
@@ -129,6 +141,12 @@ public final class GoogleDriveProxyServer {
         return null;
     }
 
+    private boolean validHost(String host) {
+        return host != null
+                && (host.equalsIgnoreCase("127.0.0.1:" + port)
+                || host.equalsIgnoreCase("localhost:" + port));
+    }
+
     private void handleClient(Socket client) {
         try (Socket socket = client) {
             socket.setSoTimeout(30000);
@@ -149,6 +167,7 @@ public final class GoogleDriveProxyServer {
                 return;
             }
 
+            String host = null;
             String method = request[0].toUpperCase(Locale.ROOT);
             String path = request[1];
 
@@ -165,6 +184,13 @@ public final class GoogleDriveProxyServer {
 
                 if ("Range".equalsIgnoreCase(name)) range = value;
                 if ("If-Range".equalsIgnoreCase(name)) ifRange = value;
+                if ("Host".equalsIgnoreCase(name)) host = value;
+
+            }
+
+            if (!validHost(host)) {
+                writeError(socket, 403, "Forbidden");
+                return;
             }
 
             String prefix = "/" + routeToken + "/drive/";

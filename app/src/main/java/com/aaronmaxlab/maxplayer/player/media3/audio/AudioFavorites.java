@@ -20,7 +20,7 @@ final class AudioFavorites {
            SqlDbHelper sqlDbHelper = new SqlDbHelper(c);
            return  sqlDbHelper.isFavorite(uri);
        } catch (Exception e) {
-           Log.e("AUDIO", Objects.requireNonNull(e.getMessage()));
+           Log.e("AUDIO", "Is favorite error", e);
            return  false;
        }
     }
@@ -33,7 +33,7 @@ final class AudioFavorites {
 
             return sqlDbHelper.setFavorite(favorites);
         } catch (Exception e) {
-            Log.e("AUDIO", Objects.requireNonNull(e.getMessage()));
+            Log.e("AUDIO", "toggle check error", e);
             return  false;
         }
 
