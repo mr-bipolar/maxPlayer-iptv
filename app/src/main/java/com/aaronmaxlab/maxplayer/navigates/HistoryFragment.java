@@ -104,8 +104,6 @@ public class HistoryFragment extends Fragment {
             } else if (type.contains(PlaylistType.VOD.name())) {
 
             networkExecutor.execute(() -> {
-                boolean reachable = UrlUtils.isStreamReachable(url);
-                boolean isStream = reachable && UrlUtils.isMediaStreamUrl(url);
 
                 mainHandler.post(() -> {
                     if (!isAdded()) {
@@ -120,7 +118,7 @@ public class HistoryFragment extends Fragment {
                             requireContext(),
                             url,
                             item.getHistoryName(),
-                            isStream,
+                            null,
                             savedPosition
                     ));
                 });
@@ -129,8 +127,6 @@ public class HistoryFragment extends Fragment {
         } else if (type.contains(PlaylistType.LIVE.name())) {
 
             networkExecutor.execute(() -> {
-                boolean reachable = UrlUtils.isStreamReachable(url);
-                boolean isStream = reachable && UrlUtils.isMediaStreamUrl(url);
 
                 mainHandler.post(() -> {
                     if (!isAdded()) {
@@ -141,7 +137,7 @@ public class HistoryFragment extends Fragment {
                             requireContext(),
                             url,
                             item.getHistoryName(),
-                            isStream
+                            true
                     ));
                 });
             });

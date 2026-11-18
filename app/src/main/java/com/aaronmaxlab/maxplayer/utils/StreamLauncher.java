@@ -37,7 +37,6 @@ public final class StreamLauncher {
             return;
         }
 
-        Context appContext = context.getApplicationContext();
 
         EXECUTOR.execute(() -> {
 
@@ -53,7 +52,7 @@ public final class StreamLauncher {
                         context,
                         url,
                         title,
-                        isStream,
+                        live != null ? live : isStream,
                         position
                 );
 

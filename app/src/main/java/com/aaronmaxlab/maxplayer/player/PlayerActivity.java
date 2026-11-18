@@ -496,7 +496,6 @@ public class PlayerActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        AppToast.info(this, "destroy called");
         final boolean owner = active == this;
         if (owner) active = null;
         unregisterPipReceiver();
@@ -569,7 +568,7 @@ public class PlayerActivity extends AppCompatActivity {
             );
             dbHelper.saveHistory(dbHistory);
         } catch (Exception e) {
-            Log.e("HISTORY", Objects.requireNonNull(e.getMessage()));
+            Log.e("HISTORY", "Failed to save history", e);
         }
     }
 

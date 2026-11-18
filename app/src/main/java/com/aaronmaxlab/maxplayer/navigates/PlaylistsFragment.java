@@ -163,7 +163,7 @@ public class PlaylistsFragment extends Fragment {
 
             recyclerView.setAdapter(categoryAdapter);
         } catch (Exception e) {
-            Log.e("CATEGORY", Objects.requireNonNull(e.getMessage()));
+            Log.e("CATEGORY", "Category set up error", e);
         }
     }
 

@@ -82,8 +82,7 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
         setChecking(true);
         ioExecutor.execute(() -> {
             boolean reachable = UrlUtils.isStreamReachable(videoUrl);
-            boolean isStream = reachable && UrlUtils.isMediaStreamUrl(videoUrl);
-            runOnUiThread(() -> onReachabilityResult(reachable, isStream, videoUrl, videoName, true));
+            runOnUiThread(() -> onReachabilityResult(reachable, videoUrl, videoName, true));
         });
     }
 
@@ -106,7 +105,6 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
 
     private void onReachabilityResult(
             boolean reachable,
-            boolean isStream,
             String url,
             String name,
             boolean saveRecentView) {
@@ -121,7 +119,7 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
             return;
         }
 
-        startActivity(PlayerActivity.forStream(this, url, name, isStream));
+        startActivity(PlayerActivity.forStream(this, url, name, null));
         LoaderAnimator.stopLoader(loader);
 
         if (saveRecentView) {
@@ -164,7 +162,6 @@ public class PlayVideoUrlActivity extends AppCompatActivity {
                             runOnUiThread(() ->
                                     onReachabilityResult(
                                             reachable,
-                                            isStream,
                                             url,
                                             name,
                                             false

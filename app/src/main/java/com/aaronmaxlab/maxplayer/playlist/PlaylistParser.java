@@ -20,6 +20,9 @@ import java.util.regex.Pattern;
 
 public final class PlaylistParser {
 
+    private static final int MAX_PLAYLIST_BYTES = 5 * 1024 * 1024;
+    private static final int MAX_CHANNELS = 10_000;
+
     private static final Pattern GROUP_TITLE = Pattern.compile(
             "group-title\\s*=\\s*\"([^\"]*)\"",
             Pattern.CASE_INSENSITIVE
@@ -43,13 +46,13 @@ public final class PlaylistParser {
         boolean m3uMime = mime.contains("mpegurl");
         boolean m3uExt = lower.endsWith(".m3u") || lower.endsWith(".m3u8");
 
-        // 1) a plain media file (not a playlist)
+        // a plain media file (not a playlist)
         if (!m3uExt && !m3uMime
                 && (MediaTypes.isMedia(lower) || mime.startsWith("video/") || mime.startsWith("audio/"))) {
             return LocalKind.MEDIA_FILE;
         }
 
-        // 2) look inside: playlist or HLS stream
+        // look inside: playlist or HLS stream
         try (InputStream input = resolver.openInputStream(uri)) {
             if (input == null) return LocalKind.UNSUPPORTED;
             try (BufferedReader reader = new BufferedReader(
@@ -60,7 +63,7 @@ public final class PlaylistParser {
                 int guard = 0;
                 while ((line = reader.readLine()) != null && guard++ < 5000) {
                     line = line.trim();
-                    if (line.startsWith("\\uFEFF")) line = line.substring(1).trim();   // BOM
+                    line = stripBom(line);
                     if (line.isEmpty()) continue;
 
                     if (first) {
@@ -76,6 +79,14 @@ public final class PlaylistParser {
             return LocalKind.UNSUPPORTED;
         }
         return LocalKind.UNSUPPORTED;   // m3u without #EXTINF entries
+    }
+
+    private static String stripBom(String line) {
+        if (line == null) return null;
+
+        return !line.isEmpty() && line.charAt(0) == '\uFEFF'
+                ? line.substring(1).trim()
+                : line;
     }
 
 
@@ -245,6 +256,7 @@ public final class PlaylistParser {
                 String pendingName = null;
                 String pendingCategory = "";
                 String pendingLogo = "";
+                long bytes = 0;
 
                 Pattern logoPattern = Pattern.compile(
                         "tvg-logo\\s*=\\s*\"([^\"]*)\"",
@@ -252,18 +264,21 @@ public final class PlaylistParser {
                 );
 
                 while ((line = reader.readLine()) != null) {
+                    bytes += line.length() + 1L;
+
+                    if (bytes > MAX_PLAYLIST_BYTES) {throw new IOException("Playlist too large");}
+
                     line = line.trim();
 
-                    if (line.isEmpty()) {
-                        continue;
-                    }
-
-                    if (line.startsWith("#EXT-X-")) {
-                        isHls = true;
-                    }
+                    if (line.isEmpty()) {continue;}
+                    if (line.startsWith("#EXT-X-")) {isHls = true;}
 
                     if (line.startsWith("#EXTINF:")) {
                         entries++;
+
+                        if (entries > MAX_CHANNELS) {
+                            throw new IOException("Too many channels in playlist");
+                        }
 
                         int comma = line.indexOf(',');
                         pendingName = comma >= 0

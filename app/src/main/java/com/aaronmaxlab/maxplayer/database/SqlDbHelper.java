@@ -740,9 +740,10 @@ public class SqlDbHelper extends SQLiteOpenHelper {
 
     // ============================================
     // Database functions recent views
-
-    public void setRecentViews(LocalDbRecentView recentViews){
+    // ============================================
+    public void setRecentViews(LocalDbRecentView recentViews) {
         try (SQLiteDatabase database = this.getWritableDatabase()) {
+
             ContentValues cv = new ContentValues();
 
             cv.put(COL_CHANNEL_NAME, recentViews.getChannelName());
@@ -751,18 +752,33 @@ public class SqlDbHelper extends SQLiteOpenHelper {
             cv.put(COL_CREATED_AT, System.currentTimeMillis());
             cv.put(COL_ICON, recentViews.getChannelIcon());
 
-            long result = database.insertWithOnConflict(
+            String where = COL_CHANNEL_URL + "=?";
+            String[] args = {recentViews.getChannelUrl()};
+
+            int updated = database.update(
                     TABLE_RECENT_VIEWS,
-                    null,
                     cv,
-                    SQLiteDatabase.CONFLICT_IGNORE
+                    where,
+                    args
             );
 
-            if(result != -1){
-                Log.e("LOCAL_DB", "Recent view error.");
-            }else{
-                Log.e("LOCAL_DB", "Recent view updated.");
+            if (updated > 0) {
+                Log.d("LOCAL_DB", "Recent view updated.");
+            } else {
+                long result = database.insert(
+                        TABLE_RECENT_VIEWS,
+                        null,
+                        cv
+                );
+
+                if (result != -1) {
+                    Log.d("LOCAL_DB", "Recent view inserted.");
+                } else {
+                    Log.e("LOCAL_DB", "Recent view insert failed.");
+                }
             }
+        } catch (Exception e) {
+            Log.e("LOCAL_DB", "Recent view error.", e);
         }
     }
 
@@ -1046,7 +1062,7 @@ public class SqlDbHelper extends SQLiteOpenHelper {
                         cursor.getString(tagIndex),
                         cursor.getString(urlIndex),
                         cursor.getString(iconIndex),
-                        PlaylistType.valueOf(cursor.getString(typeIndex)),
+                        PlaylistType.fromDisplayName(cursor.getString(typeIndex)),
                         cursor.getLong(positionIndex),
                         cursor.getLong(durationIndex),
                         cursor.getLong(createdAtIndex)

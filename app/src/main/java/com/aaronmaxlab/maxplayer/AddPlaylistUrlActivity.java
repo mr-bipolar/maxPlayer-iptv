@@ -98,6 +98,23 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
     }
 
 
+    private void syncFavoriteUi(String url, boolean showToast) {
+        boolean isFav = sqlDbHelper.isFavorite(url);
+
+        if (showToast) {
+            AppToast.success(this, isFav
+                    ? "Added to favorites."
+                    : "Removed from favorites.");
+        }
+
+        if(binding.btnFavorite != null) {
+            binding.btnFavorite.setImageResource(isFav
+                    ? androidx.media3.session.R.drawable.media3_icon_star_filled
+                    : androidx.media3.session.R.drawable.media3_icon_star_unfilled);
+        }
+    }
+
+
     // Actions
     private void onAddPlaylistClicked() {
         String url = String.valueOf(binding.inputPlaylistUrl.getText()).trim();
@@ -166,8 +183,8 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
             binding.playlistAddedCatCount.setText(String.valueOf(info.categoryNames.size()));
             binding.statesLabel.setVisibility(VISIBLE);
             binding.successCard.setVisibility(VISIBLE);
-            // check favorites
-            isFavItem(loadedPlaylistUrl);
+            // set UI
+            syncFavoriteUi(loadedPlaylistUrl, false);
             // add playlist
             addPlaylist(info, url);
             // add history
@@ -190,25 +207,14 @@ public class AddPlaylistUrlActivity extends AppCompatActivity {
         binding.btnAddPlaylistCall.setEnabled(true);
     }
 
-    private void isFavItem(String url){
-        boolean isFav = sqlDbHelper.isFavorite(url);
-            if (isFav) {AppToast.success(this, "Added to favorites.");}
-            else {AppToast.success(this, "Removed from favorites.");}
-        // Update heart icon
-        if(binding.btnFavorite == null) return;
-        binding.btnFavorite.setImageResource(
-                isFav ? androidx.media3.session.R.drawable.media3_icon_star_filled : androidx.media3.session.R.drawable.media3_icon_star_unfilled
-        );
-    }
-
 
     private  void onAddFavorite(){
         try {if(favorites == null) { return;}
             boolean result = sqlDbHelper.setFavorite(favorites);
-            if (result) {isFavItem(favorites.getFavUrl());}
+            if (result) syncFavoriteUi(favorites.getFavUrl(), true);
         } catch (Exception e) {
             AppToast.error(this, e.getMessage());
-            Log.e("FAV", Objects.requireNonNull(e.getMessage()));
+            Log.e("FAV", "Add favorite error", e);
         }
     }
 

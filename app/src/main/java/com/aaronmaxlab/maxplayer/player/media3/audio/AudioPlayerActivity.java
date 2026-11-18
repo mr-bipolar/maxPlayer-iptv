@@ -181,7 +181,7 @@ public class AudioPlayerActivity extends AppCompatActivity {
             sqlDbHelper.saveHistory(history);
 
         } catch (Exception e) {
-            Log.e("HISTORY", Objects.requireNonNull(e.getMessage()));
+            Log.e("HISTORY", "Failed to save history", e);
         }finally {
             sqlDbHelper.close();
         }
