@@ -18,6 +18,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
@@ -162,6 +163,118 @@ public class SqlDbHelperPlaylistChannelTest extends DatabaseTestBase {
 
         assertFalse(helper.isFavorite(url));
         assertFalse(helper.isHistoryExists(url));
+    }
+
+    @Test
+    public void addChannelRejectsMissingUrlsAndNormalizesValues() {
+        int liveTvIndex = AppUtils.getCategoryIndex("Live TV");
+
+        assertFalse(helper.addChannel(new LocalDbChannel("Null", null, null, liveTvIndex)));
+        assertFalse(helper.addChannel(new LocalDbChannel("Empty", null, "", liveTvIndex)));
+        assertFalse(helper.addChannel(new LocalDbChannel("Blank", null, "   ", liveTvIndex)));
+        assertTrue(helper.getChannels(null).isEmpty());
+        assertEquals(0, categoryCount("Live TV"));
+
+        assertTrue(helper.addChannel(new LocalDbChannel(
+                "Trimmed", "   ", "  http://channel/trimmed  ", liveTvIndex)));
+
+        LocalDbChannel stored = helper.getChannels(null).get(0);
+        assertEquals("http://channel/trimmed", stored.getChannelUrl());
+        assertNull(stored.getChannelImage());
+        assertEquals(1, categoryCount("Live TV"));
+
+        assertFalse(helper.addChannel(new LocalDbChannel(
+                "Duplicate", null, "http://channel/trimmed", liveTvIndex)));
+        assertEquals(1, helper.getChannels(null).size());
+    }
+
+    @Test
+    public void updateChannelRejectsMissingUrlsAndLeavesRowUnchanged() {
+        int liveTvIndex = AppUtils.getCategoryIndex("Live TV");
+        assertTrue(helper.addChannel(new LocalDbChannel(
+                "Original", "logo", "http://channel/original", liveTvIndex)));
+        int id = helper.getChannels(null).get(0).getId();
+
+        assertFalse(helper.updateChannel(
+                new LocalDbChannel(id, "Changed", "logo2", null, liveTvIndex), liveTvIndex));
+        assertFalse(helper.updateChannel(
+                new LocalDbChannel(id, "Changed", "logo2", "", liveTvIndex), liveTvIndex));
+        assertFalse(helper.updateChannel(
+                new LocalDbChannel(id, "Changed", "logo2", "   ", liveTvIndex), liveTvIndex));
+
+        LocalDbChannel stored = helper.getChannels(null).get(0);
+        assertEquals("Original", stored.getChannelName());
+        assertEquals("logo", stored.getChannelImage());
+        assertEquals("http://channel/original", stored.getChannelUrl());
+        assertEquals(1, categoryCount("Live TV"));
+    }
+
+    @Test
+    public void updateChannelTrimsUrlAndPropagatesToFavoritesAndHistory() {
+        int sportsIndex = AppUtils.getCategoryIndex("Sports");
+        String oldUrl = "http://channel/old";
+        assertTrue(helper.addChannel(new LocalDbChannel("Old", "logo", oldUrl, sportsIndex)));
+        assertTrue(helper.setFavorite(new LocalDbFavorites(
+                "Old Fav", "tag", oldUrl, "old-fav-icon", PlaylistType.LIVE)));
+        helper.saveHistory(new LocalDbHistory(
+                "Old History", "tag", oldUrl, "old-hist-icon", PlaylistType.LIVE, 0L, 0L));
+
+        int id = helper.getChannels(null).get(0).getId();
+        assertTrue(helper.updateChannel(
+                new LocalDbChannel(id, "New", "new-logo", "  http://channel/new  ", sportsIndex),
+                sportsIndex));
+
+        LocalDbChannel updated = helper.getChannels(null).get(0);
+        assertEquals("http://channel/new", updated.getChannelUrl());
+        assertEquals("new-logo", updated.getChannelImage());
+        assertEquals("http://channel/new", helper.getAllFavorites().get(0).getFavUrl());
+        assertEquals("new-logo", helper.getAllFavorites().get(0).getFavIcon());
+        assertEquals("http://channel/new", helper.getAllHistory().get(0).getHistoryUrl());
+        assertEquals("new-logo", helper.getAllHistory().get(0).getHistoryIcon());
+    }
+
+    @Test
+    public void updateChannelPreservesImageWhenNoReplacementSupplied() {
+        int liveTvIndex = AppUtils.getCategoryIndex("Live TV");
+        String oldUrl = "http://channel/keep";
+        assertTrue(helper.addChannel(new LocalDbChannel("Keep", "keep-logo", oldUrl, liveTvIndex)));
+        assertTrue(helper.setFavorite(new LocalDbFavorites(
+                "Keep Fav", "tag", oldUrl, "keep-fav-icon", PlaylistType.LIVE)));
+        helper.saveHistory(new LocalDbHistory(
+                "Keep History", "tag", oldUrl, "keep-hist-icon", PlaylistType.LIVE, 0L, 0L));
+
+        int id = helper.getChannels(null).get(0).getId();
+        assertTrue(helper.updateChannel(
+                new LocalDbChannel(id, "Renamed", null, "http://channel/keep-2", liveTvIndex),
+                liveTvIndex));
+
+        LocalDbChannel updated = helper.getChannels(null).get(0);
+        assertEquals("http://channel/keep-2", updated.getChannelUrl());
+        assertEquals("keep-logo", updated.getChannelImage());
+        assertEquals("http://channel/keep-2", helper.getAllFavorites().get(0).getFavUrl());
+        assertEquals("keep-fav-icon", helper.getAllFavorites().get(0).getFavIcon());
+        assertEquals("http://channel/keep-2", helper.getAllHistory().get(0).getHistoryUrl());
+        assertEquals("keep-hist-icon", helper.getAllHistory().get(0).getHistoryIcon());
+    }
+
+    @Test
+    public void updateChannelNormalizesBlankImageAndPreservesRelatedIcons() {
+        int liveTvIndex = AppUtils.getCategoryIndex("Live TV");
+        String oldUrl = "http://channel/clear";
+        assertTrue(helper.addChannel(new LocalDbChannel("Clear", "old-logo", oldUrl, liveTvIndex)));
+        assertTrue(helper.setFavorite(new LocalDbFavorites(
+                "Clear Fav", "tag", oldUrl, "fav-icon", PlaylistType.LIVE)));
+        helper.saveHistory(new LocalDbHistory(
+                "Clear History", "tag", oldUrl, "hist-icon", PlaylistType.LIVE, 0L, 0L));
+
+        int id = helper.getChannels(null).get(0).getId();
+        assertTrue(helper.updateChannel(
+                new LocalDbChannel(id, "Clear", "   ", "http://channel/clear-2", liveTvIndex),
+                liveTvIndex));
+
+        assertNull(helper.getChannels(null).get(0).getChannelImage());
+        assertEquals("fav-icon", helper.getAllFavorites().get(0).getFavIcon());
+        assertEquals("hist-icon", helper.getAllHistory().get(0).getHistoryIcon());
     }
 
     private int categoryCount(String name) {
