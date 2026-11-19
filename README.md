@@ -72,6 +72,12 @@ MaxPlayer is a media player application. It does not provide, host, bundle, or s
 
 ## License & Third-Party Notices
 
+MaxPlayer is free and open-source software licensed under the GNU General Public License v3.0 or later (GPL-3.0-or-later).
+
+You are free to use, study, modify, and redistribute the software under the terms of this license.
+
+See the [LICENSE](LICENSE) file for the full license text.
+
 MaxPlayer incorporates third-party software and native components. Each dependency may have its own license and redistribution requirements.
 
-This repository does not currently include a top-level `LICENSE` or `NOTICE` file. Please review the relevant upstream licenses and notices — including the [MPV Android Engine repository](https://github.com/mr-bipolar/mpv-android-engine) — before using, modifying, or redistributing this project or its bundled components.
+Third-party components remain subject to their respective licenses and copyright notices. Please review the relevant license files and notices — including the [MPV Android Engine repository](https://github.com/mr-bipolar/mpv-android-engine) — before using, modifying, or redistributing this project or its bundled components.
