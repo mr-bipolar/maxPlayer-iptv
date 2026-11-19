@@ -14,6 +14,24 @@ MaxPlayer is an open-source media player for Android phones, tablets, and Androi
 
 For complete project information, screenshots, features, downloads, support, and updates, visit the official website.
 
+## Developer Documentation
+
+- [Building and installing](docs/BUILDING.md) — environment setup, Gradle build, APK output, and installation.
+- [Testing](docs/TESTING.md) — database, playlist parser, security, and full local test commands.
+- [Platform support](docs/PLATFORM_SUPPORT.md) — Android versions, ABIs, and Android TV support.
+- [Contributing](CONTRIBUTING.md) — workflow, coding conventions, commits, and pull requests.
+
+Quick start after installing the Android SDK components listed in the [building guide](docs/BUILDING.md):
+
+```bash
+git clone https://github.com/mr-bipolar/maxPlayer-iptv.git
+cd maxPlayer-iptv
+./gradlew :app:assembleDebug
+./gradlew :app:test
+```
+
+The debug APK is written to `app/build/outputs/apk/debug/app-debug.apk`. On Windows, use `gradlew.bat` instead of `./gradlew`.
+
 ## Playback Engines
 
 MaxPlayer supports two playback engines:
@@ -56,4 +74,4 @@ MaxPlayer is a media player application. It does not provide, host, bundle, or s
 
 MaxPlayer incorporates third-party software and native components. Each dependency may have its own license and redistribution requirements.
 
-Please review the relevant license files and notices before using, modifying, or redistributing this project or its bundled components.
+This repository does not currently include a top-level `LICENSE` or `NOTICE` file. Please review the relevant upstream licenses and notices — including the [MPV Android Engine repository](https://github.com/mr-bipolar/mpv-android-engine) — before using, modifying, or redistributing this project or its bundled components.
