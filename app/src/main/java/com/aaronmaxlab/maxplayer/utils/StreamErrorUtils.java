@@ -1,12 +1,13 @@
 package com.aaronmaxlab.maxplayer.utils;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Build;
 import android.view.View;
 import android.view.Window;
 
 import androidx.annotation.Nullable;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.aaronmaxlab.maxplayer.R;
 
@@ -28,8 +29,10 @@ public final class StreamErrorUtils {
         overlay.setVisibility(View.VISIBLE);
 
         Window window = activity.getWindow();
-        window.setNavigationBarColor(Color.BLACK);
-        window.setStatusBarColor(Color.BLACK);
+        WindowInsetsControllerCompat controller =
+                WindowCompat.getInsetsController(window, window.getDecorView());
+        controller.setAppearanceLightStatusBars(false);
+        controller.setAppearanceLightNavigationBars(false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.setNavigationBarContrastEnforced(false);
         }
