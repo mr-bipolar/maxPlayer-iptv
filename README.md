@@ -8,6 +8,15 @@
 
 MaxPlayer is an open-source media player for Android phones, tablets, and Android TV. It brings live TV, movies, series, playlists, and audio streaming together in one application, with a choice of playback engines.
 
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=com.aaronmaxlab.maxplayer">
+    <img
+      src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+      alt="Get it on Google Play"
+      height="80">
+  </a>
+</p>
+
 ## Project Website
 
 **[Visit the MaxPlayer Website](https://mr-bipolar.github.io/maxplayer-website/index.html)**
