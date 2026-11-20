@@ -54,7 +54,6 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Enable edge-to-edge layout
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         EdgeToEdge.enable(this);
 
         // Inflate splash layout
