@@ -13,6 +13,7 @@ import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -179,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
             setupNavItem(bottomBar, R.id.navHistory, navController, R.id.navHistory);
 
             if(bottomBar.findViewById(R.id.btnChannels) != null){
-                ClickUtils.applyTouchEffect(bottomBar.findViewById(R.id.btnChannels), v -> showChannelsBottomSheet());
+                ClickUtils.applyTouchEffect(bottomBar.findViewById(R.id.btnChannels), v -> showChannelsBottomSheet(navController));
             }
 
             navController.addOnDestinationChangedListener(
@@ -241,15 +242,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void  showChannelsBottomSheet(){
+    private void  showChannelsBottomSheet(NavController navController){
         BottomSheetDialog sheet = new BottomSheetDialog(this);
         sheet.setContentView(R.layout.search_drawer);
         RecyclerView rvChannels = sheet.findViewById(R.id.channelsRecyclerView);
+        ScrollView emptyView = sheet.findViewById(R.id.emptySearch);
+        LinearLayout browseBtn = sheet.findViewById(R.id.browsePlaylists);
         if (rvChannels == null) return;
 
         setupChannelSearch(Objects.requireNonNull(sheet.findViewById(R.id.ChannelSearch)));
 
         List<LocalDbChannel> channels = sqlDbHelper.getChannels(null);
+
+        if(emptyView != null && browseBtn != null){
+            rvChannels.setVisibility(channels.isEmpty() ? View.GONE : View.VISIBLE);
+            emptyView.setVisibility(channels.isEmpty() ? View.VISIBLE : View.GONE);
+            ClickUtils.applyTouchEffect(browseBtn, v -> {
+                navController.navigate(R.id.navPlaylists);
+                sheet.dismiss();
+            });
+        }
 
         channelAdapter = new LocalDbChannelAdapter(
                 this,
